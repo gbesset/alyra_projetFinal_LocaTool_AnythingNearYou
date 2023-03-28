@@ -16,8 +16,8 @@ export const Hero = () => {
                     <Text className="text-white" pl="3rem" pt="1rem">
                         Pour cela rien de plus simple, Mettez le à disposition et louez le
                     </Text>
-                    <Center pt="5rem">
-                      <Button align="center" variant='solid' colorScheme='blue'>C'est parti</Button>
+                    <Center pt="2rem">
+                      <Button align="center" variant='solid' colorScheme='blue'>C'est parti !</Button>
                     </Center>
                 </Box>
                 <Box flex="1" >

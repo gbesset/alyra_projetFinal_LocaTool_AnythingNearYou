@@ -17,6 +17,7 @@ export const Home = () => {
         <>
         <Hero/>
 
+        <br/>
         <Service/>
 
         <br/>
