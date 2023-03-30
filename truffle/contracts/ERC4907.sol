@@ -15,13 +15,8 @@ contract ERC4907 is ERC721URIStorage, IERC4907 {
 
     mapping (uint256  => UserInfo) internal _users;
 
+
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) { }
-
-
-    // Event when the owner of a NFT delegate NFT to a new user or updates expires
-    /// @dev Emitted when the owner of an NFT change the expires or the user.
-    event UpdateDelegation(uint256 indexed tokenId, address indexed user, uint64 expires);
-
 
     ///beforeTransferToken hook (safeTransferFrom, tansferFrom, approve, setApprovalForAll)
     /// @dev delete delegation and emit event
@@ -33,6 +28,11 @@ contract ERC4907 is ERC721URIStorage, IERC4907 {
             emit UpdateDelegation(tokenId, address(0), 0);
         }
     }
+
+
+    // Event when the owner of a NFT delegate NFT to a new user or updates expires
+    /// @dev Emitted when the owner of an NFT change the expires or the user.
+    event UpdateDelegation(uint256 indexed tokenId, address indexed user, uint64 expires);
 
 
     /// @notice set the user and expires of an NFT

@@ -115,17 +115,25 @@ interface IAnyRental {
      /**
      * @dev Create a new NFT collection
      */
-    function createCollection() external returns(address collectionCreated);
+    function createCollection(string memory collectionName) external returns(address collectionCreated);
 
     // Delete collection
     
     /**
+     * @notice  
      * @dev get collection from renter Address
      */
-    function getCollection(address renter) external returns(Utils.Tool[] memory);
+     function getCollection(address renter) external returns(Utils.Tool[] memory);
+     function getCollectionAddress(address renter) external view returns(address);
+     //function getCollections()external view returns(Utils.Tool[] memory){
 
     
-    // AddToolToCollection
+    /**
+     * @dev add a tool to collection . onlyRenter
+     */
+     //function addToolToCollection(Utils.Tool memory, string memory _tokenURI) external returns(uint tokenId);    
+     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description )external returns(uint tokenId);    
+
     // UpdateToolIntoCollection ?
     // DeleteToolIntoCollection
     // getCollectionTools

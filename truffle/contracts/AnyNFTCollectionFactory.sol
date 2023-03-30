@@ -21,9 +21,9 @@ contract AnyNFTCollectionFactory is Ownable{
 
     
    function createNFTCollection(address renter, string memory _renterCollectionName, string memory _renterCollectionSymbol) external onlyOneCollectionByRenter returns (address collectionAddress) {
-        require(keccak256(abi.encode(_renterCollectionName)) != keccak256(abi.encode("")), "Collection name can't be empty");
-        require(keccak256(abi.encode(_renterCollectionSymbol)) != keccak256(abi.encode("")), "Collection symbol can't be empty");
-
+        require(!Utils.isEqualString(_renterCollectionName,""), "collection name can't be empty");
+        require(!Utils.isEqualString(_renterCollectionSymbol,""), "collection symbol can't be empty");
+        
        AnyNFTCollection collection = new AnyNFTCollection(_renterCollectionName, _renterCollectionSymbol, renter);
        _rentersCollection[renter]=address(collection);
 

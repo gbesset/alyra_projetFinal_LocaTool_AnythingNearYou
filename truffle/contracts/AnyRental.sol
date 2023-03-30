@@ -6,18 +6,27 @@ import "./AnyNFTCollectionFactory.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "./Utils.sol";
 
+
+/**
+ * @title Rental Any  contract 
+ * @author https://github.com/gbesset
+ * @notice contract to generate NFT of tool to locate, and manage the rental
+ * @dev Implements NFT gneration, and rental process
+ */
 contract AnyRental is Ownable, IAnyRental{
 
     AnyNFTCollectionFactory public factory;
 
-    // Rentals : a user rent some tools
+    // mapping of  a user address to the rented tools
     mapping (address => Rental[]) private rentals;
+    uint256 public constant MAX_TOOLS = 100;
 
-    //renter : for an address => NFT collection Address
+    // mapping of a renter address to the NFT Collection address
     mapping (address => address) private rentersCollection;
 
 
     constructor(){
+        // Instantiate and deploy NFT Factory
         factory = new AnyNFTCollectionFactory();
     }
 
@@ -28,6 +37,7 @@ contract AnyRental is Ownable, IAnyRental{
     *   Modifiers 
     *********************************************** */
 
+//TODO ????
     /// @dev check that a a renter can create only one collection and is no address 0
     modifier onlyOneCollectionByRenter() {
         require(msg.sender != address(0), "address zero is not valid");
@@ -36,30 +46,55 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
     
-   function createNFTCollection(string memory _renterCollectionName, string memory _renterCollectionSymbol) external onlyOneCollectionByRenter returns (address collectionAddress) {
-        require(keccak256(abi.encode(_renterCollectionName)) != keccak256(abi.encode("")), "Collection name can't be empty");
-        require(keccak256(abi.encode(_renterCollectionSymbol)) != keccak256(abi.encode("")), "Collection symbol can't be empty");
+    /**
+     * @notice Create the NFT Collection of a renter
+     * @return collectionCreated : colletion address deployed
+     */
+    function createCollection(string memory collectionName) external returns(address collectionCreated){
+        require(msg.sender != address(0), "address zero is not valid");
+        require(rentersCollection[msg.sender]==address(0), "You already have created your collection");
+        require(!Utils.isEqualString(collectionName,""), "collection name can't be empty");
 
-       AnyNFTCollection collection = new AnyNFTCollection(_renterCollectionName, _renterCollectionSymbol, msg.sender);
-       _rentersCollection[msg.sender]=address(collection);
+        address collectionCreated = factory.createNFTCollection(msg.sender, collectionName,"AnyNFT");
+        rentersCollection[msg.sender]=collectionCreated;
 
-        //Could use transferOwnerShip but want to differentiate the roles
-        // maybee need owner methods to manage collections
-        //collection.transferOwnership(msg.sender);
+        emit NFTCollectionCreated(msg.sender, "Any Collection" , collectionCreated, block.timestamp);
+        return collectionCreated;
+    }
 
-       emit NFTCollectionCreated(msg.sender, _renterCollectionName, collectionAddress, block.timestamp);
+
+  /**
+     * @dev get collection from renter Address
+     */
+    function getCollection(address renter) external view returns(Utils.Tool[] memory){
+        //return factory._rentersCollection().tools();
+        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[renter]);
+        return collec.getTools();
+    }
+
+    function getCollectionAddress(address renter) external view returns(address){
+        return rentersCollection[renter];
+    }
+
+    function getCollections()external view returns(Utils.Tool[] memory){
+        // pour toutes les addresses
+        // concatener les collections
+        // renvoyer l'ensemble
+        //ou en js appeler les differentes collections pour les addresses..?
+    }
+
+
+    //function addToolToCollection(Utils.Tool memory _tool, string memory _tokenURI ) external returns(uint tokenId){
+    function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external returns(uint tokenId){
+        require(rentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
         
-        return address(collection);
+        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[msg.sender]);
+        //uint256 tokenID = collec.mint(_tokenURI, _tool.serialID, _tool.title, _tool.description);
+        uint256 tokenID = collec.mint(_tokenURI, _serialId, _title, _description, msg.sender);
+
+        emit NFTToolAddedToCollection(msg.sender, rentersCollection[msg.sender], tokenID, block.timestamp);
+        return tokenID;
     }
-
-
-    function getRenterNFTCollection(address _address) public view returns (address) {
-        //pour le moment address
-        //return NFTCollection.getUserNFT(_address);
-    }
-
-*/
-
 
   
 }
