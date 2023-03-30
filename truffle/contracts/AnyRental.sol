@@ -1,21 +1,37 @@
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "./AnyNFTCollection.sol";
+import "./IAnyRental.sol";
+import "./AnyNFTCollectionFactory.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "./Utils.sol";
 
-contract AnyNFTCollectionFactory is Ownable{
+contract AnyRental is Ownable, IAnyRental{
+
+    AnyNFTCollectionFactory public factory;
+
+    // Rentals : a user rent some tools
+    mapping (address => Rental[]) private rentals;
+
+    //renter : for an address => NFT collection Address
+    mapping (address => address) private rentersCollection;
 
 
-    /// @dev define renter address => collection address
-    mapping (address => address) public _rentersCollection;
+    constructor(){
+        factory = new AnyNFTCollectionFactory();
+    }
 
-    event NFTCollectionCreated(address renter, string renterCollectionName, address renterCollectionAddress, uint timestamp);
-    
-    
-    /// @dev check thata a renter can create only one collection and is no address 0
+
+
+ /*  
+    /* ***********************************************
+    *   Modifiers 
+    *********************************************** */
+
+    /// @dev check that a a renter can create only one collection and is no address 0
     modifier onlyOneCollectionByRenter() {
         require(msg.sender != address(0), "address zero is not valid");
-        require(_rentersCollection[msg.sender]==address(0), "You already have created your collection");
+        require(rentersCollection[msg.sender]==address(0), "You already have created your collection");
         _;
     }
 
@@ -37,7 +53,13 @@ contract AnyNFTCollectionFactory is Ownable{
     }
 
 
-    /*
-      owner method in case of trouble on collections
-    */
+    function getRenterNFTCollection(address _address) public view returns (address) {
+        //pour le moment address
+        //return NFTCollection.getUserNFT(_address);
+    }
+
+*/
+
+
+  
 }

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol"; 
 import "./IERC4907.sol";
 
 /// @author https://github.com/gbesset based on EIP-4907 https://eips.ethereum.org/EIPS/eip-4907
-contract ERC4907 is ERC721, IERC4907 {
+contract ERC4907 is ERC721URIStorage, IERC4907 {
 
     struct UserInfo 
     {
@@ -17,6 +17,12 @@ contract ERC4907 is ERC721, IERC4907 {
 
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) { }
 
+
+    // Event when the owner of a NFT delegate NFT to a new user or updates expires
+    /// @dev Emitted when the owner of an NFT change the expires or the user.
+    event UpdateDelegation(uint256 indexed tokenId, address indexed user, uint64 expires);
+
+
     ///beforeTransferToken hook (safeTransferFrom, tansferFrom, approve, setApprovalForAll)
     /// @dev delete delegation and emit event
     function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize) internal virtual override{
@@ -27,11 +33,6 @@ contract ERC4907 is ERC721, IERC4907 {
             emit UpdateDelegation(tokenId, address(0), 0);
         }
     }
-
-
-    // Event when the owner of a NFT delegate NFT to a new user or updates expires
-    /// @dev Emitted when the owner of an NFT change the expires or the user.
-    event UpdateDelegation(uint256 indexed tokenId, address indexed user, uint64 expires);
 
 
     /// @notice set the user and expires of an NFT
