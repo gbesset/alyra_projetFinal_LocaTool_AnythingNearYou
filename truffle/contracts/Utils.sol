@@ -4,9 +4,11 @@ pragma solidity 0.8.19;
 library Utils {
 
     struct Tool {
+        uint tokenID;
         uint serialID;
         string title;
         string description;
+        string tokenURI;
         bool isAvailable; //???
     }
 

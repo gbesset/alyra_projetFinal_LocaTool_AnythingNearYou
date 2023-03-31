@@ -7,7 +7,7 @@ import "./AnyNFTCollection.sol";
 //import "./AnyNFTCollectionFactory.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "./Utils.sol";
-
+import "../node_modules/@ganache/console.log/console.sol";
 
 /**
  * @title Rental Any  contract 
@@ -21,11 +21,16 @@ contract AnyRental is Ownable, IAnyRental{
 
     // mapping of  a user address to the rented tools
     mapping (address => Rental[]) private rentals;
-    uint256 public constant MAX_TOOLS = 100;
+
 
     // mapping of a renter address to the NFT Collection address
     mapping (address => address) private rentersCollection;
 
+ // mapping of  a user address to the rented tools
+    mapping (address => uint) private rentersNFTNb;
+    uint256 public constant MAX_TOOLS = 3;
+
+//manque le user ce qui a loué
 
     constructor(){
         // Instantiate and deploy NFT Factory
@@ -33,19 +38,18 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
 
-
  /*  
     /* ***********************************************
     *   Modifiers 
     *********************************************** */
 
-//TODO ????
-    /// @dev check that a a renter can create only one collection and is no address 0
-    modifier onlyOneCollectionByRenter() {
-        require(msg.sender != address(0), "address zero is not valid");
-        require(rentersCollection[msg.sender]==address(0), "You already have created your collection");
+    /**
+    * @dev Only renter can call
+    *//*
+    modifier onlyRenter(address _from) {
+        require(renter == _from, "You are not the renter of that collection.");
         _;
-    }
+    }*/
 
     /**
      * @notice Create the NFT Collection of a renter
@@ -57,12 +61,11 @@ contract AnyRental is Ownable, IAnyRental{
         require(!Utils.isEqualString(_collectionName,""), "collection name can't be empty");
 
         AnyNFTCollection collectionCreated  = new AnyNFTCollection(_collectionName, "ANY", msg.sender);
-        rentersCollection[msg.sender]=address(collectionCreated);
+        rentersCollection[msg.sender] = address(collectionCreated);
 
-        emit NFTCollectionCreated(msg.sender, "Any Collection" , address(collectionCreated), block.timestamp);
+        emit NFTCollectionCreated(msg.sender, _collectionName , address(collectionCreated), block.timestamp);
         return address(collectionCreated);
     }
-
 
   /**
      * @dev get collection from renter Address
@@ -87,12 +90,13 @@ contract AnyRental is Ownable, IAnyRental{
 
     //function addToolToCollection(Utils.Tool memory _tool, string memory _tokenURI ) external returns(uint tokenId){
     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external returns(uint tokenId){
-        require(rentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
+        require(rentersCollection[msg.sender]!=address(0), "You don't have any collection");
+        require(rentersNFTNb[msg.sender] < MAX_TOOLS, "Maximum number of tools reached");
         
         IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[msg.sender]);
-        //uint256 tokenID = collec.mint(_tokenURI, _tool.serialID, _tool.title, _tool.description);
         uint256 tokenID = collec.mint(_tokenURI, _serialId, _title, _description, msg.sender);
 
+        rentersNFTNb[msg.sender]=tokenID;
         emit NFTToolAddedToCollection(msg.sender, rentersCollection[msg.sender], tokenID, block.timestamp);
         return tokenID;
     }

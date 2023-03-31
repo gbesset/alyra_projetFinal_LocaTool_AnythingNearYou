@@ -3,7 +3,6 @@ pragma solidity 0.8.19;
 
 import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol"; 
 import "./IERC4907.sol";
-import "../node_modules/@ganache/console.log/console.sol";
 
 /// @author https://github.com/gbesset based on EIP-4907 https://eips.ethereum.org/EIPS/eip-4907
 contract ERC4907 is ERC721URIStorage, IERC4907 {
