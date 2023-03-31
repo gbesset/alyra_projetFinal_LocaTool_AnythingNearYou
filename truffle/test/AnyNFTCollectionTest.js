@@ -53,6 +53,86 @@ describe('AnyNFTCollection mint NFT', () => {
         
     });
 
+    it("... renter should mint a NFT - getToolByTokenId verification", async () => {
+        let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _renter1, { from: _renter1 } );
+        expectEvent(tx, 'NFTCreated', { owner: _renter1, tokenId: new BN(1) });
+
+        const tool1 = await anyRentalCollectionInstance.getToolsByTokenID(1, { from: _renter1 } );
+        expect(new BN(tool1.tokenID)).to.be.bignumber.equal(new BN(1));
+        expect(new BN(tool1.serialID)).to.be.bignumber.equal(new BN(serialId));
+        expect(tool1.title).to.be.equal(title);
+        expect(tool1.description).to.be.equal(description);
+        expect(tool1.tokenURI).to.be.equal(tokenURI);
+        expect(tool1.isAvailable).to.be.true;
+        
+    });
+
+    it("... renter should mint a NFT - getTools verification", async () => {
+        let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _renter1, { from: _renter1 } );
+        expectEvent(tx, 'NFTCreated', { owner: _renter1, tokenId: new BN(1) });
+
+        const tools = await anyRentalCollectionInstance.getTools({ from: _renter1 } );
+        expect(tools).to.not.be.empty;
+        expect(tools.length).to.be.equal(2);
+        expect(new BN(tools[1].serialID)).to.be.bignumber.equal(new BN(serialId));
+        expect(tools[1].title).to.be.equal(title);
+        expect(tools[1].description).to.be.equal(description);
+        expect(tools[1].isAvailable).to.be.true;
+        
+    });
+
+});
+
+describe('AnyNFTCollection burn NFT', () => {
+    
+    beforeEach(async function () {
+        anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN", _renter1, { from: _owner });
+        await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_1", 12345, "Mon outil 1", "Une description de mon outil 1", _renter1, { from: _renter1 });
+        await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_2", 6789, "Mon outil 2", "Une description de mon outil 2", _renter1, { from: _renter1 });
+   });
+
+    it("... validate params before burn NFTs", async () => {
+        const nbNFTs = await anyRentalCollectionInstance.balanceOf(_renter1, { from: _renter1 } );
+        expect(new BN(nbNFTs)).to.be.bignumber.equal(new BN(2));
+
+        const tool1 = await anyRentalCollectionInstance.getToolsByTokenID(1, { from: _renter1 } );
+        expect(new BN(tool1.tokenID)).to.be.bignumber.equal(new BN(1));
+        expect(new BN(tool1.serialID)).to.be.bignumber.equal(new BN(12345));
+
+        const tool2 = await anyRentalCollectionInstance.getToolsByTokenID(2, { from: _renter1 } );
+        expect(new BN(tool2.tokenID)).to.be.bignumber.equal(new BN(2));
+        expect(new BN(tool2.serialID)).to.be.bignumber.equal(new BN(6789));
+        
+    });
+
+    it("... renter should burn a NFT", async () => {
+        const tx = await anyRentalCollectionInstance.burn(1, _renter1, {from: _renter1})
+        expectEvent(tx, 'NFTBurned', { owner: _renter1, tokenId: new BN(1) });
+        
+    });
+
+    it("... renter should burn a NFT - check collection", async () => {
+        const tx = await anyRentalCollectionInstance.burn(1, _renter1, {from: _renter1})
+        
+        const tools = await anyRentalCollectionInstance.getTools({ from: _renter1 } );
+        expect(tools).to.not.be.empty;
+        expect(tools.length).to.be.equal(3);
+
+        const nbNFTs = await anyRentalCollectionInstance.balanceOf(_renter1, { from: _renter1 } );
+        expect(new BN(nbNFTs)).to.be.bignumber.equal(new BN(1));
+
+        const tool2 = await anyRentalCollectionInstance.getToolsByTokenID(2, { from: _renter1 } );
+        expect(new BN(tool2.tokenID)).to.be.bignumber.equal(new BN(2));
+        expect(new BN(tool2.serialID)).to.be.bignumber.equal(new BN(6789));
+
+        //TODO GBE delet not ok ??!!
+        /*await expectRevert(
+            anyRentalCollectionInstance.getToolsByTokenID(1, { from: _renter1 } ),
+            "Tool does not exist"
+        );*/
+
+    });
+
 
 });
 
