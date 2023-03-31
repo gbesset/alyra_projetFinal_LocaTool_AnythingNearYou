@@ -1,6 +1,6 @@
 const AnyNFTCollection = artifacts.require('./AnyNFTCollection.sol');
 
-const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { BN, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 
 
@@ -55,6 +55,58 @@ describe('AnyNFTCollection mint NFT', () => {
 
 
 });
+
+describe('AnyNFTCollection delegate NFT', () => {
+
+
+    beforeEach(async function () {
+         // new instance each time : new() not deploy().
+         anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN", _renter1, { from: _owner });
+         await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_1", 12345, "Mon outil 1", "Une description de mon outil 1", _renter1, { from: _renter1 });
+         await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_2", 12345, "Mon outil 2", "Une description de mon outil 2", _renter1, { from: _renter1 });
+    });
+
+    it("... renter should delegate a NFT", async () => {
+        const tokenID = 1;
+        const expires = Math.floor(new Date().getTime()/1000) + 120;
+        let tx = await anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _renter1, { from: _renter1 } );
+        expectEvent(tx, 'UpdateDelegation', { tokenId: new BN(tokenID), user: _renter2, expires: new BN(expires) });
+        
+    });
+
+    it("... non renter can't delegate a NFT", async () => {
+        const tokenID = 1;
+        const expires = Math.floor(new Date().getTime()/1000) + 120;
+        await expectRevert(
+            anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _renter1, { from: _renter2 }),
+            "ERC4907: transfer caller is not owner nor approved"
+        );
+    });
+
+    it("... renter should delegate a NFT - check delegation to user 0x -> renter2 -> 0x after period duration", async () => {
+        const tokenID = 1;
+        const expires = Math.floor(new Date().getTime()/1000) + 1000;
+
+        let delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter1});
+        expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");
+
+
+        let tx = await anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _renter1, { from: _renter1 } );
+        expectEvent(tx, 'UpdateDelegation', { tokenId: new BN(tokenID), user: _renter2, expires: new BN(expires) });
+
+        delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter1});
+        expect(delegatedAddress).to.be.equal(_renter2);
+        
+        //Expires the delegation duration
+        await time.increase(5000) ;
+
+        delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter1});
+        expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");
+    });
+
+
+});
+
 
 
 });
