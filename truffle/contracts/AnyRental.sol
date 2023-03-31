@@ -49,17 +49,18 @@ contract AnyRental is Ownable, IAnyRental{
 
     /**
     * @dev Only renter can call
-    *//*
-    modifier onlyRenter(address _from) {
-        require(renter == _from, "You are not the renter of that collection.");
+    */
+
+    modifier onlyRenter() {
+        require(rentersCollection[msg.sender].owner==msg.sender, "You are not the renter of the collection");
         _;
-    }*/
+    }
 
     /**
      * @notice Create the NFT Collection of a renter
      * @return collectionCreated : colletion address deployed
      */
-    function createCollection(string memory _collectionName) external returns(address collectionCreated){
+    function createCollection(string memory _collectionName) external returns(address){
         require(msg.sender != address(0), "address zero is not valid");
         require(rentersCollection[msg.sender].collection==address(0), "You already have created your collection");
         require(!Utils.isEqualString(_collectionName,""), "collection name can't be empty");
@@ -69,6 +70,7 @@ contract AnyRental is Ownable, IAnyRental{
         rentersCollection[msg.sender].owner =  msg.sender;
 
         emit NFTCollectionCreated(msg.sender, _collectionName , address(collectionCreated), block.timestamp);
+        collectionCreated.transferOwnership(msg.sender);
         return address(collectionCreated);
     }
 
@@ -124,11 +126,13 @@ contract AnyRental is Ownable, IAnyRental{
      * @dev delegate the NFT to a user . onlyRenter
      */
     function delegateNFT(uint _tokenId, address _to, uint64 _expires) external {
-        require(rentersCollection[msg.sender].collection!=address(0), "No NFT collection for this user");
+        require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
+        require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");
+
         
         //Si pas de approve passer par I
          AnyNFTCollection collec = AnyNFTCollection(rentersCollection[msg.sender].collection);
- 
+        
         //collec.approve(msg.sender, _tokenId);
          collec.rentTool(_tokenId, _to, _expires, msg.sender);
 

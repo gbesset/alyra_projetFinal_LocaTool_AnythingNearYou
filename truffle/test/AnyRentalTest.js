@@ -1,6 +1,6 @@
 const AnyRental = artifacts.require('./AnyRental.sol');
+const AnyNFTCollection = artifacts.require('./AnyNFTCollection.sol');
 const AnyNFTCollectionJSon = require('../../client/src/contracts/AnyNFTCollection.json');
-//const AnyNFTCollection = artifacts.require('./AnyNFTCollection.sol')
 const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 
@@ -102,6 +102,13 @@ contract('AnyRental', accounts => {
                 let collectionAddress = tx.logs[1].args.renterCollectionAddress;
                 let collectionInstance = new web3.eth.Contract(AnyNFTCollectionJSon.abi, collectionAddress);
                 
+                //passer avec le at
+                //let collectionInstance = await AnyNFTCollection.at(collectionAddress);
+                //const ownerAddress = await collectionInstance.owner.call();
+                
+                const ownerAddress = await collectionInstance.methods.owner().call();
+                expect(ownerAddress).to.be.equal(_renter1);
+
                 const renterAddress = await collectionInstance.methods.renter().call();
                 expect(renterAddress).to.be.equal(_renter1);
 
@@ -163,6 +170,40 @@ contract('AnyRental', accounts => {
         
            
         });
+
+        describe('-- delegate NFT to a user', () => {
+            let collectionAddress;
+            beforeEach(async function () {
+                anyRentalInstance = await AnyRental.new({ from: _owner });
+
+                let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
+
+
+                await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI_1", 12345, "Mon outil 2", "Une description de mon outil 2", { from: _renter1 });
+                await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI_2", 64899, "Mon outil 2", "Une description de mon outil 2", { from: _renter1 });
+                
+
+
+                 collectionAddress = tx.logs[1].args.renterCollectionAddress;
+            });
+
+
+            /*it("... renter should delegate a NFT to a users", async () => {
+                await debug(collectionAddress);
+                const tokenID = 1;
+                const expires = Math.floor(new Date().getTime()/1000) + 100;
+
+                let tx = await anyRentalInstance.delegateNFT(tokenID, _user1, expires , {from: _renter1});
+                expectEvent(tx, 'rentalNFTToolDelegated', { renter: _renter1,  user: _user1, renterCollectionAddress: anyRentalInstance.address, tokenId: tokenID, expires: new BN(expires) });
+
+                
+            });*/
+
+        
+           
+        });
+
     
     });
 
