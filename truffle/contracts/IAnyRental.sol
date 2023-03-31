@@ -78,6 +78,9 @@ interface IAnyRental {
      * @dev Emitted when a user pay for the tental
      */
      event rentalPaymentDone(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
+    /* @dev Emitted when a user pay for the tental
+     */
+     event rentalNFTToolDelegated(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
      /**
      * @dev Emitted when a user give back the tool
      */
@@ -135,8 +138,15 @@ interface IAnyRental {
      function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description )external returns(uint tokenId);    
 
     // UpdateToolIntoCollection ?
-    // DeleteToolIntoCollection
-    // getCollectionTools
+    
+      /**
+     * @dev delete a tool into collection . onlyRenter
+     */
+     // marche pas
+     //function deleteToolIntoCollection(uint _tokenID)external;    
+
+
+
     // SearchToolIntoCollection
 
     // getUserRentals
@@ -149,7 +159,11 @@ interface IAnyRental {
     //askForRental
     //acceptRental
     //payRental
-    // 
+    /**
+     * @dev delegate the NFT to a user . onlyRenter
+     */
+    function delegateNFT(uint _tokenId, address _to, uint64 _expires) external;  
+
     // rgiveBackTool
     // acceptGiveBackTool
     // refuseGiveB  ckTool
