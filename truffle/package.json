@@ -6,9 +6,12 @@
     "test": "truffle test"
   },
   "dependencies": {
+    "@ganache/console.log": "0.3.0",
     "@openzeppelin/contracts": "^4.8.2",
     "@openzeppelin/test-helpers": "^0.5.16",
     "@truffle/hdwallet-provider": "^2.1.8",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "eth-gas-reporter": "^0.2.25",
+    "web3": "^1.9.0"
   }
 }
