@@ -66,6 +66,18 @@ describe('AnyNFTCollection delegate NFT', () => {
          await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_2", 12345, "Mon outil 2", "Une description de mon outil 2", _renter1, { from: _renter1 });
     });
 
+    it("... should have the right params after adding 2 NFTs", async () => {
+        //await debug(collectionAddress);
+       const nbNFTs = await anyRentalCollectionInstance.balanceOf(_renter1);
+       expect(nbNFTs).to.be.bignumber.equal(new BN(2))
+
+       const ownerOf = await anyRentalCollectionInstance.ownerOf(1);
+       expect(ownerOf).to.be.bignumber.equal(_renter1)
+
+       let delegatedAddress = await anyRentalCollectionInstance.userOf(1, {from: _renter1});
+       expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");
+    });
+
     it("... renter should delegate a NFT", async () => {
         const tokenID = 1;
         const expires = Math.floor(new Date().getTime()/1000) + 120;
@@ -85,7 +97,7 @@ describe('AnyNFTCollection delegate NFT', () => {
 
     it("... renter should delegate a NFT - check delegation to user 0x -> renter2 -> 0x after period duration", async () => {
         const tokenID = 1;
-        const expires = Math.floor(new Date().getTime()/1000) + 1000;
+        const expires = Math.floor(new Date().getTime()/1000) + 60;
 
         let delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter1});
         expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");
@@ -94,11 +106,13 @@ describe('AnyNFTCollection delegate NFT', () => {
         let tx = await anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _renter1, { from: _renter1 } );
         expectEvent(tx, 'UpdateDelegation', { tokenId: new BN(tokenID), user: _renter2, expires: new BN(expires) });
 
-        delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter1});
+        
+
+        delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter2});
         expect(delegatedAddress).to.be.equal(_renter2);
         
         //Expires the delegation duration
-        await time.increase(5000) ;
+        await time.increase(1) ;
 
         delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter1});
         expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");
