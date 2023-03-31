@@ -127,18 +127,22 @@ contract('AnyRental', accounts => {
 
 
             it("... renter should be able to add a NFT tool to their collection", async () => {
-
-                await debug(collectionAddress);
-                let tx = await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
-                expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(1) });
-            });
-
-            it("... renter should be able to add a NFT tool to their collection", async () => {
-
                 //await debug(collectionAddress);
                 let tx = await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(1) });
             });
+
+           /* it("... a renter can't add a NFT tool to another renter collection", async () => {
+
+                // another renter on another collection
+                let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter2 });
+
+                await expectRevert(
+                    anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _renter2 }),
+                    "You are not the owner of the collection"
+                    );
+                
+            });*/
         
             it("... renter should not allow adding a tool to a collection over the maximum count", async () => {
                 for (let i = 0; i < MAX_TOOLS; i++) {
