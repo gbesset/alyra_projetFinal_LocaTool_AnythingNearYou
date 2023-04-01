@@ -95,7 +95,6 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
 
-    //function addToolToCollection(Utils.Tool memory _tool, string memory _tokenURI ) external returns(uint tokenId){
     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external returns(uint tokenId){
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         //require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");

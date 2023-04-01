@@ -126,16 +126,20 @@ contract AnyNFTCollection is ERC4907, IAnyNFTCollection, Ownable{
 
    
     function burn(uint256 _tokenId, address _from) external onlyOwnerOrOwnerThrowFactory(_from) {
+        require(_exists(_tokenId), "Token ID does not exist");
         require(tokenIds.current() >= _tokenId, "Tool does not exist");
 
         uint id;
          for (uint i; i < tools.length; i++) {
             if(tools[i].tokenID == _tokenId){
                 id=i;
+                break;
             }
         }
         
         delete tools[id];   
+        //tools[id ] = tools[tools.length-1];
+        //tools.pop();
         _burn(_tokenId);
         emit NFTBurned(owner(), _tokenId, block.timestamp );
     }
