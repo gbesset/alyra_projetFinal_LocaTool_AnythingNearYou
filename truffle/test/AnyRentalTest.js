@@ -125,6 +125,35 @@ contract('AnyRental', accounts => {
             });
 
         });
+
+        describe('-- delete a collection NFTs', () => {
+            let collectionAddress;
+            beforeEach(async function () {
+                anyRentalInstance = await AnyRental.new({ from: _owner });
+
+                let tx = await anyRentalInstance.createCollection("Collection de test",{ from: _owner });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _owner, renterCollectionName:"Collection de test"  });
+
+                collectionAddress = tx.logs[1].args.renterCollectionAddress;
+            });
+
+            it("... owner should delete a NFT collection", async () => {
+
+                const addressColBefore = await anyRentalInstance.getCollectionAddress(_owner)
+                expect(addressColBefore).to.be.equal(collectionAddress);
+
+                const ownerAddress = await anyRentalInstance.owner.call();
+                expect(ownerAddress).to.be.equal(_owner);
+
+                let tx = await anyRentalInstance.deleteCollection();
+                expectEvent(tx, 'NFTCollectionDeleted', { renter: _owner });
+
+                const addressColl = await anyRentalInstance.getCollectionAddress(_owner)
+                expect(addressColl).to.be.equal("0x0000000000000000000000000000000000000000");
+            });
+        });
+ 
+
         describe('-- add NFT to collection', () => {
             let collectionAddress;
             beforeEach(async function () {

@@ -17,24 +17,29 @@ import "../node_modules/@ganache/console.log/console.sol";
  */
 contract AnyRental is Ownable, IAnyRental{
 
+   using Counters for Counters.Counter;
+
     //AnyNFTCollectionFactory public factory;
 
+    Counters.Counter private rentalIds;
+
+    // TODO a supprimer ??
+    Rental[] rentals;
+
+
     // mapping of  a user address to the rented tools
-    mapping (address => Rental[]) private rentals;
+    mapping (address => Rental[]) private userRentals;
 
-
-   struct CollectionNFT {
-        address collection;
-        address owner;
-   }
-    // mapping of a renter address to the NFT Collection address
+    // mapping of a renter address to its collection
     mapping (address => CollectionNFT) private rentersCollection;
-
- // mapping of  a user address to the rented tools
-    mapping (address => uint) private rentersNFTNb;
+    
+    // mapping of a renter address to its rentals
+    mapping (address => Rental[]) private rentersRentals;
     uint256 public constant MAX_TOOLS = 3;
 
-//manque le user ce qui a loué
+    // list of all the renters address
+    address[] rentersList;
+
 
     constructor(){
         // Instantiate and deploy NFT Factory
@@ -69,10 +74,44 @@ contract AnyRental is Ownable, IAnyRental{
         rentersCollection[msg.sender].collection = address(collectionCreated);
         rentersCollection[msg.sender].owner =  msg.sender;
 
+        rentersList.push(msg.sender);
+
         emit NFTCollectionCreated(msg.sender, _collectionName , address(collectionCreated), block.timestamp);
         collectionCreated.transferOwnership(msg.sender);
         return address(collectionCreated);
     }
+
+    /**
+     * @notice Create the NFT Collection of a renter
+     */
+    function deleteCollection() external {
+        require(msg.sender != address(0), "address zero is not valid");
+        require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
+      
+        AnyNFTCollection collec = AnyNFTCollection(rentersCollection[msg.sender].collection);
+
+        uint id;
+         for (uint i; i < rentersList.length; i++) {
+            if(rentersList[i] == msg.sender){
+                id=i;
+                break;
+            }
+        }
+
+        //delete element in list of renters
+        rentersList[id] = rentersList[rentersList.length-1];
+        rentersList.pop();
+
+        //delete rentals in mapping 
+        delete rentersCollection[msg.sender];
+        /*
+        //TODO supprimer l'instance en transféréant au préalbale les fonds présents....
+        selfdestruct(collec);
+       */
+        emit NFTCollectionDeleted(msg.sender , address(collec), block.timestamp);
+
+    }
+
 
   /**
      * @dev get collection from renter Address
@@ -95,15 +134,49 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
 
+   /* function  createToolRenting() internal{
+        
+        uint newRentalIds = rentalIds.current();
+
+        Rental memory rental;
+        rental.rentalID = newRentalIds;
+        rental.dayPrice;
+        rental.caution;
+        rental.start;
+        rental.end;
+        rental.rentalStatus=RentalStatus.AVAILABLE;
+        rental.isCautionDeposed;
+        rental.isNFTDelegated;
+        rental.isRented;
+        rental.isDispute;
+        rental.renter;
+        rental.colectionAddress;       
+        rental.tokenID;
+        rental.tokenURI;    
+
+ 
+        RentalStatus ;
+        bool isCautionDeposed;
+        bool isNFTDelegated;
+        bool isDispute;
+        bool isRedeemed;
+        address renter;
+        CollectionNFT collection;
+        uint tokenID;
+        string tokenURI;    // ou ca ?
+
+        rentalIds.increment();
+    }*/
+
     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external returns(uint tokenId){
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         //require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");
-        require(rentersNFTNb[msg.sender] < MAX_TOOLS, "Maximum number of tools reached");
+        require(rentersRentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
         
         IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[msg.sender].collection);
         uint256 tokenID = collec.mint(_tokenURI, _serialId, _title, _description, msg.sender);
 
-        rentersNFTNb[msg.sender]=tokenID;
+        //rentersNFTNb[msg.sender]=tokenID;
         emit NFTToolAddedToCollection(msg.sender, rentersCollection[msg.sender].collection, tokenID, block.timestamp);
         return tokenID;
     }

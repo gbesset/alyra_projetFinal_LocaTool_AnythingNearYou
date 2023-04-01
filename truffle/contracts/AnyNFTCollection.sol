@@ -137,9 +137,9 @@ contract AnyNFTCollection is ERC4907, IAnyNFTCollection, Ownable{
             }
         }
         
-        delete tools[id];   
-        //tools[id ] = tools[tools.length-1];
-        //tools.pop();
+        //delete tools[id];   
+        tools[id] = tools[tools.length-1];
+        tools.pop();
         _burn(_tokenId);
         emit NFTBurned(owner(), _tokenId, block.timestamp );
     }

@@ -6,27 +6,38 @@ interface IAnyRental {
 
 
      enum RentalStatus {
-        RENTAL_REQUESTED,           // User ask to rent a tool
-        RENTAL_ACCEPTED,            // Owner accept. 
-        WAITING_FOR_PAYMENT,        // User has to pay and get the tool
-        ON_GOING,                   // User has the tool and use it
-        COMPLETED_USER,             // User give back the tool to the owner
-        COMPLETED_OWNER,            // Owner accept the return of the tool
-        DISPUTE,                    // Owner doesn't accept the return and initiate a dispute
-        DISPUTE_SOLVED,             // DAO manage the dispute
+        AVAILABLE,                          // initiate state : tool available
+        RENTAL_REQUESTED,                   // User ask to rent a tool (send the caution and the location)
+        RENTAL_ACCEPTED,                    // Owner accept. (delegate the NFT)
+        VALIDATE_TOOL_RECEIPT_AND_PAYMENT,  // User alrrady have the NFT, receipt the tool and confirm payment
+        ON_GOING,                           // User has the tool and use it
+        COMPLETED_USER,                     // User give back the tool to the owner
+        RETURN_ACCEPTED_BY_OWNER,           // Owner accept the return of the tool
+        DISPUTE,                            // Owner doesn't accept the return and initiate a dispute
+        DISPUTE_SOLVED,                     // DAO manage the dispute
         RENTAL_ENDED                       // Rental colpleted
     }
 
+  struct CollectionNFT {
+        address collection;
+        address owner;
+   }
+
     struct Rental {
-        address colectionAddress;       //??
-        uint toolID;
+        uint256 rentalID;
         uint8 dayPrice;
         uint8 caution;
         uint64 start;
         uint64 end;
-        bool isRented;
+        RentalStatus rentalStatus;
+        bool isCautionDeposed;
+        bool isNFTDelegated;
         bool isDispute;
-        address renter;         
+        bool isRedeemed;
+        address renter;
+        CollectionNFT collection;
+        uint tokenID;
+        string tokenURI;    // ou ca ?
     }
 
 
@@ -43,7 +54,7 @@ interface IAnyRental {
      * @dev Emitted when a renter delete its NFT Collection.
      * give RenterAddress, CollectionName, CollectionAddress, timestamp
      */
-    event NFTCollectionDeleted(address renter, string renterCollectionName, address renterCollectionAddress,  uint timestamp);
+    event NFTCollectionDeleted(address renter,  address renterCollectionAddress,  uint timestamp);
     
     /**
      * @dev Emitted when a renter add a tool to its NFT Collection.
@@ -52,11 +63,11 @@ interface IAnyRental {
     /**
      * @dev Emitted when a renter update a tool into its NFT Collection.
      */
-    event NFTToolUpdatedIntoCollection(address renter, address renterCollectionAddress, uint tokenId, uint timestamp);
+//    event NFTToolUpdatedIntoCollection(address renter, address renterCollectionAddress, uint tokenId, uint timestamp);
     /**
      * @dev Emitted when a renter delete a tool into its NFT Collection.
      */
-    event NFTToolDeletedFromCollection(address renter, address renterCollectionAddress, uint tokenId, uint timestamp);
+//    event NFTToolDeletedFromCollection(address renter, address renterCollectionAddress, uint tokenId, uint timestamp);
     
 
 
@@ -119,8 +130,8 @@ interface IAnyRental {
      * @dev Create a new NFT collection
      */
     function createCollection(string memory collectionName) external returns(address collectionCreated);
-
-    // Delete collection
+    function deleteCollection() external; 
+    
     
     /**
      * @notice  
@@ -146,8 +157,6 @@ interface IAnyRental {
      //function deleteToolIntoCollection(uint _tokenID)external;    
 
 
-
-    // SearchToolIntoCollection
 
     // getUserRentals
     // getUserRentalById  ?

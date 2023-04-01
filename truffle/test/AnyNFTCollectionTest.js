@@ -63,7 +63,7 @@ describe('AnyNFTCollection mint NFT', () => {
     });
 
     it("... owner should mint a NFT", async () => {
-        await debug();
+        //await debug();
         let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _owner, { from: _owner } );
         expectEvent(tx, 'NFTCreated', { owner: _owner, tokenId: new BN(1) });
         
@@ -124,6 +124,10 @@ describe('AnyNFTCollection burn NFT', () => {
         const tool2 = await anyRentalCollectionInstance.getToolsByTokenID(2, { from: _owner } );
         expect(new BN(tool2.tokenID)).to.be.bignumber.equal(new BN(2));
         expect(new BN(tool2.serialID)).to.be.bignumber.equal(new BN(6789));
+
+        const tools = await anyRentalCollectionInstance.getTools({ from: _owner } );
+        expect(tools).to.not.be.empty;
+        expect(tools.length).to.be.equal(3);
         
     });
 
@@ -138,7 +142,7 @@ describe('AnyNFTCollection burn NFT', () => {
         
         const tools = await anyRentalCollectionInstance.getTools({ from: _owner } );
         expect(tools).to.not.be.empty;
-        expect(tools.length).to.be.equal(3);
+        expect(tools.length).to.be.equal(2);
 
         const nbNFTs = await anyRentalCollectionInstance.balanceOf(_owner, { from: _owner } );
         expect(new BN(nbNFTs)).to.be.bignumber.equal(new BN(1));
@@ -220,7 +224,19 @@ describe('AnyNFTCollection delegate NFT', () => {
         expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");*/
     });
 
-
+/*
+    onst _renting = {
+        id: 1,
+        owner: '0x0000000000000000000000000000000000000000',
+        unitPrice: ethers.utils.parseUnits('0.1', 'ether'),
+        deposit: ethers.utils.parseUnits('1', 'ether'),
+        personCount: BigNumber.from(1),
+        location: 'Paris',
+        tags: ['Maison', 'Bord de mer'],
+        description: 'Une jolie maison',
+        imageURL: 'https://gateway.pinata.cloud/ipfs/QmVxnXboDSY9CpBsHZRaZxYDPZPeVKSdxwnAEYznD9vuTs'
+    };*/
+    
 });
 
 
