@@ -223,19 +223,6 @@ describe('AnyNFTCollection delegate NFT', () => {
         delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter1});
         expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");*/
     });
-
-/*
-    onst _renting = {
-        id: 1,
-        owner: '0x0000000000000000000000000000000000000000',
-        unitPrice: ethers.utils.parseUnits('0.1', 'ether'),
-        deposit: ethers.utils.parseUnits('1', 'ether'),
-        personCount: BigNumber.from(1),
-        location: 'Paris',
-        tags: ['Maison', 'Bord de mer'],
-        description: 'Une jolie maison',
-        imageURL: 'https://gateway.pinata.cloud/ipfs/QmVxnXboDSY9CpBsHZRaZxYDPZPeVKSdxwnAEYznD9vuTs'
-    };*/
     
 });
 

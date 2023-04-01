@@ -30,6 +30,11 @@ contract AnyRental is Ownable, IAnyRental{
     // mapping of  a user address to the rented tools
     mapping (address => Rental[]) private userRentals;
 
+
+
+    // list of all the renters address
+    address[] rentersList;
+
     // mapping of a renter address to its collection
     mapping (address => CollectionNFT) private rentersCollection;
     
@@ -37,8 +42,6 @@ contract AnyRental is Ownable, IAnyRental{
     mapping (address => Rental[]) private rentersRentals;
     uint256 public constant MAX_TOOLS = 3;
 
-    // list of all the renters address
-    address[] rentersList;
 
 
     constructor(){
@@ -47,7 +50,6 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
 
- /*  
     /* ***********************************************
     *   Modifiers 
     *********************************************** */
@@ -61,6 +63,36 @@ contract AnyRental is Ownable, IAnyRental{
         _;
     }
 
+
+
+    /* ***********************************************
+    *   Getters 
+    *********************************************** */
+     /**
+     * @dev get collection from renter Address
+     */
+    function getCollection(address renter) external view returns(Utils.Tool[] memory){
+        //return factory._rentersCollection().tools();
+        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[renter].collection);
+        return collec.getTools();
+    }
+
+    function getCollectionAddress(address renter) external view returns(address){
+        return rentersCollection[renter].collection;
+    }
+
+    function getCollections()external view returns(Utils.Tool[] memory){
+        // pour toutes les addresses
+        // concatener les collections
+        // renvoyer l'ensemble
+        //ou en js appeler les differentes collections pour les addresses..?
+    }
+
+
+
+    /* ***********************************************
+    *   Functions 
+    *********************************************** */
     /**
      * @notice Create the NFT Collection of a renter
      * @return collectionCreated : colletion address deployed
@@ -71,9 +103,12 @@ contract AnyRental is Ownable, IAnyRental{
         require(!Utils.isEqualString(_collectionName,""), "collection name can't be empty");
 
         AnyNFTCollection collectionCreated  = new AnyNFTCollection(_collectionName, "ANY");
+        
+        // update Renters Collection
         rentersCollection[msg.sender].collection = address(collectionCreated);
         rentersCollection[msg.sender].owner =  msg.sender;
 
+        //update the list of renters
         rentersList.push(msg.sender);
 
         emit NFTCollectionCreated(msg.sender, _collectionName , address(collectionCreated), block.timestamp);
@@ -82,7 +117,7 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
     /**
-     * @notice Create the NFT Collection of a renter
+     * @notice drenter delete its NFT Collection of a
      */
     function deleteCollection() external {
         require(msg.sender != address(0), "address zero is not valid");
@@ -113,61 +148,6 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
 
-  /**
-     * @dev get collection from renter Address
-     */
-    function getCollection(address renter) external view returns(Utils.Tool[] memory){
-        //return factory._rentersCollection().tools();
-        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[renter].collection);
-        return collec.getTools();
-    }
-
-    function getCollectionAddress(address renter) external view returns(address){
-        return rentersCollection[renter].collection;
-    }
-
-    function getCollections()external view returns(Utils.Tool[] memory){
-        // pour toutes les addresses
-        // concatener les collections
-        // renvoyer l'ensemble
-        //ou en js appeler les differentes collections pour les addresses..?
-    }
-
-
-   /* function  createToolRenting() internal{
-        
-        uint newRentalIds = rentalIds.current();
-
-        Rental memory rental;
-        rental.rentalID = newRentalIds;
-        rental.dayPrice;
-        rental.caution;
-        rental.start;
-        rental.end;
-        rental.rentalStatus=RentalStatus.AVAILABLE;
-        rental.isCautionDeposed;
-        rental.isNFTDelegated;
-        rental.isRented;
-        rental.isDispute;
-        rental.renter;
-        rental.colectionAddress;       
-        rental.tokenID;
-        rental.tokenURI;    
-
- 
-        RentalStatus ;
-        bool isCautionDeposed;
-        bool isNFTDelegated;
-        bool isDispute;
-        bool isRedeemed;
-        address renter;
-        CollectionNFT collection;
-        uint tokenID;
-        string tokenURI;    // ou ca ?
-
-        rentalIds.increment();
-    }*/
-
     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external returns(uint tokenId){
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         //require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");
@@ -176,10 +156,37 @@ contract AnyRental is Ownable, IAnyRental{
         IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[msg.sender].collection);
         uint256 tokenID = collec.mint(_tokenURI, _serialId, _title, _description, msg.sender);
 
-        //rentersNFTNb[msg.sender]=tokenID;
+
         emit NFTToolAddedToCollection(msg.sender, rentersCollection[msg.sender].collection, tokenID, block.timestamp);
         return tokenID;
     }
+    function addToolToRentals(Rental memory _rental, uint _tokenID, string memory _tokenURI) external {
+        require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
+        require(rentersRentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
+
+         uint newRentalIds = rentalIds.current();
+
+        Rental memory rental;
+        rental.rentalID = newRentalIds;
+        rental.dayPrice = _rental.dayPrice;
+        rental.caution = _rental.caution;
+        rental.start = _rental.start;
+        rental.end = _rental.end;
+        rental.rentalStatus = RentalStatus.AVAILABLE;
+        rental.isCautionDeposed = false;
+        rental.isNFTDelegated = false;
+        rental.isDispute = false;
+        rental.isRedeemed = false;
+        rental.collection = rentersCollection[msg.sender];
+        rental.tokenID = _tokenID;
+        rental.tokenURI = _tokenURI; 
+
+        rentersRentals[msg.sender].push(rental);
+
+        rentalIds.increment();
+        emit ToolAddedToRentals(msg.sender, newRentalIds , block.timestamp);
+    }
+
 
     /**
      * @dev delete a tool into collection . onlyRenter

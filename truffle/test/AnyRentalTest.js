@@ -37,40 +37,38 @@ contract('AnyRental', accounts => {
         console.log("-----------------------------------------------------------------------");
     }
 
-  /**
-   * Smart contract Deploiement
-   */
-  describe('Smart contract Deploiement', () => {
-        beforeEach(async function () {
-             // new instance each time : new() not deploy().
-             anyRentalInstance = await AnyRental.new({ from: _owner });
-        });
+    /**
+     * Smart contract Deploiement
+     */
+    describe('Smart contract Deploiement', () => {
+            beforeEach(async function () {
+                // new instance each time : new() not deploy().
+                anyRentalInstance = await AnyRental.new({ from: _owner });
+            });
 
-        it("...Should store the administrator address", async () => {
-            let owner = await anyRentalInstance.owner.call();
-            expect(owner).to.equal(_owner);
-        });
+            it("...Should store the administrator address", async () => {
+                let owner = await anyRentalInstance.owner.call();
+                expect(owner).to.equal(_owner);
+            });
 
-        it('...Should be instantiated and default values defined', async () => {
-             expect(await anyRentalInstance.MAX_TOOLS()).to.be.bignumber.equal(MAX_TOOLS);
-        });
-  });
+            it('...Should be instantiated and default values defined', async () => {
+                expect(await anyRentalInstance.MAX_TOOLS()).to.be.bignumber.equal(MAX_TOOLS);
+            });
+    });
+
+        /**
+     * Smart contract Permissions
+     */
+    describe('Smart contract Permissions', () => {
+            beforeEach(async function () {
+                anyRentalInstance = await AnyRental.new({ from: _owner });
+            });
+
+    });
 
     /**
-   * Smart contract Permissions
-   */
-  describe('Smart contract Permissions', () => {
-        beforeEach(async function () {
-            anyRentalInstance = await AnyRental.new({ from: _owner });
-        });
-
-  });
-
-
-
-    /**
-   * Smart contract NFTs
-   */
+     * Smart contract NFTs
+     */
     describe('Smart contract collection NFTs', () => {
         describe('-- create collection NFTs', () => {
             beforeEach(async function () {
@@ -126,6 +124,7 @@ contract('AnyRental', accounts => {
 
         });
 
+
         describe('-- delete a collection NFTs', () => {
             let collectionAddress;
             beforeEach(async function () {
@@ -152,7 +151,7 @@ contract('AnyRental', accounts => {
                 expect(addressColl).to.be.equal("0x0000000000000000000000000000000000000000");
             });
         });
- 
+    
 
         describe('-- add NFT to collection', () => {
             let collectionAddress;
@@ -162,7 +161,7 @@ contract('AnyRental', accounts => {
                 let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
 
-                 collectionAddress = tx.logs[1].args.renterCollectionAddress;
+                    collectionAddress = tx.logs[1].args.renterCollectionAddress;
             });
 
 
@@ -179,7 +178,7 @@ contract('AnyRental', accounts => {
                 );        
             });
 
-           /* it("... a renter can't add a NFT tool to another renter collection", async () => {
+            /* it("... a renter can't add a NFT tool to another renter collection", async () => {
 
                 // another renter on another collection
                 let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter2 });
@@ -206,9 +205,7 @@ contract('AnyRental', accounts => {
                     anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _renter2 }),
                     "You don't have any collection"
                 );
-            });
-        
-           
+            });     
         });
 
         describe('-- delegate NFT to a user', () => {
@@ -219,15 +216,12 @@ contract('AnyRental', accounts => {
                 let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
 
-
                 await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI_1", 12345, "Mon outil 2", "Une description de mon outil 2", { from: _renter1 });
                 await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI_2", 64899, "Mon outil 2", "Une description de mon outil 2", { from: _renter1 });
-                
 
 
-                 collectionAddress = tx.logs[1].args.renterCollectionAddress;
+                collectionAddress = tx.logs[1].args.renterCollectionAddress;
             });
-
 
             /*it("... renter should delegate a NFT to a users", async () => {
                 await debug(collectionAddress);
@@ -236,18 +230,18 @@ contract('AnyRental', accounts => {
 
                 let tx = await anyRentalInstance.delegateNFT(tokenID, _user1, expires , {from: _renter1});
                 expectEvent(tx, 'rentalNFTToolDelegated', { renter: _renter1,  user: _user1, renterCollectionAddress: anyRentalInstance.address, tokenId: tokenID, expires: new BN(expires) });
-
                 
             });*/
-
-        
-           
+            
         });
 
-    
+        
     });
 
-  
+    /*
+    {"rentalID": 1, "dayPrice": 10, "caution": 100, "start": 1649124800, "end": 1649211200, "rentalStatus": 0, "isCautionDeposed": false, "isNFTDelegated": false, "isDispute": false, "isRedeemed": false, "renter": "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "collection": "0x52ed77e51efB6324C118f9783384F2Ae80e437d4", "tokenID": 123, "tokenURI": "http://test.com"}*/
+
+    
 
 });
   

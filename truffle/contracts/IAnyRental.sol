@@ -60,6 +60,11 @@ interface IAnyRental {
      * @dev Emitted when a renter add a tool to its NFT Collection.
      */
     event NFTToolAddedToCollection(address renter, address renterCollectionAddress, uint tokenId, uint timestamp);
+       /**
+     * @dev Emitted when a renter add a tool to its NFT Collection.
+     */
+    event ToolAddedToRentals(address renter, uint toolID, uint timestamp);
+    
     /**
      * @dev Emitted when a renter update a tool into its NFT Collection.
      */
@@ -148,6 +153,10 @@ interface IAnyRental {
      //function addToolToCollection(Utils.Tool memory, string memory _tokenURI) external returns(uint tokenId);    
      function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description )external returns(uint tokenId);    
 
+    /**
+     * @dev add a tool to collection . onlyRenter
+     */
+     function addToolToRentals(Rental memory _rental, uint _tokenID, string memory _tokenURI) external;
     // UpdateToolIntoCollection ?
     
       /**
