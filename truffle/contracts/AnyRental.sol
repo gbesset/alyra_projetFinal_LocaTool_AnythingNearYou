@@ -65,7 +65,7 @@ contract AnyRental is Ownable, IAnyRental{
         require(rentersCollection[msg.sender].collection==address(0), "You already have created your collection");
         require(!Utils.isEqualString(_collectionName,""), "collection name can't be empty");
 
-        AnyNFTCollection collectionCreated  = new AnyNFTCollection(_collectionName, "ANY", msg.sender);
+        AnyNFTCollection collectionCreated  = new AnyNFTCollection(_collectionName, "ANY");
         rentersCollection[msg.sender].collection = address(collectionCreated);
         rentersCollection[msg.sender].owner =  msg.sender;
 

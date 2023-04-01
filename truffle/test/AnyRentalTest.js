@@ -22,20 +22,19 @@ contract('AnyRental', accounts => {
 
 
    async function debug(collectionAddress){
-        let collectionInstance = new web3.eth.Contract(AnyNFTCollectionJSon.abi, collectionAddress);
-
-        console.log("---------------------------------------------------------"); 
-        console.log("-- owner est : "+_owner);
-        console.log("-- _renter1 est : "+_renter1);
+        let collectionInstance = await AnyNFTCollection.at(collectionAddress);
+        console.log("-----------------------------------------------------------------------"); 
+        console.log("-- owner est :                        "+_owner);
+        console.log("-- _renter1 est :                     "+_renter1);
         const owner = await anyRentalInstance.owner();
-        console.log("-- Le onwer de AnyRental est "+owner)
+        console.log("-- Le owner de AnyRental est          "+owner)
         console.log("-- l'adresse du contrat AnyRental est "+anyRentalInstance.address )
 
-        const ownernft = await collectionInstance.methods.owner().call();
-        const renterAddress = await collectionInstance.methods.renter().call();
-        console.log("-- Le onwer de la collecion NFT crée est "+ownernft)
-        console.log("-- Le renter de la collection NFT crée est  "+renterAddress)
-        console.log("---------------------------------------------------------");
+        const ownernft = await collectionInstance.owner.call();
+        const factoryAddress = await collectionInstance.factory.call();
+        console.log("-- Le owner de la collecion NFT crée est        "+ownernft)
+        console.log("-- La factory qui a crée la collection NFT est  "+factoryAddress)
+        console.log("-----------------------------------------------------------------------");
     }
 
   /**
@@ -100,22 +99,27 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
         
                 let collectionAddress = tx.logs[1].args.renterCollectionAddress;
-                let collectionInstance = new web3.eth.Contract(AnyNFTCollectionJSon.abi, collectionAddress);
+                //await debug(collectionAddress)
                 
-                //passer avec le at
-                //let collectionInstance = await AnyNFTCollection.at(collectionAddress);
-                //const ownerAddress = await collectionInstance.owner.call();
+                let collectionInstance = await AnyNFTCollection.at(collectionAddress);
+                // pour mémoire autre manière de faire
+                //let collectionInstance = new web3.eth.Contract(AnyNFTCollectionJSon.abi, collectionAddress);
                 
-                const ownerAddress = await collectionInstance.methods.owner().call();
+                
+                const ownerAddress = await collectionInstance.owner.call();
+                //const ownerAddress = await collectionInstance.methods.owner().call();
                 expect(ownerAddress).to.be.equal(_renter1);
 
-                const renterAddress = await collectionInstance.methods.renter().call();
-                expect(renterAddress).to.be.equal(_renter1);
+                const factoryAdress = await collectionInstance.factory.call();
+                // const factoryAdress = await collectionInstance.methods.factory().call();
+                expect(factoryAdress).to.be.equal(anyRentalInstance.address);
 
-                const collectionName = await collectionInstance.methods.name().call();
+                const collectionName = await collectionInstance.name.call();
+                //const collectionName = await collectionInstance.methods.name().call();
                 expect(collectionName).to.be.equal("Collection de test");
 
-                const collectionSymbol = await collectionInstance.methods.symbol().call();
+                const collectionSymbol = await collectionInstance.symbol.call();
+                //const collectionSymbol = await collectionInstance.methods.symbol().call();
                 expect(collectionSymbol).to.be.equal("ANY");
 
             });
@@ -134,9 +138,16 @@ contract('AnyRental', accounts => {
 
 
             it("... renter should be able to add a NFT tool to their collection", async () => {
-                //await debug(collectionAddress);
                 let tx = await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(1) });
+            });
+
+            it("... user could'nt add a NFT tool if not the owner", async () => {
+                //await debug(collectionAddress);
+                await expectRevert(
+                    anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _renter2 }),
+                    "You don't have any collection"
+                );        
             });
 
            /* it("... a renter can't add a NFT tool to another renter collection", async () => {

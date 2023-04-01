@@ -16,13 +16,23 @@ contract('AnyNFTCollection', accounts => {
     //instance declaration
     let anyRentalCollectionInstance;
 
+
+    async function debug(){
+        console.log("-----------------------------------------------------------------------"); 
+        console.log("-- owner est :                        "+_owner);
+        console.log("-- _renter1 est :                     "+_renter1);
+        console.log("-- Le owner de la collecion NFT crée est        "+await anyRentalCollectionInstance.owner())
+        console.log("-- La factory qui a crée la collection NFT est  "+await anyRentalCollectionInstance.factory())
+        console.log("-----------------------------------------------------------------------");
+    }
+
      /**
    * Smart contract Deploiement
    */
   describe('AnyNFTCollection Deploiement', () => {
     beforeEach(async function () {
          // new instance each time : new() not deploy().
-         anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN",_renter1, { from: _owner });
+         anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN", { from: _owner });
     });
 
     it("...Should store the owner address", async () => {
@@ -31,8 +41,13 @@ contract('AnyNFTCollection', accounts => {
     });
 
     it('...Should be instantiated and default values defined', async () => {
-         expect(await anyRentalCollectionInstance.renter()).to.be.equal(_renter1);
-         //expect(await anyRentalCollectionInstance.tools().length).to.be.bignumber.equal(1);
+         expect(await anyRentalCollectionInstance.owner()).to.be.equal(_owner);
+         expect(await anyRentalCollectionInstance.factory()).to.be.equal(_owner);
+
+         const tools = await anyRentalCollectionInstance.getTools({ from: _renter1 } )
+         expect(tools).to.not.be.empty;
+         expect(tools.length).to.be.equal(1);
+
     });
 });
 
@@ -44,18 +59,25 @@ describe('AnyNFTCollection mint NFT', () => {
 
     beforeEach(async function () {
          // new instance each time : new() not deploy().
-         anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN",_renter1, { from: _owner });
+         anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN", { from: _owner });
     });
 
-    it("... renter should mint a NFT", async () => {
-        let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _renter1, { from: _renter1 } );
-        expectEvent(tx, 'NFTCreated', { owner: _renter1, tokenId: new BN(1) });
+    it("... owner should mint a NFT", async () => {
+        await debug();
+        let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _owner, { from: _owner } );
+        expectEvent(tx, 'NFTCreated', { owner: _owner, tokenId: new BN(1) });
         
+    });
+    it("... owner could'n mint a NFT throw a non referenced factory", async () => {
+        await expectRevert(
+             anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _owner, { from: _renter1 } ),
+            "You are not the owner of that collection."
+        );       
     });
 
     it("... renter should mint a NFT - getToolByTokenId verification", async () => {
-        let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _renter1, { from: _renter1 } );
-        expectEvent(tx, 'NFTCreated', { owner: _renter1, tokenId: new BN(1) });
+        let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _renter1, { from: _owner } );
+        expectEvent(tx, 'NFTCreated', { owner: _owner, tokenId: new BN(1) });
 
         const tool1 = await anyRentalCollectionInstance.getToolsByTokenID(1, { from: _renter1 } );
         expect(new BN(tool1.tokenID)).to.be.bignumber.equal(new BN(1));
@@ -68,8 +90,8 @@ describe('AnyNFTCollection mint NFT', () => {
     });
 
     it("... renter should mint a NFT - getTools verification", async () => {
-        let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _renter1, { from: _renter1 } );
-        expectEvent(tx, 'NFTCreated', { owner: _renter1, tokenId: new BN(1) });
+        let tx = await anyRentalCollectionInstance.mint(tokenURI,serialId, title, description, _renter1, { from: _owner } );
+        expectEvent(tx, 'NFTCreated', { owner: _owner, tokenId: new BN(1) });
 
         const tools = await anyRentalCollectionInstance.getTools({ from: _renter1 } );
         expect(tools).to.not.be.empty;
@@ -86,42 +108,42 @@ describe('AnyNFTCollection mint NFT', () => {
 describe('AnyNFTCollection burn NFT', () => {
     
     beforeEach(async function () {
-        anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN", _renter1, { from: _owner });
-        await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_1", 12345, "Mon outil 1", "Une description de mon outil 1", _renter1, { from: _renter1 });
-        await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_2", 6789, "Mon outil 2", "Une description de mon outil 2", _renter1, { from: _renter1 });
+        anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN", { from: _owner });
+        await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_1", 12345, "Mon outil 1", "Une description de mon outil 1", _renter1, { from: _owner });
+        await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_2", 6789, "Mon outil 2", "Une description de mon outil 2", _renter1, { from: _owner });
    });
 
     it("... validate params before burn NFTs", async () => {
-        const nbNFTs = await anyRentalCollectionInstance.balanceOf(_renter1, { from: _renter1 } );
+        const nbNFTs = await anyRentalCollectionInstance.balanceOf(_owner, { from: _owner } );
         expect(new BN(nbNFTs)).to.be.bignumber.equal(new BN(2));
 
-        const tool1 = await anyRentalCollectionInstance.getToolsByTokenID(1, { from: _renter1 } );
+        const tool1 = await anyRentalCollectionInstance.getToolsByTokenID(1, { from: _owner } );
         expect(new BN(tool1.tokenID)).to.be.bignumber.equal(new BN(1));
         expect(new BN(tool1.serialID)).to.be.bignumber.equal(new BN(12345));
 
-        const tool2 = await anyRentalCollectionInstance.getToolsByTokenID(2, { from: _renter1 } );
+        const tool2 = await anyRentalCollectionInstance.getToolsByTokenID(2, { from: _owner } );
         expect(new BN(tool2.tokenID)).to.be.bignumber.equal(new BN(2));
         expect(new BN(tool2.serialID)).to.be.bignumber.equal(new BN(6789));
         
     });
 
     it("... renter should burn a NFT", async () => {
-        const tx = await anyRentalCollectionInstance.burn(1, _renter1, {from: _renter1})
-        expectEvent(tx, 'NFTBurned', { owner: _renter1, tokenId: new BN(1) });
+        const tx = await anyRentalCollectionInstance.burn(1, _owner, {from: _owner})
+        expectEvent(tx, 'NFTBurned', { owner: _owner, tokenId: new BN(1) });
         
     });
 
     it("... renter should burn a NFT - check collection", async () => {
-        const tx = await anyRentalCollectionInstance.burn(1, _renter1, {from: _renter1})
+        const tx = await anyRentalCollectionInstance.burn(1, _owner, {from: _owner})
         
-        const tools = await anyRentalCollectionInstance.getTools({ from: _renter1 } );
+        const tools = await anyRentalCollectionInstance.getTools({ from: _owner } );
         expect(tools).to.not.be.empty;
         expect(tools.length).to.be.equal(3);
 
-        const nbNFTs = await anyRentalCollectionInstance.balanceOf(_renter1, { from: _renter1 } );
+        const nbNFTs = await anyRentalCollectionInstance.balanceOf(_owner, { from: _owner } );
         expect(new BN(nbNFTs)).to.be.bignumber.equal(new BN(1));
 
-        const tool2 = await anyRentalCollectionInstance.getToolsByTokenID(2, { from: _renter1 } );
+        const tool2 = await anyRentalCollectionInstance.getToolsByTokenID(2, { from: _owner } );
         expect(new BN(tool2.tokenID)).to.be.bignumber.equal(new BN(2));
         expect(new BN(tool2.serialID)).to.be.bignumber.equal(new BN(6789));
 
@@ -141,27 +163,27 @@ describe('AnyNFTCollection delegate NFT', () => {
 
     beforeEach(async function () {
          // new instance each time : new() not deploy().
-         anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN", _renter1, { from: _owner });
-         await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_1", 12345, "Mon outil 1", "Une description de mon outil 1", _renter1, { from: _renter1 });
-         await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_2", 12345, "Mon outil 2", "Une description de mon outil 2", _renter1, { from: _renter1 });
+         anyRentalCollectionInstance = await AnyNFTCollection.new("CollectionName", "CN", { from: _owner });
+         await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_1", 12345, "Mon outil 1", "Une description de mon outil 1", _owner, { from: _owner });
+         await anyRentalCollectionInstance.mint("https://www.example.com/tokenURI_2", 12345, "Mon outil 2", "Une description de mon outil 2", _owner, { from: _owner });
     });
 
     it("... should have the right params after adding 2 NFTs", async () => {
         //await debug(collectionAddress);
-       const nbNFTs = await anyRentalCollectionInstance.balanceOf(_renter1);
+       const nbNFTs = await anyRentalCollectionInstance.balanceOf(_owner);
        expect(nbNFTs).to.be.bignumber.equal(new BN(2))
 
        const ownerOf = await anyRentalCollectionInstance.ownerOf(1);
-       expect(ownerOf).to.be.bignumber.equal(_renter1)
+       expect(ownerOf).to.be.bignumber.equal(_owner)
 
-       let delegatedAddress = await anyRentalCollectionInstance.userOf(1, {from: _renter1});
+       let delegatedAddress = await anyRentalCollectionInstance.userOf(1, {from: _owner});
        expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");
     });
 
     it("... renter should delegate a NFT", async () => {
         const tokenID = 1;
         const expires = Math.floor(new Date().getTime()/1000) + 120;
-        let tx = await anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _renter1, { from: _renter1 } );
+        let tx = await anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _owner, { from: _owner } );
         expectEvent(tx, 'UpdateDelegation', { tokenId: new BN(tokenID), user: _renter2, expires: new BN(expires) });
         
     });
@@ -170,8 +192,8 @@ describe('AnyNFTCollection delegate NFT', () => {
         const tokenID = 1;
         const expires = Math.floor(new Date().getTime()/1000) + 120;
         await expectRevert(
-            anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _renter1, { from: _renter2 }),
-            "ERC4907: transfer caller is not owner nor approved"
+            anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _owner, { from: _renter2 }),
+            "You are not the owner of that collection."
         );
     });
 
@@ -179,11 +201,11 @@ describe('AnyNFTCollection delegate NFT', () => {
         const tokenID = 1;
         const expires = Math.floor(new Date().getTime()/1000) + 100;
 
-        let delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _renter1});
+        let delegatedAddress = await anyRentalCollectionInstance.userOf(tokenID, {from: _owner});
         expect(delegatedAddress).to.be.equal("0x0000000000000000000000000000000000000000");
 
 
-        let tx = await anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _renter1, { from: _renter1 } );
+        let tx = await anyRentalCollectionInstance.rentTool(tokenID,_renter2, expires, _owner, { from: _owner } );
         expectEvent(tx, 'UpdateDelegation', { tokenId: new BN(tokenID), user: _renter2, expires: new BN(expires) });
 
         
