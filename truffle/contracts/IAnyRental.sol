@@ -25,8 +25,8 @@ interface IAnyRental {
 
     struct Rental {
         uint256 rentalID;
-        uint8 dayPrice;
-        uint8 caution;
+        uint64 dayPrice;
+        uint64 caution;
         uint64 start;
         uint64 end;
         RentalStatus rentalStatus;
@@ -65,6 +65,18 @@ interface IAnyRental {
      */
     event ToolAddedToRentals(address renter, uint toolID, uint timestamp);
     
+    /**
+     * @dev Emitted when a renter delete a tool into its NFT Collection.
+     */
+    event ToolDeletedFromRentals(address renter, uint toolID, uint timestamp);
+    /**
+     * @dev Emitted when a renter aduptate a tool to its NFT Collection.
+     */
+    event ToolUpdatedFromRentals(address renter, uint toolID, uint timestamp);
+
+
+
+
     /**
      * @dev Emitted when a renter update a tool into its NFT Collection.
      */
@@ -125,9 +137,36 @@ interface IAnyRental {
     event RentalExtended(address renter, address user, address renterCollectionAddress, uint tokenId, uint duration ,uint timestamp);
     
 
+    /** ****************************************************
+     *  Getters
+     **************************************************** */
+
+
+     //  getUserRentals
+    // getUserRentalById  ?
+
+    
+     /**
+     * @notice  
+     * @dev get NFT Collection Tool created by a renter (all, and from an Id)
+     */
+     function getToolsCollection(address _renter) external returns(Utils.Tool[] memory);
+     function getToolsCollectionAddress(address _renter) external view returns(address);
+     //function getCollections()external view returns(Utils.Tool[] memory){
+    
+      /**
+     * @notice  
+     * @dev get Rentals created by a renter (all, from an ID)
+     */
+    function getRenterTools(address _renter) external view returns(Rental[] memory);
+    function getRenterToolByID(address renter, uint _rentalId) external view returns(Rental memory);
+
+    
+    // getUserToolById     ?
+    // getToolRental        // pour un tool, renter, user, duree caution, etc
 
     /** ****************************************************
-     *  functions
+     *  functions   NFT Management
      **************************************************** */
    
 
@@ -137,59 +176,91 @@ interface IAnyRental {
     function createCollection(string memory collectionName) external returns(address collectionCreated);
     function deleteCollection() external; 
     
-    
-    /**
-     * @notice  
-     * @dev get collection from renter Address
-     */
-     function getCollection(address renter) external returns(Utils.Tool[] memory);
-     function getCollectionAddress(address renter) external view returns(address);
-     //function getCollections()external view returns(Utils.Tool[] memory){
-
-    
-    /**
-     * @dev add a tool to collection . onlyRenter
-     */
-     //function addToolToCollection(Utils.Tool memory, string memory _tokenURI) external returns(uint tokenId);    
-     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description )external returns(uint tokenId);    
-
-    /**
-     * @dev add a tool to collection . onlyRenter
-     */
-     function addToolToRentals(Rental memory _rental, uint _tokenID, string memory _tokenURI) external;
-    // UpdateToolIntoCollection ?
-    
-      /**
-     * @dev delete a tool into collection . onlyRenter
-     */
-     // marche pas
-     //function deleteToolIntoCollection(uint _tokenID)external;    
-
-
-
-    // getUserRentals
-    // getUserRentalById  ?
-    // getRenterTools
-    // getUserToolById     ?
-    // getToolRental        // pour un tool, renter, user, duree caution, etc
-
-
-    //askForRental
-    //acceptRental
-    //payRental
     /**
      * @dev delegate the NFT to a user . onlyRenter
      */
     function delegateNFT(uint _tokenId, address _to, uint64 _expires) external;  
 
-    // rgiveBackTool
-    // acceptGiveBackTool
-    // refuseGiveB  ckTool
-    // initiateDispute
+  /**
+     * @dev add a tool to collection . onlyRenter
+     */
+     //function addToolToCollection(Utils.Tool memory, string memory _tokenURI) external returns(uint tokenId);    
+     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description )external returns(uint tokenId);    
 
-    // retreievecautioj
-    // retrievePayment
-    // pay
+   /** ****************************************************
+     *  functions   Rental Management
+     **************************************************** */
 
+    /**
+     * @dev add a tool to collection . onlyRenter
+     */
+     function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID, string memory _tokenURI) external;
+  
+     /**
+     * @dev update a tool into collection . onlyRenter
+     */
+     function updateToolIntoRentals(uint _rentalID, uint64 _dayPrice,  uint64 _caution) external;
+  
+      /**
+     * @dev delete a tool into collection . onlyRenter
+     */
+     function deleteToolIntoRentals(uint _rentalID) external;    
+
+    /**
+     * @notice user send thr location and caution which in order to ask for the rental of a Rental
+     * - the caution and location is secured until
+     * @dev user send caution and location price for rent a Rental
+     */
+     function sendPaiementForRental(uint _rentalID)  external; //, start, end) external;   
+
+   /**
+     * @notice renter delegate the NFT in order to validate the rental asking
+     * - the caution and location is still secured
+     * @dev renter validate the delagation of the NFT
+     */
+     function validateNFTDelegationForRental(uint _rentalID, uint _tokenID) external;   
+
+
+    /**
+     * @notice user get the tool in real life, has the NFT and valiate the transaction
+     * - the caution is still secured, the location is payed
+     * @dev user validate having the NFT, annd receipt the tool
+     */
+     function validateNFTandToolReception(uint _rentalID, uint _tokenID) external;  
+
+    /**
+     * @notice user give back the toool at the end of renting
+     * - the caution is still secured, the location is already payed
+     * @dev user give bak th etool
+     */
+     function giveBackToolAfterRental(uint _rentalID) external;  
+     
+    /**
+     * @notice renter validate the return of the tool
+     * - the caution is given back
+     * @dev renter validae the return of the tool
+     */
+     function validateReturnToolAfterRental(uint _rentalID) external;  
+
+    /**
+     * @notice renter doens't validate the return of the tool. Problem. dispute creation
+     * - the caution still secured
+     * @dev renter doesn't validate the return of the tool, because of a problem
+     */
+     function refuseReturnToolAfterRental(uint _rentalID, string memory message) external;  
+
+    /**
+     * @notice user confirm dispute and expose its point of view
+     * - the caution still secured
+     * @dev user confirm dispute and expose its point of view
+     */
+     function confirmReturnToolAfterRental(uint _rentalID, string memory message) external;  
+
+    /**
+     * @notice user redeem its caution or caution and location
+     * - the caution is given back at the end of rental or because the renter refuse the rental
+     * @dev user redeem its caution
+     */
+     function redeemPaymentForRental(uint _rentalID, string memory message) external;  
 
 }

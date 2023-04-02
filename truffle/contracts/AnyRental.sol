@@ -39,7 +39,7 @@ contract AnyRental is Ownable, IAnyRental{
     mapping (address => CollectionNFT) private rentersCollection;
     
     // mapping of a renter address to its rentals
-    mapping (address => Rental[]) private rentersRentals;
+    mapping (address => Rental[]) public rentersRentals;
     uint256 public constant MAX_TOOLS = 3;
 
 
@@ -71,27 +71,41 @@ contract AnyRental is Ownable, IAnyRental{
      /**
      * @dev get collection from renter Address
      */
-    function getCollection(address renter) external view returns(Utils.Tool[] memory){
+    function getToolsCollection(address _renter) external view returns(Utils.Tool[] memory){
         //return factory._rentersCollection().tools();
-        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[renter].collection);
+        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[_renter].collection);
         return collec.getTools();
     }
 
-    function getCollectionAddress(address renter) external view returns(address){
-        return rentersCollection[renter].collection;
+    function getToolsCollectionAddress(address _renter) external view returns(address){
+        return rentersCollection[_renter].collection;
     }
 
-    function getCollections()external view returns(Utils.Tool[] memory){
+    /*function getCollections()external view returns(Utils.Tool[] memory){
         // pour toutes les addresses
         // concatener les collections
         // renvoyer l'ensemble
         //ou en js appeler les differentes collections pour les addresses..?
+    }*/
+
+    function getRenterTools(address _renter) external view returns(Rental[] memory){
+        return rentersRentals[_renter];
     }
+    function getRenterToolByID(address _renter, uint _rentalId) external view returns(Rental memory){
+        uint found;
+         for(uint i; i< rentersRentals[msg.sender].length; i++){
+            if(rentersRentals[msg.sender][i].rentalID == _rentalId){
+                 found=i;
+            }   
+        }
+        return rentersRentals[_renter][found];
+    }
+    
 
 
 
     /* ***********************************************
-    *   Functions 
+    *   Functions  - NFT Managment
     *********************************************** */
     /**
      * @notice Create the NFT Collection of a renter
@@ -160,48 +174,8 @@ contract AnyRental is Ownable, IAnyRental{
         emit NFTToolAddedToCollection(msg.sender, rentersCollection[msg.sender].collection, tokenID, block.timestamp);
         return tokenID;
     }
-    function addToolToRentals(Rental memory _rental, uint _tokenID, string memory _tokenURI) external {
-        require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
-        require(rentersRentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
 
-         uint newRentalIds = rentalIds.current();
-
-        Rental memory rental;
-        rental.rentalID = newRentalIds;
-        rental.dayPrice = _rental.dayPrice;
-        rental.caution = _rental.caution;
-        rental.start = _rental.start;
-        rental.end = _rental.end;
-        rental.rentalStatus = RentalStatus.AVAILABLE;
-        rental.isCautionDeposed = false;
-        rental.isNFTDelegated = false;
-        rental.isDispute = false;
-        rental.isRedeemed = false;
-        rental.collection = rentersCollection[msg.sender];
-        rental.tokenID = _tokenID;
-        rental.tokenURI = _tokenURI; 
-
-        rentersRentals[msg.sender].push(rental);
-
-        rentalIds.increment();
-        emit ToolAddedToRentals(msg.sender, newRentalIds , block.timestamp);
-    }
-
-
-    /**
-     * @dev delete a tool into collection . onlyRenter
-     */
-     /*function deleteToolIntoCollection(uint _tokenID)external {
-         require(rentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
-        
-        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[msg.sender].collection);
-
-         collec.burn(_tokenID, msg.sender);
-
-        emit NFTToolDeletedFromCollection(msg.sender, rentersCollection[msg.sender].collection, _tokenID, block.timestamp);
-     }*/
-
-    /**
+      /**
      * @dev delegate the NFT to a user . onlyRenter
      */
     function delegateNFT(uint _tokenId, address _to, uint64 _expires) external {
@@ -218,5 +192,156 @@ contract AnyRental is Ownable, IAnyRental{
         emit rentalNFTToolDelegated(msg.sender, _to, rentersCollection[msg.sender].collection, _tokenId, block.timestamp);
     }
 
+
+    /* ***********************************************
+    *   Functions  - Rental Managment
+    *********************************************** */
+
+    function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID, string memory _tokenURI) external {
+        require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
+        require(rentersRentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
+        require(_dayPrice > 0, "number must be > 0");
+        require(_caution > 0, "number must be > 0");
+
+         uint newRentalIds = rentalIds.current();
+
+        CollectionNFT memory collec;
+        collec.collection = rentersCollection[msg.sender].collection;
+        collec.owner = rentersCollection[msg.sender].owner;
+
+        Rental memory rental;
+        rental.rentalID = newRentalIds;
+        rental.dayPrice =_dayPrice;
+        rental.caution = _caution;
+        rental.rentalStatus = RentalStatus.AVAILABLE;
+        rental.isCautionDeposed = false;
+        rental.isNFTDelegated = false;
+        rental.isDispute = false;
+        rental.isRedeemed = false;
+        rental.collection = collec;
+        rental.tokenID = _tokenID;
+        rental.tokenURI = _tokenURI; 
+
+        rentersRentals[msg.sender].push(rental);
+
+        rentalIds.increment();
+        emit ToolAddedToRentals(msg.sender, newRentalIds , block.timestamp);
+    }
+
+     /**
+     * @dev update a tool into collection . onlyRenter
+     */
+     function updateToolIntoRentals(uint _rentalID, uint64 _dayPrice, uint64 _caution) external{
+        require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
+        require(_dayPrice > 0, "number must be > 0");
+        require(_caution > 0, "number must be > 0");
+
+        for(uint i; i< rentersRentals[msg.sender].length; i++){
+            if(rentersRentals[msg.sender][i].rentalID == _rentalID){
+                 rentersRentals[msg.sender][i].dayPrice = _dayPrice;
+                 rentersRentals[msg.sender][i].caution = _caution;
+                 break;
+            }   
+        }
+
+        emit ToolUpdatedFromRentals(msg.sender, _rentalID, block.timestamp);
+     }
+      /**
+     * @dev delete a tool into collection . onlyRenter
+     */
+     function deleteToolIntoRentals(uint _rentalID) external{
+        require(rentersRentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
+        
+        uint id;
+        for(uint i; i< rentersRentals[msg.sender].length; i++){
+            if(rentersRentals[msg.sender][i].rentalID == _rentalID){
+                id = i;
+                 break;
+            }   
+        }
+        rentersRentals[msg.sender][id] = rentersRentals[msg.sender][rentersRentals[msg.sender].length-1];
+        rentersRentals[msg.sender].pop();
+
+
+         
+        emit ToolDeletedFromRentals(msg.sender, _rentalID, block.timestamp);
+     }
+
+
+ /**
+     * @notice user send thr location and caution which in order to ask for the rental of a Rental
+     * - the caution and location is secured until
+     * @dev user send caution and location price for rent a Rental
+     */
+     function sendPaiementForRental(uint _rentalID) external{
+        //TODO
+     }
+
+   /**
+     * @notice renter delegate the NFT in order to validate the rental asking
+     * - the caution and location is still secured
+     * @dev renter validate the delagation of the NFT
+     */
+     function validateNFTDelegationForRental(uint _rentalID, uint _tokenID) external{
+        //TODO
+     }   
+
+
+    /**
+     * @notice user get the tool in real life, has the NFT and valiate the transaction
+     * - the caution is still secured, the location is payed
+     * @dev user validate having the NFT, annd receipt the tool
+     */
+     function validateNFTandToolReception(uint _rentalID, uint _tokenID) external{
+        //TODO
+     }
+
+    /**
+     * @notice user give back the toool at the end of renting
+     * - the caution is still secured, the location is already payed
+     * @dev user give bak th etool
+     */
+     function giveBackToolAfterRental(uint _rentalID) external{
+        //TODO
+     }  
+     
+    /**
+     * @notice renter validate the return of the tool
+     * - the caution is given back
+     * @dev renter validae the return of the tool
+     */
+     function validateReturnToolAfterRental(uint _rentalID) external{
+        //TODO
+     } 
+
+    /**
+     * @notice renter doens't validate the return of the tool. Problem. dispute creation
+     * - the caution still secured
+     * @dev renter doesn't validate the return of the tool, because of a problem
+     */
+     function refuseReturnToolAfterRental(uint _rentalID, string memory message) external{
+        //TODO
+     }
+
+    /**
+     * @notice user confirm dispute and expose its point of view
+     * - the caution still secured
+     * @dev user confirm dispute and expose its point of view
+     */
+     function confirmReturnToolAfterRental(uint _rentalID, string memory message) external{
+        //TODO
+     }
+
+    /**
+     * @notice user redeem its caution or caution and location
+     * - the caution is given back at the end of rental or because the renter refuse the rental
+     * @dev user redeem its caution
+     */
+     function redeemPaymentForRental(uint _rentalID, string memory message) external{
+        //TODO
+     }  
+
+
+  
   
 }

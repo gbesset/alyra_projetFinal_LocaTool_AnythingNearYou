@@ -40,7 +40,7 @@ contract('AnyRental', accounts => {
     /**
      * Smart contract Deploiement
      */
-    describe('Smart contract Deploiement', () => {
+    describe('AnyRental Deploiement', () => {
             beforeEach(async function () {
                 // new instance each time : new() not deploy().
                 anyRentalInstance = await AnyRental.new({ from: _owner });
@@ -59,7 +59,7 @@ contract('AnyRental', accounts => {
         /**
      * Smart contract Permissions
      */
-    describe('Smart contract Permissions', () => {
+    describe('AnyRental Permissions', () => {
             beforeEach(async function () {
                 anyRentalInstance = await AnyRental.new({ from: _owner });
             });
@@ -69,7 +69,7 @@ contract('AnyRental', accounts => {
     /**
      * Smart contract NFTs
      */
-    describe('Smart contract collection NFTs', () => {
+    describe('AnyRental collection NFTs management', () => {
         describe('-- create collection NFTs', () => {
             beforeEach(async function () {
                 anyRentalInstance = await AnyRental.new({ from: _owner });
@@ -138,7 +138,7 @@ contract('AnyRental', accounts => {
 
             it("... owner should delete a NFT collection", async () => {
 
-                const addressColBefore = await anyRentalInstance.getCollectionAddress(_owner)
+                const addressColBefore = await anyRentalInstance.getToolsCollectionAddress(_owner)
                 expect(addressColBefore).to.be.equal(collectionAddress);
 
                 const ownerAddress = await anyRentalInstance.owner.call();
@@ -147,7 +147,7 @@ contract('AnyRental', accounts => {
                 let tx = await anyRentalInstance.deleteCollection();
                 expectEvent(tx, 'NFTCollectionDeleted', { renter: _owner });
 
-                const addressColl = await anyRentalInstance.getCollectionAddress(_owner)
+                const addressColl = await anyRentalInstance.getToolsCollectionAddress(_owner)
                 expect(addressColl).to.be.equal("0x0000000000000000000000000000000000000000");
             });
         });
@@ -161,7 +161,7 @@ contract('AnyRental', accounts => {
                 let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
 
-                    collectionAddress = tx.logs[1].args.renterCollectionAddress;
+                collectionAddress = tx.logs[1].args.renterCollectionAddress;
             });
 
 
@@ -238,10 +238,184 @@ contract('AnyRental', accounts => {
         
     });
 
-    /*
-    {"rentalID": 1, "dayPrice": 10, "caution": 100, "start": 1649124800, "end": 1649211200, "rentalStatus": 0, "isCautionDeposed": false, "isNFTDelegated": false, "isDispute": false, "isRedeemed": false, "renter": "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "collection": "0x52ed77e51efB6324C118f9783384F2Ae80e437d4", "tokenID": 123, "tokenURI": "http://test.com"}*/
+      /**
+     * Smart contract NFTs
+     */
+     describe('AnyRental rental management', () => {
+         describe('-- renter shoud add a Rental to  Rentals', () => {
+            let collectionAddress;
+            let tokenID = 1;
+            let tokenURI = "https://www.example.com/tokenURI";
+            beforeEach(async function () {
+                anyRentalInstance = await AnyRental.new({ from: _owner });
 
-    
+                let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
 
+                collectionAddress = tx.logs[1].args.renterCollectionAddress;
+
+                tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
+                expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(tokenID) });
+
+                rentalExpected = {
+                    "rentalID": 0, 
+                    "dayPrice": 11, 
+                    "caution": 200, 
+                    "start": 0, 
+                    "end": 0, 
+                    "rentalStatus": 0, 
+                    "isCautionDeposed": false, 
+                    "isNFTDelegated": false, 
+                    "isDispute": false, 
+                    "isRedeemed": false,
+                    "renter": "0x0000000000000000000000000000000000000000",
+                    "collection": {
+                        "collection":collectionAddress.address, 
+                        "owner":_renter1
+                    },
+                    "tokenID": tokenID, 
+                    "tokenURI": tokenURI
+                }
+            });
+
+
+            it("... after the NFT creation, owner can add a Rental - should emit ToolAddedToRentals", async () => {
+                tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
+            });
+
+            it("... after the NFT creation, owner can add a Rental -  should emit 2 ToolAddedToRentals ", async () => {
+                tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
+
+                tx = await anyRentalInstance.addToolToRentals(54, 800,  2,"http://another-one",{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(1) });
+
+            });
+            
+            it("... after the NFT creation, owner can add a Rental  - check rental stored", async () => {
+                       
+                await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
+                
+                const rentalRetuned = await anyRentalInstance.getRenterToolByID(_renter1, 0);
+                console.log(rentalRetuned)
+                console.log("--------------")
+                console.log(rentalRetuned.dayPrice)
+                console.log(rentalExpected.dayPrice)
+                expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rentalExpected.rentalID));
+                expect(new BN( rentalRetuned.dayPrice)).to.be.bignumber.equal(new BN(rentalExpected.dayPrice));
+                expect(new BN(rentalRetuned.caution)).to.be.bignumber.equal(new BN(rentalExpected.caution));
+                expect(new BN(rentalRetuned.start)).to.be.bignumber.equal(new BN(rentalExpected.start));
+                expect(new BN(rentalRetuned.end)).to.be.bignumber.equal(new BN(rentalExpected.end));
+                expect(new BN(rentalRetuned.rentalStatus)).to.be.bignumber.equal(new BN(rentalExpected.rentalStatus));
+                expect(new BN(rentalRetuned.isCautionDeposed)).to.be.bignumber.equal(new BN(rentalExpected.isCautionDeposed));
+                expect(new BN(rentalRetuned.isNFTDelegated)).to.be.bignumber.equal(new BN(rentalExpected.isNFTDelegated));
+                expect(new BN(rentalRetuned.isDispute)).to.be.bignumber.equal(new BN(rentalExpected.isDispute));
+                expect(new BN(rentalRetuned.isRedeemed)).to.be.bignumber.equal(new BN(rentalExpected.isRedeemed));
+                expect(rentalRetuned.renter).to.be.equal(rentalExpected.renter);
+                //TODO ICI
+                //expect(rentalRetuned.collection.collection).to.be.equal(rentalExpected.collection.collection);
+                //expect((rentalRetuned.collection.owner)).to.be.equal(rentalExpected.collection.owner);
+                expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(rentalExpected.tokenID));
+                expect(rentalRetuned.tokenURI).to.be.equal(rentalExpected.tokenURI);
+            });
+
+            it("... after the NFT creation, should revert if the renter does'nt have any collection", async () => {
+                await expectRevert(
+                    anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter2 }),
+                    "You don't have any collection"
+                );
+            });
+        
+            it("... after the NFT creation, should revert if the renter reached the maximum size of tools", async () => {
+                await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter1 });
+                await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter1 });
+                await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter1 });
+        
+                await expectRevert(
+                    anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter1 }),
+                    "Maximum number of tools reached"
+                );
+            });
+        
+            it("... after the NFT creation, should revert if the day price is not greater than 0", async () => {
+                await expectRevert(
+                    anyRentalInstance.addToolToRentals(0, 200, tokenID, tokenURI, { from: _renter1 }),
+                    "number must be > 0"
+                );
+            });
+        
+            it("... after the NFT creation, should revert if the caution is not greater than 0", async () => {
+                await expectRevert(
+                    anyRentalInstance.addToolToRentals(11, 0, tokenID, tokenURI, { from: _renter1 }),
+                    "number must be > 0"
+                );
+            });
+        
+            it("... after the NFT creation, event with correct data", async () => {
+                const receipt = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter1 });
+        
+                expectEvent(receipt, "ToolAddedToRentals", {
+                    renter: _renter1,
+                    toolID: new BN(0)
+                });
+            });
+        
+        });
+        describe('-- update a Rental into Rentals', () => {
+            let collectionAddress;
+            let tokenID = 1;
+            tokenURI = "https://www.example.com/tokenURI";
+            
+            beforeEach(async function () {
+                anyRentalInstance = await AnyRental.new({ from: _owner });
+                
+                let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
+                
+                collectionAddress = tx.logs[1].args.renterCollectionAddress;
+                
+                tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
+                expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(tokenID) });
+                
+                tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
+                
+                rentalExpected = {
+                    "rentalID": 0, 
+                    "dayPrice": 21, 
+                    "caution": 210, 
+                }
+            });
+            
+            
+            it("...  owner can update a Rental  - check rental stored before update", async () => {
+                let rentalDefault = await anyRentalInstance.getRenterToolByID(_renter1, 0);     
+                expect(new BN(rentalDefault.rentalID)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalDefault.dayPrice)).to.be.bignumber.equal(new BN(11));
+                expect(new BN(rentalDefault.caution)).to.be.bignumber.equal(new BN(200));
+            });
+            
+            it("... owner can update a Rental - should emit ToolUpdatedFromRentals", async () => {
+                tx = await anyRentalInstance.updateToolIntoRentals(0, 21, 210,{ from: _renter1 });
+                expectEvent(tx, "ToolUpdatedFromRentals", { renter: _renter1,  toolID: new BN(0) });
+                
+            });
+            it("... owner can update a Rental - check modifications", async () => {
+                tx = await anyRentalInstance.updateToolIntoRentals(0, 21, 210,{ from: _renter1 });
+                
+                let rentalDefault = await anyRentalInstance.getRenterToolByID(_renter1, 0);    
+                
+                expect(new BN(rentalDefault.rentalID)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalDefault.dayPrice)).to.be.bignumber.equal(new BN(rentalExpected.dayPrice));
+                expect(new BN(rentalDefault.caution)).to.be.bignumber.equal(new BN(rentalExpected.caution));
+            });
+            
+        });
+        
+        
+        
+    });
+        
 });
   
