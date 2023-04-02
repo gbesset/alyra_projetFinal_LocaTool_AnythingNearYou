@@ -65,21 +65,33 @@ contract AnyRental is Ownable, IAnyRental{
         nbRentalMax = _nb;
     }
 
+    function renterExists(address _renter) internal view returns(bool) {
+        return rentersRentals[_renter].length>0;
+    }
+
     /* ***********************************************
     *   Getters 
     *********************************************** */
-     /**
+     /** 
+     * @notice return the NFT Tools from a renter address
      * @dev get collection from renter Address
+     * @return Tool[]  (NFT attributes)
      */
     function getToolsCollection(address _renter) external view returns(Utils.Tool[] memory){
         //return factory._rentersCollection().tools();
         IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[_renter].collection);
         return collec.getTools();
     }
-
+    /** 
+     * @notice return the NFT Collection address from a renter address
+     * @dev get collection address a from renter Address
+     * @return address of the collection NFT
+     */
     function getToolsCollectionAddress(address _renter) external view returns(address){
         return rentersCollection[_renter].collection;
     }
+    
+
 
     /*function getCollections()external view returns(Utils.Tool[] memory){
         // pour toutes les addresses
@@ -88,22 +100,47 @@ contract AnyRental is Ownable, IAnyRental{
         //ou en js appeler les differentes collections pour les addresses..?
     }*/
 
-    function getRenterTools(address _renter) external view returns(Rental[] memory){
+    /** 
+     * @notice return the Rentals from a renter address
+     * @dev get rentals array from an renter address
+     * @return Rental[]
+     */
+    function getRentalsByRenter(address _renter) external view returns(Rental[] memory){
         return rentersRentals[_renter];
     }
 
-    function getRenterToolByID(address _renter, uint _rentalId) external view returns(Rental memory){
+    /** 
+     * @notice return the Rental by the renter address and rentalId
+     * @dev return a rental from an address and a rentalID
+     * @return Rental 
+     */
+    function getRentalByRenterAddressAndRentalID(address _renter, uint _rentalId) external view returns(Rental memory){
         uint found;
-         for(uint i; i< rentersRentals[msg.sender].length; i++){
-            if(rentersRentals[msg.sender][i].rentalID == _rentalId){
+         for(uint i; i< rentersRentals[_renter].length; i++){
+            if(rentersRentals[_renter][i].rentalID == _rentalId){
                  found=i;
                  break;
             }   
         }
         return rentersRentals[_renter][found];
     }
+        function getRentalIndexByRenterAddressAndRentalID(address _renter, uint _rentalId) internal view returns(uint){
+        uint found;
+         for(uint i; i< rentersRentals[_renter].length; i++){
+            if(rentersRentals[_renter][i].rentalID == _rentalId){
+                 found=i;
+                 break;
+            }   
+        }
+        return found;
+    }
 
-     function getRenterRentalByRentalId(uint _rentalId) internal view returns(Rental memory){
+    /** 
+     * @notice return a Rental by the  rentalId
+     * @dev Internal ! very bad complexity.... don't use often !
+     * @return Rental 
+     */
+    /* function getRentalByRentalId(uint _rentalId) internal view returns(Rental memory){
         Rental memory rentalFound;
          for(uint i; i< rentersList.length; i++){
             Rental[] memory rentalsTmp = rentersRentals[rentersList[i]];
@@ -115,7 +152,7 @@ contract AnyRental is Ownable, IAnyRental{
             }   
         }
         return rentalFound;
-     }
+     }*/
     
 
 
@@ -148,7 +185,7 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
     /**
-     * @notice drenter delete its NFT Collection of a
+     * @notice renter delete its NFT Collection of a
      */
     function deleteCollection() external {
         require(msg.sender != address(0), "address zero is not valid");
@@ -290,15 +327,20 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution and location is secured until
      * @dev user send caution and location price for rent a Rental
      */
-     function sendPaiementForRental(uint _rentalID, uint64 _begin, uint64 _end) external{
+     function sendPaiementForRental(address _renter, uint _rentalID, uint64 _begin, uint64 _end) external{
+         require(renterExists(_renter), "Renter does not exist");
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
          require(_begin > 0, "begin must be a valid date");
-         require(_begin > 0, "endmust be a valid daten");
+         require(_end > 0, "end must be a valid date");
          require(_begin < _end, "End of rental can't be before begin");
 
+         uint found = getRentalIndexByRenterAddressAndRentalID(_renter, _rentalID);
+        Rental storage rental = rentersRentals[_renter][found];
+        require(rental.rentalID == _rentalID, "The rental is not available.");
+        require(rental.rentalStatus == RentalStatus.AVAILABLE, "The rental status is incorrect.");
+        
         //gestion caution et paiement
 
-        Rental memory rental = getRenterRentalByRentalId(_rentalID);
         rental.start = _begin;
         rental.end = _end;
         rental.rentalStatus = RentalStatus.RENTAL_REQUESTED;
@@ -314,7 +356,16 @@ contract AnyRental is Ownable, IAnyRental{
      * @dev renter validate the delagation of the NFT
      */
      function validateNFTDelegationForRental(uint _rentalID, uint _tokenID) external{
-        //TODO
+         require(rentalIds.current() >= _rentalID, "Tool does not exist");
+         require(_tokenID > 0, "token ID must be valid");
+
+        Rental memory rental = this.getRentalByRenterAddressAndRentalID(msg.sender, _rentalID);
+        require(rental.rentalStatus == RentalStatus.RENTAL_REQUESTED, "The rental status is incorrect.");
+ 
+        rental.rentalStatus = RentalStatus.RENTAL_ACCEPTED_NFT_SENT;
+        rental.isNFTDelegated = true;
+        
+        emit rentalAccepted(rental.collection.owner, msg.sender,  rental.collection.collection, rental.tokenID, block.timestamp);
      }   
 
 

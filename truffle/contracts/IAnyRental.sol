@@ -8,7 +8,7 @@ interface IAnyRental {
      enum RentalStatus {
         AVAILABLE,                          // initiate state : tool available
         RENTAL_REQUESTED,                   // User ask to rent a tool (send the caution and the location)
-        RENTAL_ACCEPTED,                    // Owner accept. (delegate the NFT)
+        RENTAL_ACCEPTED_NFT_SENT,                    // Owner accept. (delegate the NFT)
         VALIDATE_TOOL_RECEIPT_AND_PAYMENT,  // User alrrady have the NFT, receipt the tool and confirm payment
         ON_GOING,                           // User has the tool and use it
         COMPLETED_USER,                     // User give back the tool to the owner
@@ -149,20 +149,34 @@ interface IAnyRental {
     // getUserRentalById  ?
 
     
-     /**
-     * @notice  
-     * @dev get NFT Collection Tool created by a renter (all, and from an Id)
+     /** 
+     * @notice return the NFT Tools from a renter address
+     * @dev get collection from renter Address
+     * @return Tool[]  (NFT attributes)
      */
      function getToolsCollection(address _renter) external returns(Utils.Tool[] memory);
+     
+    /** 
+     * @notice return the NFT Collection address from a renter address
+     * @dev get collection address a from renter Address
+     * @return address of the collection NFT
+     */
      function getToolsCollectionAddress(address _renter) external view returns(address);
      //function getCollections()external view returns(Utils.Tool[] memory){
     
-      /**
-     * @notice  
-     * @dev get Rentals created by a renter (all, from an ID)
+    /** 
+     * @notice return the Rentals from a renter address
+     * @dev get collection from renter Address
+     * @return Rental[]
      */
-    function getRenterTools(address _renter) external view returns(Rental[] memory);
-    function getRenterToolByID(address renter, uint _rentalId) external view returns(Rental memory);
+    function getRentalsByRenter(address _renter) external view returns(Rental[] memory);
+    
+      /** 
+     * @notice return the Rental by the renter address and rentalId
+     * @dev return a rental from an address and a rentalID
+     * @return Rental 
+     */
+     function getRentalByRenterAddressAndRentalID(address renter, uint _rentalId) external view returns(Rental memory);
   
     // getUserToolById     ?
     // getToolRental        // pour un tool, renter, user, duree caution, etc
@@ -219,7 +233,7 @@ interface IAnyRental {
      * - the caution and location is secured until
      * @dev user send caution and location price for rent a Rental
      */
-     function sendPaiementForRental(uint _rentalID, uint64 _begin, uint64 _end)  external;   
+     function sendPaiementForRental(address _renter, uint _rentalID, uint64 _begin, uint64 _end)  external;   
 
   /**
      * @notice renter refuse the rental
