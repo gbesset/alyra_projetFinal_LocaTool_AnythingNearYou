@@ -39,27 +39,29 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-      - name: Navigate to truffle directory
-        run: cd truffle
 
       - name: Install & setup Node.js
+        working-directory: truffle
         uses: actions/setup-node@v2
         with:
           node-version: "14.x"
 
       - name: Install dependencies (node & truffle)
+        working-directory: truffle
         run: |
           npm install
           npm install -g truffle
 
       - name: Compile Contracts
+        working-directory: truffle
         run: truffle compile
 
       - name: Migrate Contracts
+        working-directory: truffle
         run: truffle migrate --reset
 
       - name: Run Truffle tests
+        working-directory: truffle
         run: truffle test
 
   # code coverage du code
