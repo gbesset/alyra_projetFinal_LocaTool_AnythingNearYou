@@ -175,7 +175,7 @@ interface IAnyRental {
      /**
      * @dev Create a new NFT collection
      */
-    function createCollection(string memory collectionName) external returns(address collectionCreated);
+    function createCollection(string memory _collectionName, string memory _collectionSymbol) external returns(address collectionCreated);
     function deleteCollection() external; 
     
     /**
@@ -219,7 +219,7 @@ interface IAnyRental {
      * - the caution and location is secured until
      * @dev user send caution and location price for rent a Rental
      */
-     //function sendPaiementForRental(uint _rentalID, uint64 _begin, uint64 _end)  external;   
+     function sendPaiementForRental(uint _rentalID, uint64 _begin, uint64 _end)  external;   
 
   /**
      * @notice renter refuse the rental

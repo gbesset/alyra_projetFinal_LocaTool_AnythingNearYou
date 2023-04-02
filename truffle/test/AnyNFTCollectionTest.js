@@ -42,7 +42,7 @@ contract('AnyNFTCollection', accounts => {
 
     it('...Should be instantiated and default values defined', async () => {
          expect(await anyRentalCollectionInstance.owner()).to.be.equal(_owner);
-         expect(await anyRentalCollectionInstance.factory()).to.be.equal(_owner);
+         expect(await anyRentalCollectionInstance.factory()).to.be.equal("0x0000000000000000000000000000000000000000");
 
          const tools = await anyRentalCollectionInstance.getTools({ from: _renter1 } )
          expect(tools).to.not.be.empty;
