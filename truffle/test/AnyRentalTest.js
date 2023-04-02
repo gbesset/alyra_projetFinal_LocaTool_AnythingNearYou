@@ -320,7 +320,7 @@ contract('AnyRental', accounts => {
                        
                 await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
                 
-                const rentalRetuned = await anyRentalInstance.getRenterToolByID(_renter1, 0);
+                const rentalRetuned = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_renter1, 0);
                 expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rentalExpected.rentalID));
                 expect(new BN( rentalRetuned.dayPrice)).to.be.bignumber.equal(new BN(rentalExpected.dayPrice));
                 expect(new BN(rentalRetuned.caution)).to.be.bignumber.equal(new BN(rentalExpected.caution));
@@ -414,7 +414,7 @@ contract('AnyRental', accounts => {
             
             
             it("...  owner can update a Rental  - check rental stored before update", async () => {
-                let rentalDefault = await anyRentalInstance.getRenterToolByID(_renter1, 0);     
+                let rentalDefault = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_renter1, 0);     
                 expect(new BN(rentalDefault.rentalID)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalDefault.dayPrice)).to.be.bignumber.equal(new BN(11));
                 expect(new BN(rentalDefault.caution)).to.be.bignumber.equal(new BN(200));
@@ -428,7 +428,7 @@ contract('AnyRental', accounts => {
             it("... owner can update a Rental - check modifications", async () => {
                 tx = await anyRentalInstance.updateToolIntoRentals(0, 21, 210,{ from: _renter1 });
                 
-                let rentalDefault = await anyRentalInstance.getRenterToolByID(_renter1, 0);    
+                let rentalDefault = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_renter1, 0);    
                 
                 expect(new BN(rentalDefault.rentalID)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalDefault.dayPrice)).to.be.bignumber.equal(new BN(rentalExpected.dayPrice));
@@ -467,7 +467,7 @@ contract('AnyRental', accounts => {
     
     
             it("...  owner can delete a Rental  - check rental stored before delete", async () => {
-                 let rentals = await anyRentalInstance.getRenterTools(_renter1);     
+                 let rentals = await anyRentalInstance.getRentalsByRenter(_renter1);     
                  expect(new BN(rentals.length)).to.be.bignumber.equal(new BN(3));
                  expect(new BN(rentals[0].dayPrice)).to.be.bignumber.equal(new BN(11));
                  expect(new BN(rentals[1].dayPrice)).to.be.bignumber.equal(new BN(22));
@@ -482,7 +482,7 @@ contract('AnyRental', accounts => {
             it("... owner can delete a Rental - check rentals", async () => {
                  tx = await anyRentalInstance.deleteToolIntoRentals(1,{ from: _renter1 });
     
-                 let rentals = await anyRentalInstance.getRenterTools(_renter1);     
+                 let rentals = await anyRentalInstance.getRentalsByRenter(_renter1);     
                  expect(new BN(rentals.length)).to.be.bignumber.equal(new BN(2));
                  expect(new BN(rentals[0].dayPrice)).to.be.bignumber.equal(new BN(11));
                  expect(new BN(rentals[1].dayPrice)).to.be.bignumber.equal(new BN(33));
@@ -495,7 +495,7 @@ contract('AnyRental', accounts => {
     /**
      * * AnyRental check all the managment of a rental (workflow)
      */
-    describe('AnyRental: rental workflow (process between user, renter and DAO)', () => {
+    describe.only('AnyRental: rental workflow (process between user, renter and DAO)', () => {
         describe('-- user shoud send paiment for a rental', () => {
 
             let collectionAddress;
@@ -503,6 +503,14 @@ contract('AnyRental', accounts => {
             let rental1 = 0;
             let token2 = 2;
             let rental2 = 1;
+            let token3 = 3;
+            let rental3 = 2;
+
+
+            const start = Math.floor(new Date().getTime()/1000) + 86400;
+            const end = Math.floor(new Date().getTime()/1000) + (86400 *2);
+
+
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
                 anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
@@ -524,18 +532,70 @@ contract('AnyRental', accounts => {
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(20, 300, token2, tokenURI,{ from: _renter1 });
                  expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(rental2) });
+
+
+                 let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _renter2 });
+                 expectEvent(tx2, 'NFTCollectionCreated', { renter: _renter2, renterCollectionName:"Collection de test for renter2"  });
+                 
+                // add third tool to another one to increment toolID
+                tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _renter2 });
+                expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
+                tx = await anyRentalInstance.addToolToRentals(5, 40, token1, tokenURI,{ from: _renter2 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter2,  toolID: new BN(rental3) });
+
+
             });
 
 
             it("... user should book a rental, sending paiement and caution - emit ToolAddedToRentals", async () => {
-                const start = Math.floor(new Date().getTime()/1000) + 86400;
-                const end = Math.floor(new Date().getTime()/1000) + (86400 *2);
-                tx = await anyRentalInstance.sendPaiementForRental(rental1, start, end  ,{ from: _user1 });
+
+                tx = await anyRentalInstance.sendPaiementForRental(_renter1, rental1, start, end  ,{ from: _user1 });
                 expectEvent(tx, "rentalRequested", { renter: _renter1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
-            
+            it("... user should book a rental, sending paiement and caution - check rental params", async () => {
 
+                tx = await anyRentalInstance.sendPaiementForRental(_renter1, rental1, start, end  ,{ from: _user1 });
+               
+                const rentalRetuned = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_renter1, rental1);
+                expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rental1));
+                expect(new BN( rentalRetuned.dayPrice)).to.be.bignumber.equal(new BN(11));
+                expect(new BN(rentalRetuned.caution)).to.be.bignumber.equal(new BN(200));
+                expect(new BN(rentalRetuned.start)).to.be.bignumber.equal(new BN(start));
+                expect(new BN(rentalRetuned.end)).to.be.bignumber.equal(new BN(end));
+                expect(new BN(rentalRetuned.rentalStatus)).to.be.bignumber.equal(new BN(1));
+                expect(rentalRetuned.isCautionDeposed).to.be.true;
+                expect(new BN(rentalRetuned.isNFTDelegated)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalRetuned.isDispute)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalRetuned.isRedeemed)).to.be.bignumber.equal(new BN(0));
+                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
+                expect((rentalRetuned.collection.owner)).to.be.equal(_renter1);
+                expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
+                expect(rentalRetuned.tokenURI).to.be.equal(tokenURI);
+            });            
+
+            it("... user should book a rental, sending paiement and caution - check paiement", async () => {
+            });
+
+            it("... user should book a rental, sending paiement and caution - errors dates", async () => {
+                await expectRevert(
+                    anyRentalInstance.sendPaiementForRental(_renter1, rental1, end, start  ,{ from: _user1 }),
+                    "End of rental can't be before begin"
+                );
+            });
+            it("... user should book a rental, sending paiement and caution - errors renter", async () => {
+                await expectRevert(
+                    anyRentalInstance.sendPaiementForRental(_user2, rental1,start, end  ,{ from: _user1 }),
+                    "Renter does not exist"
+                );
+            });
+            it("... user should book a rental, sending paiement and caution - errors renter", async () => {
+                await expectRevert(
+                    anyRentalInstance.sendPaiementForRental(_renter1, 3, start, end  ,{ from: _user1 }),
+                    "The rental is not available"
+                );
+            });
 
         });
         describe('-- renter shoud validate a NFT delegation to a user (in order to validate the rental asking)', () => {
