@@ -4,10 +4,10 @@ pragma solidity 0.8.19;
 import "./IAnyRental.sol";
 import "./IAnyNFTCollection.sol";
 import "./AnyNFTCollection.sol";
-//import "./AnyNFTCollectionFactory.sol";
+import "./AnyNFTCollectionFactory.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "./Utils.sol";
-import "../node_modules/@ganache/console.log/console.sol";
+//import "../node_modules/@ganache/console.log/console.sol";
 
 /**
  * @title Rental Any  contract 
@@ -19,12 +19,9 @@ contract AnyRental is Ownable, IAnyRental{
 
    using Counters for Counters.Counter;
 
-    //AnyNFTCollectionFactory public factory;
+    AnyNFTCollectionFactory public factory;
 
     Counters.Counter private rentalIds;
-
-    // TODO a supprimer ??
-    Rental[] rentals;
 
 
     // mapping of  a user address to the rented tools
@@ -44,9 +41,9 @@ contract AnyRental is Ownable, IAnyRental{
 
 
 
-    constructor(){
-        // Instantiate and deploy NFT Factory
-        //factory = new AnyNFTCollectionFactory();
+    constructor(address _anyNFTFactory){
+        // Instantiate the Any NFT Factory from its address
+        factory = AnyNFTCollectionFactory(_anyNFTFactory);
     }
 
 
@@ -130,23 +127,24 @@ contract AnyRental is Ownable, IAnyRental{
      * @notice Create the NFT Collection of a renter
      * @return collectionCreated : colletion address deployed
      */
-    function createCollection(string memory _collectionName) external returns(address){
+    function createCollection(string memory _collectionName, string memory _collectionSymbol) external returns(address){
         require(msg.sender != address(0), "address zero is not valid");
         require(rentersCollection[msg.sender].collection==address(0), "You already have created your collection");
         require(!Utils.isEqualString(_collectionName,""), "collection name can't be empty");
 
-        AnyNFTCollection collectionCreated  = new AnyNFTCollection(_collectionName, "ANY");
-        
+         address collectionAddress = factory.createAnyNFTCollection(msg.sender, _collectionName, _collectionSymbol);
+         //AnyNFTCollection collectionCreated = AnyNFTCollection(collectionAddress);
+
         // update Renters Collection
-        rentersCollection[msg.sender].collection = address(collectionCreated);
+        rentersCollection[msg.sender].collection = collectionAddress;
         rentersCollection[msg.sender].owner =  msg.sender;
 
         //update the list of renters
         rentersList.push(msg.sender);
 
-        emit NFTCollectionCreated(msg.sender, _collectionName , address(collectionCreated), block.timestamp);
-        collectionCreated.transferOwnership(msg.sender);
-        return address(collectionCreated);
+        emit NFTCollectionCreated(msg.sender, _collectionName , collectionAddress, block.timestamp);
+        
+        return collectionAddress;
     }
 
     /**
@@ -292,7 +290,7 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution and location is secured until
      * @dev user send caution and location price for rent a Rental
      */
-    /* function sendPaiementForRental(uint _rentalID, uint64 _begin, uint64 _end) external{
+     function sendPaiementForRental(uint _rentalID, uint64 _begin, uint64 _end) external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
          require(_begin > 0, "begin must be a valid date");
          require(_begin > 0, "endmust be a valid daten");
@@ -308,7 +306,7 @@ contract AnyRental is Ownable, IAnyRental{
         rental.renter = msg.sender;
 
          emit rentalRequested(rental.collection.owner, msg.sender,  rental.collection.collection, rental.tokenID, block.timestamp);
-     }*/
+     }
 
    /**
      * @notice renter delegate the NFT in order to validate the rental asking

@@ -22,7 +22,6 @@ contract AnyNFTCollection is ERC4907, IAnyNFTCollection, Ownable{
     uint8 public constant MAX_TOOLS = 100;
 
     constructor(string memory _name, string memory _symbol) ERC4907(_name,_symbol){
-        factory = msg.sender;
 
         // Fill the first element of tools to match NFT tokenId that starts at 1
         Utils.Tool memory _tool0;
@@ -66,8 +65,14 @@ contract AnyNFTCollection is ERC4907, IAnyNFTCollection, Ownable{
     }
  
 /* ***********************************************
-*   Getters 
+*   setter / Getters 
 *********************************************** */
+
+function setFactoryAddress(address _factoryAuthorized) external onlyOwner{
+        factory = _factoryAuthorized;
+    }
+
+
     function getTools() public view returns (Utils.Tool[] memory){
         return tools;
     }
