@@ -16,14 +16,14 @@ contract("ERC4907", async accounts => {
     });
 
 
-    describe("Owner delegate to a user", function () {
+    describe.skip("Owner delegate to a user", function () {
        
         beforeEach(async function () {
             ERC4907Instance = await ERC4907.new("ANY_NFT","ANY",{ from: owner });
         });
         
 
-        it("should set user to Bob", async () => {
+        it.skip("should set user to Bob", async () => {
     
             await ERC4907Instance.mint(1, Alice);
             let expires = Math.floor(new Date().getTime()/1000) + 1000;

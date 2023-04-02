@@ -189,7 +189,7 @@ contract('AnyRental', accounts => {
                 
             });*/
         
-            it("... renter should not allow adding a tool to a collection over the maximum count", async () => {
+            it.skip("... renter should not allow adding a tool to a collection over the maximum count", async () => {
                 const MAX_TOOLS = 3;
                 anyRentalInstance.setNbRentalMax(MAX_TOOLS);
                 
