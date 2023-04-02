@@ -39,7 +39,7 @@ contract('AnyRental', accounts => {
     /**
      * Smart contract Deploiement
      */
-    describe('AnyRental Deploiement', () => {
+    describe('AnyRental: Deploiement', () => {
             beforeEach(async function () {
                 // new instance each time : new() not deploy().
                 anyRentalInstance = await AnyRental.new({ from: _owner });
@@ -58,7 +58,7 @@ contract('AnyRental', accounts => {
         /**
      * Smart contract Permissions
      */
-    describe('AnyRental Permissions', () => {
+    describe('AnyRental: Permissions', () => {
             beforeEach(async function () {
                 anyRentalInstance = await AnyRental.new({ from: _owner });
             });
@@ -66,9 +66,9 @@ contract('AnyRental', accounts => {
     });
 
     /**
-     * Smart contract NFTs
+     * AnyRental check all the managment of the NFTs factory
      */
-    describe('AnyRental collection NFTs management', () => {
+    describe('AnyRental:  NFTs collection management (a NFT Tool throw the factory)', () => {
         describe('-- create collection NFTs', () => {
             beforeEach(async function () {
                 anyRentalInstance = await AnyRental.new({ from: _owner });
@@ -241,9 +241,9 @@ contract('AnyRental', accounts => {
     });
 
       /**
-     * Smart contract NFTs
+     * * AnyRental check all the managment of the Rentals of a renter (add/update/delete)
      */
-     describe('AnyRental rental management', () => {
+     describe('AnyRental: rental management (a Rental into a renter list of rentals)', () => {
          describe('-- renter shoud add a Rental to  Rentals', () => {
             let collectionAddress;
             let tokenID = 1;
@@ -467,5 +467,78 @@ contract('AnyRental', accounts => {
         
     });
         
+    /**
+     * * AnyRental check all the managment of a rental (workflow)
+     */
+    describe('AnyRental: rental workflow (process between user, renter and DAO)', () => {
+        describe('-- user shoud send paiment for a rental', () => {
+        });
+        describe('-- renter shoud validate a NFT delegation to a user (in order to validate the rental asking)', () => {
+        });
+        describe('-- user shoud validate a NFT reception (in order to validate the receipt of the tool)', () => {
+        });
+        describe('-- user shoud give back the tool to end the rental', () => {
+        });
+        describe('-- renter shoud validate the return of the tool and end the rental', () => {
+        });
+        describe('-- renter shoud refuse the return of the tool and create a dispute', () => {
+        });
+        describe('-- user shoud confirm the dispute', () => {
+        });
+        describe('-- user shoud redeem its payment (caution or rental decline)', () => {
+        });
+        
+        
+            let collectionAddress;
+            let tokenID = 1;
+            let tokenURI = "https://www.example.com/tokenURI";
+            beforeEach(async function () {
+                anyRentalInstance = await AnyRental.new({ from: _owner });
+
+                let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
+
+                collectionAddress = tx.logs[1].args.renterCollectionAddress;
+
+                tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
+                expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(tokenID) });
+
+                rentalExpected = {
+                    "rentalID": 0, 
+                    "dayPrice": 11, 
+                    "caution": 200, 
+                    "start": 0, 
+                    "end": 0, 
+                    "rentalStatus": 0, 
+                    "isCautionDeposed": false, 
+                    "isNFTDelegated": false, 
+                    "isDispute": false, 
+                    "isRedeemed": false,
+                    "renter": "0x0000000000000000000000000000000000000000",
+                    "collection": {
+                        "collection":collectionAddress.address, 
+                        "owner":_renter1
+                    },
+                    "tokenID": tokenID, 
+                    "tokenURI": tokenURI
+                }
+            });
+
+
+            it("... after the NFT creation, owner can add a Rental - should emit ToolAddedToRentals", async () => {
+                tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
+            });
+
+            it("... after the NFT creation, owner can add a Rental -  should emit 2 ToolAddedToRentals ", async () => {
+                tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
+
+                tx = await anyRentalInstance.addToolToRentals(54, 800,  2,"http://another-one",{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(1) });
+
+            });
+            
+    });
 });
   

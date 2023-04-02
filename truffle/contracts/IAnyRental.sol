@@ -209,12 +209,25 @@ interface IAnyRental {
      */
      function deleteToolIntoRentals(uint _rentalID) external;    
 
+
     /**
-     * @notice user send thr location and caution which in order to ask for the rental of a Rental
+    * Managment of a rental 
+    * workflow cf documentation
+     */
+
+    /**
+     * @notice user send the location and caution which in order to ask for the rental of a Rental
      * - the caution and location is secured until
      * @dev user send caution and location price for rent a Rental
      */
      function sendPaiementForRental(uint _rentalID)  external; //, start, end) external;   
+
+  /**
+     * @notice renter refuse the rental
+     * - the caution and location is still secured
+     * @dev renter refuse to rent its tool
+     */
+     //function refuseRental(uint _rentalID, uint _tokenID, string message) external;   
 
    /**
      * @notice renter delegate the NFT in order to validate the rental asking
@@ -225,7 +238,7 @@ interface IAnyRental {
 
 
     /**
-     * @notice user get the tool in real life, has the NFT and valiate the transaction
+     * @notice user get the tool in real life, has the NFT and validate the transaction
      * - the caution is still secured, the location is payed
      * @dev user validate having the NFT, annd receipt the tool
      */
@@ -257,7 +270,7 @@ interface IAnyRental {
      * - the caution still secured
      * @dev user confirm dispute and expose its point of view
      */
-     function confirmReturnToolAfterRental(uint _rentalID, string memory message) external;  
+     function confirmDisputeAfterRental(uint _rentalID, string memory message) external;  
 
     /**
      * @notice user redeem its caution or caution and location

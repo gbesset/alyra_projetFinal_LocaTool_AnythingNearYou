@@ -331,7 +331,7 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution still secured
      * @dev user confirm dispute and expose its point of view
      */
-     function confirmReturnToolAfterRental(uint _rentalID, string memory message) external{
+     function confirmDisputeAfterRental(uint _rentalID, string memory message) external{
         //TODO
      }
 
