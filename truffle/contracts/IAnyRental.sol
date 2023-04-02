@@ -63,7 +63,7 @@ interface IAnyRental {
        /**
      * @dev Emitted when a renter add a tool to its NFT Collection.
      */
-    event ToolAddedToRentals(address renter, uint toolID, uint timestamp);
+    event ToolAddedToRentals(address renter, uint toolID, uint tokenID, uint timestamp);
     
     /**
      * @dev Emitted when a renter delete a tool into its NFT Collection.
@@ -163,8 +163,7 @@ interface IAnyRental {
      */
     function getRenterTools(address _renter) external view returns(Rental[] memory);
     function getRenterToolByID(address renter, uint _rentalId) external view returns(Rental memory);
-
-    
+  
     // getUserToolById     ?
     // getToolRental        // pour un tool, renter, user, duree caution, etc
 
@@ -220,7 +219,7 @@ interface IAnyRental {
      * - the caution and location is secured until
      * @dev user send caution and location price for rent a Rental
      */
-     function sendPaiementForRental(uint _rentalID)  external; //, start, end) external;   
+     //function sendPaiementForRental(uint _rentalID, uint64 _begin, uint64 _end)  external;   
 
   /**
      * @notice renter refuse the rental

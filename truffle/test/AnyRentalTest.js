@@ -283,15 +283,15 @@ contract('AnyRental', accounts => {
 
             it("... after the NFT creation, owner can add a Rental - should emit ToolAddedToRentals", async () => {
                 tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0), tokenID: new BN(tokenID) });
             });
 
             it("... after the NFT creation, owner can add a Rental -  should emit 2 ToolAddedToRentals ", async () => {
                 tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0), tokenID: new BN(tokenID) });
 
                 tx = await anyRentalInstance.addToolToRentals(54, 800,  2,"http://another-one",{ from: _renter1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(1), tokenID: new BN(2) });
 
             });
             
@@ -472,6 +472,44 @@ contract('AnyRental', accounts => {
      */
     describe('AnyRental: rental workflow (process between user, renter and DAO)', () => {
         describe('-- user shoud send paiment for a rental', () => {
+
+            let collectionAddress;
+            let token1 = 1;
+            let rental1 = 0;
+            let token2 = 2;
+            let rental2 = 1;
+            beforeEach(async function () {
+                anyRentalInstance = await AnyRental.new({ from: _owner });
+
+                let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
+
+                collectionAddress = tx.logs[1].args.renterCollectionAddress;
+
+                // add first tool
+                tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
+                expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(token1) });
+                tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(rental1) });
+
+                 // add second tool
+                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _renter1 });
+                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(token2) });
+                 tx = await anyRentalInstance.addToolToRentals(20, 300, tokenID, tokenURI,{ from: _renter1 });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(rental2) });
+            });
+
+
+          /*  it.only("... user should book a rental, sending paiement and caution - emit ToolAddedToRentals", async () => {
+                const start = Math.floor(new Date().getTime()/1000) + 86400;
+                const end = Math.floor(new Date().getTime()/1000) + (86400 *2);
+                tx = await anyRentalInstance.sendPaiementForRental(rental1, start, end  ,{ from: _user1 });
+                expectEvent(tx, "rentalRequested", { renter: _renter1, address: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token2) });
+            });*/
+
+            
+
+
         });
         describe('-- renter shoud validate a NFT delegation to a user (in order to validate the rental asking)', () => {
         });
@@ -489,56 +527,7 @@ contract('AnyRental', accounts => {
         });
         
         
-            let collectionAddress;
-            let tokenID = 1;
-            let tokenURI = "https://www.example.com/tokenURI";
-            beforeEach(async function () {
-                anyRentalInstance = await AnyRental.new({ from: _owner });
-
-                let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
-                expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
-
-                collectionAddress = tx.logs[1].args.renterCollectionAddress;
-
-                tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
-                expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(tokenID) });
-
-                rentalExpected = {
-                    "rentalID": 0, 
-                    "dayPrice": 11, 
-                    "caution": 200, 
-                    "start": 0, 
-                    "end": 0, 
-                    "rentalStatus": 0, 
-                    "isCautionDeposed": false, 
-                    "isNFTDelegated": false, 
-                    "isDispute": false, 
-                    "isRedeemed": false,
-                    "renter": "0x0000000000000000000000000000000000000000",
-                    "collection": {
-                        "collection":collectionAddress.address, 
-                        "owner":_renter1
-                    },
-                    "tokenID": tokenID, 
-                    "tokenURI": tokenURI
-                }
-            });
-
-
-            it("... after the NFT creation, owner can add a Rental - should emit ToolAddedToRentals", async () => {
-                tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
-            });
-
-            it("... after the NFT creation, owner can add a Rental -  should emit 2 ToolAddedToRentals ", async () => {
-                tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
-
-                tx = await anyRentalInstance.addToolToRentals(54, 800,  2,"http://another-one",{ from: _renter1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(1) });
-
-            });
-            
+           
     });
 });
   

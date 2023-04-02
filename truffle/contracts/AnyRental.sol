@@ -94,15 +94,31 @@ contract AnyRental is Ownable, IAnyRental{
     function getRenterTools(address _renter) external view returns(Rental[] memory){
         return rentersRentals[_renter];
     }
+
     function getRenterToolByID(address _renter, uint _rentalId) external view returns(Rental memory){
         uint found;
          for(uint i; i< rentersRentals[msg.sender].length; i++){
             if(rentersRentals[msg.sender][i].rentalID == _rentalId){
                  found=i;
+                 break;
             }   
         }
         return rentersRentals[_renter][found];
     }
+
+     function getRenterRentalByRentalId(uint _rentalId) internal view returns(Rental memory){
+        Rental memory rentalFound;
+         for(uint i; i< rentersList.length; i++){
+            Rental[] memory rentalsTmp = rentersRentals[rentersList[i]];
+            for(uint j; j<rentalsTmp.length; j++){
+                if(rentalsTmp[j].rentalID == _rentalId){
+                     rentalFound=rentalsTmp[j];
+                    break;
+                }
+            }   
+        }
+        return rentalFound;
+     }
     
 
 
@@ -167,7 +183,7 @@ contract AnyRental is Ownable, IAnyRental{
 
     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external returns(uint tokenId){
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
-        //require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");
+
         require(rentersRentals[msg.sender].length < nbRentalMax, "Maximum number of tools reached");
         
         IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[msg.sender].collection);
@@ -228,7 +244,7 @@ contract AnyRental is Ownable, IAnyRental{
         rentersRentals[msg.sender].push(rental);
 
         rentalIds.increment();
-        emit ToolAddedToRentals(msg.sender, newRentalIds , block.timestamp);
+        emit ToolAddedToRentals(msg.sender, newRentalIds , _tokenID, block.timestamp);
     }
 
      /**
@@ -272,13 +288,27 @@ contract AnyRental is Ownable, IAnyRental{
 
 
  /**
-     * @notice user send thr location and caution which in order to ask for the rental of a Rental
+     * @notice user send the location and caution which in order to ask for the rental of a Rental
      * - the caution and location is secured until
      * @dev user send caution and location price for rent a Rental
      */
-     function sendPaiementForRental(uint _rentalID) external{
-        //TODO
-     }
+    /* function sendPaiementForRental(uint _rentalID, uint64 _begin, uint64 _end) external{
+         require(rentalIds.current() >= _rentalID, "Tool does not exist");
+         require(_begin > 0, "begin must be a valid date");
+         require(_begin > 0, "endmust be a valid daten");
+         require(_begin < _end, "End of rental can't be before begin");
+
+        //gestion caution et paiement
+
+        Rental memory rental = getRenterRentalByRentalId(_rentalID);
+        rental.start = _begin;
+        rental.end = _end;
+        rental.rentalStatus = RentalStatus.RENTAL_REQUESTED;
+        rental.isCautionDeposed = true;
+        rental.renter = msg.sender;
+
+         emit rentalRequested(rental.collection.owner, msg.sender,  rental.collection.collection, rental.tokenID, block.timestamp);
+     }*/
 
    /**
      * @notice renter delegate the NFT in order to validate the rental asking
