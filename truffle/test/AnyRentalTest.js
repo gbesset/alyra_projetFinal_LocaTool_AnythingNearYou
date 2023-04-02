@@ -15,7 +15,6 @@ contract('AnyRental', accounts => {
     const _user2 = accounts[4];
     const _user3 = accounts[5];
   
-    const MAX_TOOLS = new BN(3);
 
     //instance declaration
     let anyRentalInstance;
@@ -52,7 +51,7 @@ contract('AnyRental', accounts => {
             });
 
             it('...Should be instantiated and default values defined', async () => {
-                expect(await anyRentalInstance.MAX_TOOLS()).to.be.bignumber.equal(MAX_TOOLS);
+                expect(await anyRentalInstance.nbRentalMax.call()).to.be.bignumber.equal(new BN(20));
             });
     });
 
@@ -191,6 +190,9 @@ contract('AnyRental', accounts => {
             });*/
         
             it("... renter should not allow adding a tool to a collection over the maximum count", async () => {
+                const MAX_TOOLS = 3;
+                anyRentalInstance.setNbRentalMax(MAX_TOOLS);
+                
                 for (let i = 0; i < MAX_TOOLS; i++) {
                     await anyRentalInstance.addToolToCollection(`https://www.example.com/tokenURI${i}`, i, `Outil ${i}`, `Description de l'outil ${i}`, { from: _renter1 });
                 }
@@ -298,10 +300,6 @@ contract('AnyRental', accounts => {
                 await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
                 
                 const rentalRetuned = await anyRentalInstance.getRenterToolByID(_renter1, 0);
-                console.log(rentalRetuned)
-                console.log("--------------")
-                console.log(rentalRetuned.dayPrice)
-                console.log(rentalExpected.dayPrice)
                 expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rentalExpected.rentalID));
                 expect(new BN( rentalRetuned.dayPrice)).to.be.bignumber.equal(new BN(rentalExpected.dayPrice));
                 expect(new BN(rentalRetuned.caution)).to.be.bignumber.equal(new BN(rentalExpected.caution));
@@ -328,6 +326,9 @@ contract('AnyRental', accounts => {
             });
         
             it("... after the NFT creation, should revert if the renter reached the maximum size of tools", async () => {
+               const MAX_TOOLS = 3;
+               anyRentalInstance.setNbRentalMax(MAX_TOOLS)
+               
                 await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter1 });
                 await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter1 });
                 await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _renter1 });
@@ -413,7 +414,56 @@ contract('AnyRental', accounts => {
             
         });
         
-        
+        describe('-- delete a Rental into Rentals', () => {
+            let collectionAddress;
+            let tokenID = 1;
+            tokenURI = "https://www.example.com/tokenURI";
+           
+            beforeEach(async function () {
+                anyRentalInstance = await AnyRental.new({ from: _owner });
+    
+                let tx = await anyRentalInstance.createCollection("Collection de test", { from: _renter1 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
+    
+                collectionAddress = tx.logs[1].args.renterCollectionAddress;
+    
+                tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _renter1 });
+                expectEvent(tx, "NFTToolAddedToCollection", { renter: _renter1,  tokenId: new BN(tokenID) });
+    
+               tx = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(0) });
+             
+                tx = await anyRentalInstance.addToolToRentals(22, 420, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(1) });
+    
+                tx = await anyRentalInstance.addToolToRentals(33, 350, tokenID, tokenURI,{ from: _renter1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _renter1,  toolID: new BN(2) });
+            });
+    
+    
+            it("...  owner can delete a Rental  - check rental stored before delete", async () => {
+                 let rentals = await anyRentalInstance.getRenterTools(_renter1);     
+                 expect(new BN(rentals.length)).to.be.bignumber.equal(new BN(3));
+                 expect(new BN(rentals[0].dayPrice)).to.be.bignumber.equal(new BN(11));
+                 expect(new BN(rentals[1].dayPrice)).to.be.bignumber.equal(new BN(22));
+                 expect(new BN(rentals[2].dayPrice)).to.be.bignumber.equal(new BN(33));
+         });
+    
+            it("... owner can delete a Rental - should emit ToolDeletedFromRentals", async () => {
+                 tx = await anyRentalInstance.deleteToolIntoRentals(1, { from: _renter1 });
+                 expectEvent(tx, "ToolDeletedFromRentals", { renter: _renter1,  toolID: new BN(1) });
+    
+            });
+            it("... owner can delete a Rental - check rentals", async () => {
+                 tx = await anyRentalInstance.deleteToolIntoRentals(1,{ from: _renter1 });
+    
+                 let rentals = await anyRentalInstance.getRenterTools(_renter1);     
+                 expect(new BN(rentals.length)).to.be.bignumber.equal(new BN(2));
+                 expect(new BN(rentals[0].dayPrice)).to.be.bignumber.equal(new BN(11));
+                 expect(new BN(rentals[1].dayPrice)).to.be.bignumber.equal(new BN(33));
+             });
+    
+        });
         
     });
         

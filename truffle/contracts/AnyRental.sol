@@ -40,7 +40,7 @@ contract AnyRental is Ownable, IAnyRental{
     
     // mapping of a renter address to its rentals
     mapping (address => Rental[]) public rentersRentals;
-    uint256 public constant MAX_TOOLS = 3;
+    uint256 public nbRentalMax = 20;
 
 
 
@@ -64,6 +64,9 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
 
+    function setNbRentalMax(uint _nb) external onlyOwner{
+        nbRentalMax = _nb;
+    }
 
     /* ***********************************************
     *   Getters 
@@ -165,7 +168,7 @@ contract AnyRental is Ownable, IAnyRental{
     function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external returns(uint tokenId){
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         //require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");
-        require(rentersRentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
+        require(rentersRentals[msg.sender].length < nbRentalMax, "Maximum number of tools reached");
         
         IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[msg.sender].collection);
         uint256 tokenID = collec.mint(_tokenURI, _serialId, _title, _description, msg.sender);
@@ -199,7 +202,7 @@ contract AnyRental is Ownable, IAnyRental{
 
     function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID, string memory _tokenURI) external {
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
-        require(rentersRentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
+        require(rentersRentals[msg.sender].length < nbRentalMax, "Maximum number of tools reached");
         require(_dayPrice > 0, "number must be > 0");
         require(_caution > 0, "number must be > 0");
 
@@ -250,7 +253,7 @@ contract AnyRental is Ownable, IAnyRental{
      * @dev delete a tool into collection . onlyRenter
      */
      function deleteToolIntoRentals(uint _rentalID) external{
-        require(rentersRentals[msg.sender].length < MAX_TOOLS, "Maximum number of tools reached");
+        require(rentersRentals[msg.sender].length < nbRentalMax, "Maximum number of tools reached");
         
         uint id;
         for(uint i; i< rentersRentals[msg.sender].length; i++){

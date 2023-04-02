@@ -137,6 +137,9 @@ interface IAnyRental {
     event RentalExtended(address renter, address user, address renterCollectionAddress, uint tokenId, uint duration ,uint timestamp);
     
 
+
+    function setNbRentalMax(uint _nb) external;
+
     /** ****************************************************
      *  Getters
      **************************************************** */
