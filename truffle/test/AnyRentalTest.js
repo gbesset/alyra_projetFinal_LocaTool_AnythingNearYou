@@ -16,8 +16,6 @@ contract('AnyRental', accounts => {
     const _renter1 = accounts[1];           // renter of the rental from the owner
     const _renter2 = accounts[2];
     const _user = accounts[3];              // Basic user (for public access)
-    const _user1 = accounts[4];
-    const _user2 = accounts[5];
 
   
 
@@ -86,7 +84,7 @@ contract('AnyRental', accounts => {
      * AnyRental check all the managment of the NFTs factory
      */
     describe('AnyRental:  NFTs collection management (a NFT Tool throw the factory)', () => {
-        describe('-- create collection NFTs', () => {
+        describe('-- create a NFTs collection', () => {
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
                 anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
@@ -97,20 +95,20 @@ contract('AnyRental', accounts => {
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _owner2 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _owner2, renterCollectionName:"Collection de test"  });
             });
-            it("... renter should create a NFT collection", async () => {
+            it("... owner should create a NFT collection", async () => {
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _owner1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _owner1, renterCollectionName:"Collection de test"  });
             });
-            it("... renter shouldn't create a NFT collection without name", async () => {
+            it("... owner shouldn't create a NFT collection without name", async () => {
                 await expectRevert(anyRentalInstance.createCollection("", "CT", {from:_owner1}), "collection name can't be empty");
             });
-            it("... renter shouldn't create two NFT collection", async () => {
+            it("... owner shouldn't create two NFT collection", async () => {
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _owner1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _owner1, renterCollectionName:"Collection de test"  });
                 await expectRevert(anyRentalInstance.createCollection("Collection de test 2", "CT", { from: _owner1 }), "You already have created your collection");
             });
 
-            it("... renter created a NFT collection - Check the renter is the owner and instance name is OK ", async () => {
+            it("... owner should created a NFT collection - Check the renter is the owner and instance name is OK ", async () => {
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _owner1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _owner1, renterCollectionName:"Collection de test"  });
                 let collectionAddress = tx.logs[2].args.renterCollectionAddress;
@@ -142,7 +140,7 @@ contract('AnyRental', accounts => {
         });
 
 
-        describe('-- delete a collection NFTs', () => {
+        describe('-- delete a NFTs collection', () => {
             let collectionAddress;
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
@@ -172,7 +170,7 @@ contract('AnyRental', accounts => {
         });
     
 
-        describe('-- add NFT to collection', () => {
+        describe('-- add NFT to NFTSs collection', () => {
             let collectionAddress;
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
@@ -186,12 +184,12 @@ contract('AnyRental', accounts => {
             });
 
 
-            it("... renter should be able to add a NFT tool to their collection", async () => {
+            it("... owner should be able to add a NFT tool to its collection", async () => {
                 let tx = await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(1) });
             });
 
-            it("... user could'nt add a NFT tool if not the owner", async () => {
+            it("... non owner couldn't add a NFT tool to a NFT collection if not the owner", async () => {
                 //await debug(collectionAddress);
                 await expectRevert(
                     anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _owner2 }),
@@ -211,7 +209,7 @@ contract('AnyRental', accounts => {
                 
             });*/
         
-            it.skip("... renter should not allow adding a tool to a collection over the maximum count", async () => {
+            it.skip("... owner should not be able to add a NFT to a collection over the maximum count", async () => {
                 const MAX_TOOLS = 3;
                 anyRentalInstance.setNbRentalMax(MAX_TOOLS);
                 
@@ -224,7 +222,7 @@ contract('AnyRental', accounts => {
                 );
             });
         
-            it("... should not allow adding a tool to a non-existent collection", async () => {
+            it("... owner should not be able to add a NFT into a non-existing collection", async () => {
                 await expectRevert(
                     anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _owner2 }),
                     "You don't have any collection"
@@ -254,8 +252,8 @@ contract('AnyRental', accounts => {
                 const tokenID = 1;
                 const expires = Math.floor(new Date().getTime()/1000) + 100;
 
-                let tx = await anyRentalInstance.delegateNFT(tokenID, _user1, expires , {from: _owner1});
-                expectEvent(tx, 'rentalNFTToolDelegated', { renter: _owner1,  user: _user1, renterCollectionAddress: anyRentalInstance.address, tokenId: tokenID, expires: new BN(expires) });
+                let tx = await anyRentalInstance.delegateNFT(tokenID, _renter1, expires , {from: _owner1});
+                expectEvent(tx, 'rentalNFTToolDelegated', { renter: _owner1,  user: _renter1, renterCollectionAddress: anyRentalInstance.address, tokenId: tokenID, expires: new BN(expires) });
                 
             });*/
             
@@ -267,8 +265,8 @@ contract('AnyRental', accounts => {
       /**
      * * AnyRental check all the managment of the Rentals of a renter (add/update/delete)
      */
-     describe('AnyRental: rental management (a Rental into a renter list of rentals)', () => {
-         describe('-- renter shoud add a Rental to  Rentals', () => {
+     describe('AnyRental: Rental management (a Rental into a renter list of rentals)', () => {
+         describe('-- owner shoud add a Rental to its Rentals list after NFT tool creation', () => {
             let collectionAddress;
             let tokenID = 1;
             let tokenURI = "https://www.example.com/tokenURI";
@@ -326,7 +324,7 @@ contract('AnyRental', accounts => {
 
             });
             
-            it("... after the NFT creation, owner can add a Rental  - check rental stored", async () => {
+            it("... after the NFT creation, owner can add a Rental  - check the Rental object stored", async () => {
                        
                 await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI,{ from: _owner1 });
                 
@@ -352,14 +350,14 @@ contract('AnyRental', accounts => {
                 expect(rentalRetuned.tokenURI).to.be.equal(rentalExpected.tokenURI);
             });
 
-            it("... after the NFT creation, should revert if the renter does'nt have any collection", async () => {
+            it("... after the NFT creation, owner could not add a Rental if he doesn't have any collection", async () => {
                 await expectRevert(
                     anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _owner2 }),
                     "You don't have any collection"
                 );
             });
         
-            it("... after the NFT creation, should revert if the renter reached the maximum size of tools", async () => {
+            it("... after the NFT creation,  owner could not add a Rental if he reached the maximum size of rentals", async () => {
                const MAX_TOOLS = 3;
                anyRentalInstance.setNbRentalMax(MAX_TOOLS)
                
@@ -373,21 +371,21 @@ contract('AnyRental', accounts => {
                 );
             });
         
-            it("... after the NFT creation, should revert if the day price is not greater than 0", async () => {
+            it("... after the NFT creation, owner could not add a Rental if the day price is not greater than 0", async () => {
                 await expectRevert(
                     anyRentalInstance.addToolToRentals(0, 200, tokenID, tokenURI, { from: _owner1 }),
                     "number must be > 0"
                 );
             });
         
-            it("... after the NFT creation, should revert if the caution is not greater than 0", async () => {
+            it("... after the NFT creation, owner could not add a Rental if the caution is not greater than 0", async () => {
                 await expectRevert(
                     anyRentalInstance.addToolToRentals(11, 0, tokenID, tokenURI, { from: _owner1 }),
                     "number must be > 0"
                 );
             });
         
-            it("... after the NFT creation, event with correct data", async () => {
+            it("... after the NFT creation, owner should add a Rental - check emit ToolAddedToRentals", async () => {
                 const receipt = await anyRentalInstance.addToolToRentals(11, 200, tokenID, tokenURI, { from: _owner1 });
         
                 expectEvent(receipt, "ToolAddedToRentals", {
@@ -426,7 +424,7 @@ contract('AnyRental', accounts => {
             });
             
             
-            it("...  owner can update a Rental  - check rental stored before update", async () => {
+            it("... owner can update a Rental  - check rental stored before update", async () => {
                 let rentalDefault = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_owner1, 0);     
                 expect(new BN(rentalDefault.rentalID)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalDefault.dayPrice)).to.be.bignumber.equal(new BN(11));
@@ -438,7 +436,7 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "ToolUpdatedFromRentals", { renter: _owner1,  toolID: new BN(0) });
                 
             });
-            it("... owner can update a Rental - check modifications", async () => {
+            it("... owner can update a Rental - check Rental stored modifications", async () => {
                 tx = await anyRentalInstance.updateToolIntoRentals(0, 21, 210,{ from: _owner1 });
                 
                 let rentalDefault = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_owner1, 0);    
@@ -479,7 +477,7 @@ contract('AnyRental', accounts => {
             });
     
     
-            it("...  owner can delete a Rental  - check rental stored before delete", async () => {
+            it("... owner can delete a Rental  - check rental stored before delete", async () => {
                  let rentals = await anyRentalInstance.getRentalsByRenter(_owner1);     
                  expect(new BN(rentals.length)).to.be.bignumber.equal(new BN(3));
                  expect(new BN(rentals[0].dayPrice)).to.be.bignumber.equal(new BN(11));
@@ -508,7 +506,7 @@ contract('AnyRental', accounts => {
     /**
      * * AnyRental check all the managment of a rental (workflow)
      */
-    describe('AnyRental: rental workflow (process between user, renter and DAO)', () => {
+    describe('AnyRental: Rental workflow (process between user, renter and DAO)', () => {
         let collectionAddress;
         let token1 = 1;
         let rental1 = 0;
@@ -520,7 +518,7 @@ contract('AnyRental', accounts => {
         const start = Math.floor(new Date().getTime()/1000) + 86400;
         const end = Math.floor(new Date().getTime()/1000) + (86400 *2);
 
-        describe('-- user shoud send paiment for a rental', () => {
+        describe('-- renter shoud send paiment for a rental', () => {
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
                 anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
@@ -543,7 +541,7 @@ contract('AnyRental', accounts => {
                  tx = await anyRentalInstance.addToolToRentals(20, 300, token2, tokenURI,{ from: _owner1 });
                  expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
 
-
+                // add a colelction to owner2 to have another one
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
                  expectEvent(tx2, 'NFTCollectionCreated', { renter: _owner2, renterCollectionName:"Collection de test for renter2"  });
                  
@@ -557,15 +555,15 @@ contract('AnyRental', accounts => {
             });
 
 
-            it("... user should book a rental, sending paiement and caution - emit ToolAddedToRentals", async () => {
+            it("... renter should book a rental, sending paiement and caution - emit ToolAddedToRentals", async () => {
 
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
-            it("... user should book a rental, sending paiement and caution - check rental params", async () => {
+            it("... renter should book a rental, sending paiement and caution - check Rental object stored", async () => {
 
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
                
                 const rentalRetuned = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_owner1, rental1);
                 expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rental1));
@@ -581,37 +579,37 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.rentalData.Dispute)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(0));
-                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.renter).to.be.equal(_renter1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenURI).to.be.equal(tokenURI);
             });            
 
-            it("... user should book a rental, sending paiement and caution - check paiement", async () => {
+            it("... renter should book a rental, sending paiement and caution - check paiement", async () => {
             });
 
-            it("... user should book a rental, sending paiement and caution - errors dates", async () => {
+            it("... renter could not book a rental, sending paiement and caution with errors dates", async () => {
                 await expectRevert(
-                    anyRentalInstance.sendPaiementForRental(_owner1, rental1, end, start  ,{ from: _user1 }),
+                    anyRentalInstance.sendPaiementForRental(_owner1, rental1, end, start  ,{ from: _renter1 }),
                     "End of rental can't be before begin"
                 );
             });
-            it("... user should book a rental, sending paiement and caution - errors renter", async () => {
+            it("... renter could not book a rental, sending paiement and caution with wrong renter", async () => {
                 await expectRevert(
-                    anyRentalInstance.sendPaiementForRental(_user2, rental1,start, end  ,{ from: _user1 }),
+                    anyRentalInstance.sendPaiementForRental(_user, rental1,start, end  ,{ from: _renter1 }),
                     "Renter does not exist"
                 );
             });
-            it("... user should book a rental, sending paiement and caution - errors renter", async () => {
+            it("... renter could not book a rental, sending paiement and caution with wrong rental ID", async () => {
                 await expectRevert(
-                    anyRentalInstance.sendPaiementForRental(_owner1, 3, start, end  ,{ from: _user1 }),
+                    anyRentalInstance.sendPaiementForRental(_owner1, 3, start, end  ,{ from: _renter1 }),
                     "The rental is not available"
                 );
             });
 
         });
-        describe('-- renter shoud validate a NFT delegation to a user (in order to validate the rental asking)', () => {
+        describe('-- owner shoud validate a NFT delegation to a renter (in order to validate the rental asking)', () => {
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
                 anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
@@ -645,20 +643,20 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
      
 
 
             });
 
 
-            it("... renter should validate the sending ot NFT   - emit RentalAccepted", async () => {
+            it("... owner should validate the sending ot NFT   - emit RentalAccepted", async () => {
                 tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
-                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
-            it("... renter should validate the sending ot NFT - check rental params", async () => {
+            it("... owner should validate the sending ot NFT - check rental params", async () => {
 
                 tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
                
@@ -676,7 +674,7 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.rentalData.Dispute)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(0));
-                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.renter).to.be.equal(_renter1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
@@ -684,7 +682,7 @@ contract('AnyRental', accounts => {
             });            
             
         });
-        describe('-- user shoud validate a NFT reception (in order to validate the receipt of the tool in real life)', () => {
+        describe('-- renter shoud validate a NFT reception (in order to validate the receipt of the tool in real life)', () => {
 
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
@@ -719,23 +717,23 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
      
                 //owner validate NFT delegation 
                 tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
-                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
 
-            it("... user should validate the receipt of NFT and the tool in real life  - emit RentalAccepted", async () => {
-                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+            it("... renter should validate the receipt of NFT and the tool in real life  - emit RentalAccepted", async () => {
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
-            it("... user should book a rental, sending paiement and caution - check rental params", async () => {
+            it("... renter should book a rental, sending paiement and caution - check rental params", async () => {
 
-                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _user1 });
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
                
                 const rentalRetuned = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_owner1, rental1);
                 expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rental1));
@@ -750,7 +748,7 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.rentalData.Dispute)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(0));
-                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.renter).to.be.equal(_renter1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
@@ -758,7 +756,7 @@ contract('AnyRental', accounts => {
             });            
 
         });
-        describe('-- [After time...] user shoud give back the tool to end the rental', () => {
+        describe('-- [After time...] renter shoud give back the tool to end the rental', () => {
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
                 anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
@@ -792,29 +790,29 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
      
                 //owner validate NFT delegation 
                 tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
-                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
     
                 // user validate the NFT reception and tool in real life
-                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
 
             });
 
 
-            it("... user should validate the receipt of NFT and the tool in real life  - emit RentalCompletedByUser", async () => {
-                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+            it("... renter shoud give back the tool  - emit RentalCompletedByUser", async () => {
+                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
-            it("... user should book a rental, sending paiement and caution - check rental params", async () => {
+            it("... renter shoud give back the tool - check Rental stored params", async () => {
 
-                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _user1 });
+                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 });
                
                 const rentalRetuned = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_owner1, rental1);
                 expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rental1));
@@ -829,7 +827,7 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.rentalData.Dispute)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(0));
-                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.renter).to.be.equal(_renter1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
@@ -838,7 +836,7 @@ contract('AnyRental', accounts => {
 
 
         });
-        describe('-- renter shoud validate the return of the tool and end the rental', () => {
+        describe('-- owner shoud validate the return of the tool and end the rental', () => {
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
                 anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
@@ -872,31 +870,31 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
      
                 //owner validate NFT delegation 
                 tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
-                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
     
                 // user validate the NFT reception and tool in real life
-                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
                 // user give back the tool
-                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
 
             });
 
 
-            it("... user should validate the receipt of NFT and the tool in real life  - emit RentalCompletedByRenter", async () => {
+            it("... owner shoud validate the return of the tool and end the rental  - emit RentalCompletedByRenter", async () => {
                 tx = await anyRentalInstance.validateReturnToolAfterRental( rental1, { from: _owner1 });
-                expectEvent(tx, "RentalCompletedByRenter", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalCompletedByRenter", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
-            it("... user should book a rental, sending paiement and caution - check rental params", async () => {
+            it("... owner shoud validate the return of the tool and end the rental - check Rental stored params", async () => {
 
                 tx = await anyRentalInstance.validateReturnToolAfterRental(rental1, { from: _owner1 });
                
@@ -914,7 +912,7 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.rentalData.Dispute)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(0));
-                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.renter).to.be.equal(_renter1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
@@ -922,7 +920,7 @@ contract('AnyRental', accounts => {
             });            
 
         });
-        describe('-- renter shoud refuse the return of the tool and create a dispute', () => {
+        describe('-- owner shoud refuse the return of the tool and create a dispute', () => {
             let msg = "Mon outils a été déterioré";
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
@@ -957,20 +955,20 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
      
                 //owner validate NFT delegation 
                 tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
-                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
     
                 // user validate the NFT reception and tool in real life
-                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
                 // user give back the tool
-                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
 
             });
@@ -978,10 +976,10 @@ contract('AnyRental', accounts => {
 
             it("... renter shoud refuse the return of the tool and create a dispute  - emit RentalDisputeCreated", async () => {
                 tx = await anyRentalInstance.refuseReturnToolAfterRental( rental1, msg, { from: _owner1 });
-                expectEvent(tx, "RentalDisputeCreated", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, dispute: msg, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalDisputeCreated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, dispute: msg, tokenId: new BN(token1) });
             });
 
-            it("... renter shoud refuse the return of the tool and create a dispute - check rental params", async () => {
+            it("... renter shoud refuse the return of the tool and create a dispute - check Rental stored params", async () => {
 
                 tx = await anyRentalInstance.refuseReturnToolAfterRental(rental1, msg, { from: _owner1 });
                
@@ -999,14 +997,14 @@ contract('AnyRental', accounts => {
                 expect(rentalRetuned.rentalData.isDispute).to.be.true;
                 expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(0));
-                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.renter).to.be.equal(_renter1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenURI).to.be.equal(tokenURI);
             });            
         });
-        describe('-- user shoud confirm the dispute', () => {
+        describe('-- renter should confirm the dispute', () => {
             const disputeOwner = "Mon objet a été abimé";
             const disputeRenter = "c'est faux, il était comme ca avant";
             beforeEach(async function () {
@@ -1042,37 +1040,37 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
      
                 //owner validate NFT delegation 
                 tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
-                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
     
                 // user validate the NFT reception and tool in real life
-                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
                 // user give back the tool
-                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
                 // renter refuse the rental and create a dispute
                 tx = await anyRentalInstance.refuseReturnToolAfterRental( rental1, disputeOwner, { from: _owner1 });
-                expectEvent(tx, "RentalDisputeCreated", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, dispute:disputeOwner, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalDisputeCreated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, dispute:disputeOwner, tokenId: new BN(token1) });
   
 
             });
 
 
-            it("... user shoud confirm the dispute  - emit RentalDisputelConfirmedByUser", async () => {
-                tx = await anyRentalInstance.confirmDisputeAfterRental(_owner1, rental1, disputeRenter, { from: _user1 });
-                expectEvent(tx, "RentalDisputelConfirmedByUser", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, dispute:disputeRenter, tokenId: new BN(token1) });
+            it("... renter should confirm the dispute  - emit RentalDisputelConfirmedByUser", async () => {
+                tx = await anyRentalInstance.confirmDisputeAfterRental(_owner1, rental1, disputeRenter, { from: _renter1 });
+                expectEvent(tx, "RentalDisputelConfirmedByUser", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, dispute:disputeRenter, tokenId: new BN(token1) });
             });
 
-            it("...user shoud confirm the dispute - check rental params", async () => {
+            it("... renter should confirm the dispute - check Rental stored params", async () => {
 
-                tx = await anyRentalInstance.confirmDisputeAfterRental(_owner1, rental1, disputeRenter, { from: _user1 });
+                tx = await anyRentalInstance.confirmDisputeAfterRental(_owner1, rental1, disputeRenter, { from: _renter1 });
                
                 const rentalRetuned = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_owner1, rental1);
                 expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rental1));
@@ -1088,14 +1086,14 @@ contract('AnyRental', accounts => {
                 expect(rentalRetuned.rentalData.isDispute).to.be.true;
                 expect(rentalRetuned.rentalData.isDisputeConfirmed).to.be.true;
                 expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(0));
-                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.renter).to.be.equal(_renter1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenURI).to.be.equal(tokenURI);
             });            
         });
-        describe('-- user shoud redeem its payment (caution or rental decline)', () => {
+        describe('-- renter shoud redeem its payment (caution or rental decline)', () => {
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
                 anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
@@ -1129,37 +1127,37 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
-                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
      
                 //owner validate NFT delegation 
                 tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
-                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
     
                 // user validate the NFT reception and tool in real life
-                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
                 // user give back the tool
-                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
   
                 //renter valiate the return
                 tx = await anyRentalInstance.validateReturnToolAfterRental( rental1, { from: _owner1 });
-                expectEvent(tx, "RentalCompletedByRenter", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalCompletedByRenter", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
 
 
             });
 
 
-            it("... user should redeem its caution after the renter validation  - emit RentalEnded", async () => {
-                tx = await anyRentalInstance.redeemPaymentForRental(_owner1, rental1, { from: _user1 });
-                expectEvent(tx, "RentalEnded", { renter: _owner1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+            it("... renter should redeem its caution after the renter validation  - emit RentalEnded", async () => {
+                tx = await anyRentalInstance.redeemPaymentForRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalEnded", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
-            it("... user should redeem its caution after the renter validation - check rental params", async () => {
+            it("... renter should redeem its caution after the renter validation - check Rental stored params", async () => {
 
-                tx = await anyRentalInstance.redeemPaymentForRental(_owner1, rental1, { from: _user1 });
+                tx = await anyRentalInstance.redeemPaymentForRental(_owner1, rental1, { from: _renter1 });
                
                 const rentalRetuned = await anyRentalInstance.getRentalByRenterAddressAndRentalID(_owner1, rental1);
                 expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rental1));
@@ -1175,17 +1173,14 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.rentalData.Dispute)).to.be.bignumber.equal(new BN(0));
                 expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(0));
                 expect(rentalRetuned.rentalData.isRedeemed).to.be.true;
-                expect(rentalRetuned.renter).to.be.equal(_user1);
+                expect(rentalRetuned.renter).to.be.equal(_renter1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenURI).to.be.equal(tokenURI);
             });        
 
-        });
-        
-        
-           
+        });           
     });
 });
   
