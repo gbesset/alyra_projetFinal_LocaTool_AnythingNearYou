@@ -20,11 +20,8 @@ export const HeaderApp = () => {
                 <Text className="text-white"><Link to="/app/dao">DAO</Link></Text>
           </Flex>
           <Box className="navbar-end">
-                    <div className="buttons">
-                    <Button width="5rem">Go</Button>
-                        <Account accounts={accounts}  isOwner={isOwner}/>
-                    </div>
-        </Box>
+                <Account accounts={accounts}  isOwner={isOwner}/> 
+          </Box>
 
         </Flex>    
        </header>
