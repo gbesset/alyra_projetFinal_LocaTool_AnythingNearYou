@@ -8,9 +8,8 @@ interface IAnyRental {
      enum RentalStatus {
         AVAILABLE,                          // initiate state : tool available
         RENTAL_REQUESTED,                   // User ask to rent a tool (send the caution and the location)
-        RENTAL_ACCEPTED_NFT_SENT,                    // Owner accept. (delegate the NFT)
-        VALIDATE_TOOL_RECEIPT_AND_PAYMENT,  // User alrrady have the NFT, receipt the tool and confirm payment
-        ON_GOING,                           // User has the tool and use it
+        RENTAL_ACCEPTED_NFT_SENT,           // Owner accept. (delegate the NFT)
+        VALIDATE_RECEIPT_PAYMENT,           // User alrrady have the NFT, receipt the tool and confirm payment. Rental is ON GOING
         COMPLETED_USER,                     // User give back the tool to the owner
         RETURN_ACCEPTED_BY_OWNER,           // Owner accept the return of the tool
         DISPUTE,                            // Owner doesn't accept the return and initiate a dispute
@@ -23,6 +22,16 @@ interface IAnyRental {
         address owner;
    }
 
+     struct RentalData {
+        bool isCautionDeposed;
+        bool isNFTDelegated;
+        bool isToolReturned;
+        bool isReturnValidated;
+        bool isDispute;
+        bool isDisputeConfirmed;
+        bool isRedeemed;
+     }
+
     struct Rental {
         uint256 rentalID;
         uint64 dayPrice;
@@ -30,15 +39,13 @@ interface IAnyRental {
         uint64 start;
         uint64 end;
         RentalStatus rentalStatus;
-        bool isCautionDeposed;
-        bool isNFTDelegated;
-        bool isDispute;
-        bool isRedeemed;
+        RentalData rentalData;
         address renter;
         CollectionNFT collection;
         uint tokenID;
-        string tokenURI;    // ou ca ?
+        string tokenURI; 
     }
+
 
 
     /** ****************************************************
@@ -92,45 +99,46 @@ interface IAnyRental {
     /**
      * @dev Emitted when a user ask to rent a tool from a collection
      */
-    event rentalRequested(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
+    event RentalRequested(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
     
     /**
      * @dev Emitted when a renter accept to rent its tool
      */
-     event rentalAccepted(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
+     event RentalAccepted(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
      /**
      * @dev Emitted when a renter doesn't accept to rent its tool
      */
-     event rentalRejected(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
-     /**
-     * @dev Emitted when a user pay for the tental
+     event RentalRejected(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
+   
+       /* @dev Emitted when a user pay for the tental
      */
-     event rentalPaymentDone(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
-    /* @dev Emitted when a user pay for the tental
-     */
-     event rentalNFTToolDelegated(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
+     event RentalNFTToolDelegated(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
      /**
      * @dev Emitted when a user give back the tool
      */
-     event rentalCompletedByUser(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
+     event RentalCompletedByUser(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
     /**
      * @dev Emitted when a renter accept thereturn of the tool
      */
-     event rentalCompletedByRenter(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
+     event RentalCompletedByRenter(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
     /**
      * @dev Emitted when a renter doensn't accept the return of the tool
      */
-     event rentalDisputeCreated(address renter, address user, address renterCollectionAddress, uint tokenId, string dispute, uint timestamp);
+     event RentalDisputeCreated(address renter, address user, address renterCollectionAddress, uint tokenId, string dispute, uint timestamp);
+ /**
+     * @dev Emitted when a renter doensn't accept the return of the tool
+     */
+     event RentalDisputelConfirmedByUser(address renter, address user, address renterCollectionAddress, uint tokenId, string dispute, uint timestamp);
 
     /**
      * @dev Emitted when a renter doensn't accept the return of the tool
      */
-     event rentalDisputeSolved(address renter, address user, address renterCollectionAddress, uint tokenId, string disputeSolution, uint timestamp);
+     event RentalDisputeSolved(address renter, address user, address renterCollectionAddress, uint tokenId, string disputeSolution, uint timestamp);
 
     /**
-     * @dev Emitted when a renter doensn't accept the return of the tool
+     * @dev Emitted when a renter redeem its causion and end the rental of the tool
      */
-     event rentalEnded(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
+     event RentalEnded(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
     /**
      * @dev Emitted when a user ask to extznd the rental duration
      */
@@ -255,41 +263,41 @@ interface IAnyRental {
      * - the caution is still secured, the location is payed
      * @dev user validate having the NFT, annd receipt the tool
      */
-     function validateNFTandToolReception(uint _rentalID, uint _tokenID) external;  
+     function validateNFTandToolReception(address _renter, uint _rentalID) external;  
 
     /**
      * @notice user give back the toool at the end of renting
      * - the caution is still secured, the location is already payed
      * @dev user give bak th etool
      */
-     function giveBackToolAfterRental(uint _rentalID) external;  
+     function giveBackToolAfterRental(address _renter, uint _rentalID) external;  
      
     /**
      * @notice renter validate the return of the tool
      * - the caution is given back
      * @dev renter validae the return of the tool
      */
-     function validateReturnToolAfterRental(uint _rentalID) external;  
+    // function validateReturnToolAfterRental(uint _rentalID) external;  
 
     /**
      * @notice renter doens't validate the return of the tool. Problem. dispute creation
      * - the caution still secured
      * @dev renter doesn't validate the return of the tool, because of a problem
      */
-     function refuseReturnToolAfterRental(uint _rentalID, string memory message) external;  
+   //  function refuseReturnToolAfterRental(uint _rentalID, string memory message) external;  
 
     /**
      * @notice user confirm dispute and expose its point of view
      * - the caution still secured
      * @dev user confirm dispute and expose its point of view
      */
-     function confirmDisputeAfterRental(uint _rentalID, string memory message) external;  
+    // function confirmDisputeAfterRental(address _renter, uint _rentalID, string memory message) external;  
 
     /**
      * @notice user redeem its caution or caution and location
      * - the caution is given back at the end of rental or because the renter refuse the rental
      * @dev user redeem its caution
      */
-     function redeemPaymentForRental(uint _rentalID, string memory message) external;  
+     //function redeemPaymentForRental(uint _rentalID, string memory message) external;  
 
 }

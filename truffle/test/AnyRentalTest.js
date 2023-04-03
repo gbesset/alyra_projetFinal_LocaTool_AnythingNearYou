@@ -287,10 +287,15 @@ contract('AnyRental', accounts => {
                     "start": 0, 
                     "end": 0, 
                     "rentalStatus": 0, 
-                    "isCautionDeposed": false, 
-                    "isNFTDelegated": false, 
-                    "isDispute": false, 
-                    "isRedeemed": false,
+                    "rentalData": {
+                        "isCautionDeposed": false, 
+                        "isNFTDelegated": false, 
+                        "isToolReturned": false, 
+                        "isReturnValidated": false, 
+                        "isDispute": false, 
+                        "isDisputeConfirmed": false, 
+                        "isRedeemed": false,
+                    },
                     "renter": "0x0000000000000000000000000000000000000000",
                     "collection": {
                         "collection":collectionAddress.address, 
@@ -327,10 +332,13 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.start)).to.be.bignumber.equal(new BN(rentalExpected.start));
                 expect(new BN(rentalRetuned.end)).to.be.bignumber.equal(new BN(rentalExpected.end));
                 expect(new BN(rentalRetuned.rentalStatus)).to.be.bignumber.equal(new BN(rentalExpected.rentalStatus));
-                expect(new BN(rentalRetuned.isCautionDeposed)).to.be.bignumber.equal(new BN(rentalExpected.isCautionDeposed));
-                expect(new BN(rentalRetuned.isNFTDelegated)).to.be.bignumber.equal(new BN(rentalExpected.isNFTDelegated));
-                expect(new BN(rentalRetuned.isDispute)).to.be.bignumber.equal(new BN(rentalExpected.isDispute));
-                expect(new BN(rentalRetuned.isRedeemed)).to.be.bignumber.equal(new BN(rentalExpected.isRedeemed));
+                expect(new BN(rentalRetuned.rentalData.isCautionDeposed)).to.be.bignumber.equal(new BN(rentalExpected.rentalData.isCautionDeposed));
+                expect(new BN(rentalRetuned.rentalData.isNFTDelegated)).to.be.bignumber.equal(new BN(rentalExpected.rentalData.isNFTDelegated));
+                expect(new BN(rentalRetuned.rentalData.isToolReturned)).to.be.bignumber.equal(new BN(rentalExpected.rentalData.isToolReturned));
+                expect(new BN(rentalRetuned.rentalData.isReturnValidated)).to.be.bignumber.equal(new BN(rentalExpected.rentalData.isReturnValidated));
+                expect(new BN(rentalRetuned.rentalData.isDispute)).to.be.bignumber.equal(new BN(rentalExpected.rentalData.isDispute));
+                expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(rentalExpected.rentalData.isDisputeConfirmed));
+                expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(rentalExpected.rentalData.isRedeemed));
                 expect(rentalRetuned.renter).to.be.equal(rentalExpected.renter);
                 //TODO ICI
                 //expect(rentalRetuned.collection.collection).to.be.equal(rentalExpected.collection.collection);
@@ -495,7 +503,7 @@ contract('AnyRental', accounts => {
     /**
      * * AnyRental check all the managment of a rental (workflow)
      */
-    describe.only('AnyRental: rental workflow (process between user, renter and DAO)', () => {
+    describe('AnyRental: rental workflow (process between user, renter and DAO)', () => {
         describe('-- user shoud send paiment for a rental', () => {
 
             let collectionAddress;
@@ -550,7 +558,7 @@ contract('AnyRental', accounts => {
             it("... user should book a rental, sending paiement and caution - emit ToolAddedToRentals", async () => {
 
                 tx = await anyRentalInstance.sendPaiementForRental(_renter1, rental1, start, end  ,{ from: _user1 });
-                expectEvent(tx, "rentalRequested", { renter: _renter1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+                expectEvent(tx, "RentalRequested", { renter: _renter1, user: _user1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
             });
 
             it("... user should book a rental, sending paiement and caution - check rental params", async () => {
@@ -564,10 +572,12 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.start)).to.be.bignumber.equal(new BN(start));
                 expect(new BN(rentalRetuned.end)).to.be.bignumber.equal(new BN(end));
                 expect(new BN(rentalRetuned.rentalStatus)).to.be.bignumber.equal(new BN(1));
-                expect(rentalRetuned.isCautionDeposed).to.be.true;
-                expect(new BN(rentalRetuned.isNFTDelegated)).to.be.bignumber.equal(new BN(0));
-                expect(new BN(rentalRetuned.isDispute)).to.be.bignumber.equal(new BN(0));
-                expect(new BN(rentalRetuned.isRedeemed)).to.be.bignumber.equal(new BN(0));
+                expect(rentalRetuned.rentalData.isCautionDeposed).to.be.true;
+                expect(new BN(rentalRetuned.rentalData.isNFTDelegated)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalRetuned.rentalData.isToolReturned)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalRetuned.rentalData.Dispute)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalRetuned.rentalData.isDisputeConfirmed)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalRetuned.rentalData.isRedeemed)).to.be.bignumber.equal(new BN(0));
                 expect(rentalRetuned.renter).to.be.equal(_user1);
                 expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
                 expect((rentalRetuned.collection.owner)).to.be.equal(_renter1);
