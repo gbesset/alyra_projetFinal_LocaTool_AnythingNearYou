@@ -1,0 +1,468 @@
+{
+  "contractName": "IERC4907",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint64",
+          "name": "expires",
+          "type": "uint64"
+        }
+      ],
+      "name": "setUser",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "userOf",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "userExpires",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint64\",\"name\":\"expires\",\"type\":\"uint64\"}],\"name\":\"setUser\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"userExpires\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"userOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"setUser(uint256,address,uint64)\":{\"details\":\"The zero address indicates there is no user Throws if `tokenId` is not valid NFT\",\"params\":{\"expires\":\"UNIX timestamp, The new user could use the NFT before expires\",\"user\":\"The new user of the NFT\"}},\"userExpires(uint256)\":{\"details\":\"The zero value indicates that there is no user\",\"params\":{\"tokenId\":\"The NFT to get the user expires for\"},\"returns\":{\"_0\":\"The user expires for this NFT\"}},\"userOf(uint256)\":{\"details\":\"The zero address indicates that there is no user or the user is expired\",\"params\":{\"tokenId\":\"The NFT to get the user address for\"},\"returns\":{\"_0\":\"The user address for this NFT\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"setUser(uint256,address,uint64)\":{\"notice\":\"set the user and expires of an NFT\"},\"userExpires(uint256)\":{\"notice\":\"Get the user expires of an NFT\"},\"userOf(uint256)\":{\"notice\":\"Get the user address of an NFT\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/IERC4907.sol\":\"IERC4907\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/IERC4907.sol\":{\"keccak256\":\"0x22867524c3c4de4e805a2fa884366359820b0af13d83b42fc839cb5560cf6833\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://dac5e347c05540d17526ba300750fb7a922cdefdfb3b250ae05bf844197f5348\",\"dweb:/ipfs/QmUfoB2g2io3N3MLR6vFN8gQSfXirDvLCNYw2g3aWoz23C\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.19;\n\ninterface IERC4907 {\n\n    /// @notice set the user and expires of an NFT\n    /// @dev The zero address indicates there is no user\n    /// Throws if `tokenId` is not valid NFT\n    /// @param user  The new user of the NFT\n    /// @param expires  UNIX timestamp, The new user could use the NFT before expires\n    function setUser(uint256 tokenId, address user, uint64 expires) external;\n\n    /// @notice Get the user address of an NFT\n    /// @dev The zero address indicates that there is no user or the user is expired\n    /// @param tokenId The NFT to get the user address for\n    /// @return The user address for this NFT\n    function userOf(uint256 tokenId) external view returns(address);\n\n    /// @notice Get the user expires of an NFT\n    /// @dev The zero value indicates that there is no user\n    /// @param tokenId The NFT to get the user expires for\n    /// @return The user expires for this NFT\n    function userExpires(uint256 tokenId) external view returns(uint256);\n}",
+  "sourcePath": "/Users/gbesset/wks/learning/web3/alyra_projetFinal_LocaTool_AnythingNearYou/truffle/contracts/IERC4907.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/IERC4907.sol",
+    "exportedSymbols": {
+      "IERC4907": [
+        3058
+      ]
+    },
+    "id": 3059,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3031,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".19"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:6"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IERC4907",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 3058,
+        "linearizedBaseContracts": [
+          3058
+        ],
+        "name": "IERC4907",
+        "nameLocation": "67:8:6",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 3032,
+              "nodeType": "StructuredDocumentation",
+              "src": "83:279:6",
+              "text": "@notice set the user and expires of an NFT\n @dev The zero address indicates there is no user\n Throws if `tokenId` is not valid NFT\n @param user  The new user of the NFT\n @param expires  UNIX timestamp, The new user could use the NFT before expires"
+            },
+            "functionSelector": "e030565e",
+            "id": 3041,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setUser",
+            "nameLocation": "376:7:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3039,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3034,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nameLocation": "392:7:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3041,
+                  "src": "384:15:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3033,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "384:7:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3036,
+                  "mutability": "mutable",
+                  "name": "user",
+                  "nameLocation": "409:4:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3041,
+                  "src": "401:12:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3035,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "401:7:6",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3038,
+                  "mutability": "mutable",
+                  "name": "expires",
+                  "nameLocation": "422:7:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3041,
+                  "src": "415:14:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 3037,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "415:6:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "383:47:6"
+            },
+            "returnParameters": {
+              "id": 3040,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "439:0:6"
+            },
+            "scope": 3058,
+            "src": "367:73:6",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3042,
+              "nodeType": "StructuredDocumentation",
+              "src": "446:232:6",
+              "text": "@notice Get the user address of an NFT\n @dev The zero address indicates that there is no user or the user is expired\n @param tokenId The NFT to get the user address for\n @return The user address for this NFT"
+            },
+            "functionSelector": "c2f1f14a",
+            "id": 3049,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "userOf",
+            "nameLocation": "692:6:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3045,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3044,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nameLocation": "707:7:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3049,
+                  "src": "699:15:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3043,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "699:7:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "698:17:6"
+            },
+            "returnParameters": {
+              "id": 3048,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3047,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3049,
+                  "src": "738:7:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3046,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "738:7:6",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "737:9:6"
+            },
+            "scope": 3058,
+            "src": "683:64:6",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3050,
+              "nodeType": "StructuredDocumentation",
+              "src": "753:207:6",
+              "text": "@notice Get the user expires of an NFT\n @dev The zero value indicates that there is no user\n @param tokenId The NFT to get the user expires for\n @return The user expires for this NFT"
+            },
+            "functionSelector": "8fc88c48",
+            "id": 3057,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "userExpires",
+            "nameLocation": "974:11:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3053,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3052,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nameLocation": "994:7:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3057,
+                  "src": "986:15:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3051,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "986:7:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "985:17:6"
+            },
+            "returnParameters": {
+              "id": 3056,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3055,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3057,
+                  "src": "1025:7:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3054,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1025:7:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1024:9:6"
+            },
+            "scope": 3058,
+            "src": "965:69:6",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3059,
+        "src": "57:979:6",
+        "usedErrors": []
+      }
+    ],
+    "src": "32:1004:6"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.19+commit.7dd6d404.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.11",
+  "updatedAt": "2023-04-03T18:53:34.582Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "setUser(uint256,address,uint64)": {
+        "details": "The zero address indicates there is no user Throws if `tokenId` is not valid NFT",
+        "params": {
+          "expires": "UNIX timestamp, The new user could use the NFT before expires",
+          "user": "The new user of the NFT"
+        }
+      },
+      "userExpires(uint256)": {
+        "details": "The zero value indicates that there is no user",
+        "params": {
+          "tokenId": "The NFT to get the user expires for"
+        },
+        "returns": {
+          "_0": "The user expires for this NFT"
+        }
+      },
+      "userOf(uint256)": {
+        "details": "The zero address indicates that there is no user or the user is expired",
+        "params": {
+          "tokenId": "The NFT to get the user address for"
+        },
+        "returns": {
+          "_0": "The user address for this NFT"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "setUser(uint256,address,uint64)": {
+        "notice": "set the user and expires of an NFT"
+      },
+      "userExpires(uint256)": {
+        "notice": "Get the user expires of an NFT"
+      },
+      "userOf(uint256)": {
+        "notice": "Get the user address of an NFT"
+      }
+    },
+    "version": 1
+  }
+}
