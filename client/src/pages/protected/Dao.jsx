@@ -21,7 +21,6 @@ export const Dao = () => {
                   </>
                 ) : (
                     <>
-                    pfff
                     <Authent />
                     </>
                 )
