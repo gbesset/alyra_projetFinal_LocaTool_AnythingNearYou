@@ -30,7 +30,7 @@ export const Account = ({accounts, isOwner}) => {
                          {user}
                 </Button>
             ) : (
-                 <Button width="8rem" isDisabled="true">    
+                 <Button width="8rem" isDisabled={true}>    
                          {user}
                 </Button>
             )}

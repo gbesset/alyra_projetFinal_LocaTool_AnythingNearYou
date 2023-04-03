@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedLayout } from '../pages/protected/ProtectedLayout';
-import { Location } from '../pages/protected/location';
+import { Location } from '../pages/protected/Location';
 import { Dao } from '../pages/protected/Dao';
 import { EthProvider } from "../contexts/EthContext";
 import { NotFound } from '../pages/NotFound';
