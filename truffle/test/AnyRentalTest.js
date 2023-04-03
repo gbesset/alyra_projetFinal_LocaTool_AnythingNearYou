@@ -10,12 +10,15 @@ const { expect } = require('chai');
 
 
 contract('AnyRental', accounts => {
-    const _owner = accounts[0];
-    const _renter1 = accounts[1];
+    const _contractOwner = accounts[0];     // the one that deploy the contract
+    const _owner1 = accounts[1];            // owner of a Rental that rent it
+    const _owner2 = accounts[2];
+    const _renter1 = accounts[1];           // renter of the rental from the owner
     const _renter2 = accounts[2];
-    const _user1 = accounts[3];
-    const _user2 = accounts[4];
-    const _user3 = accounts[5];
+    const _user = accounts[3];              // absic user (for public)
+    const _user1 = accounts[4];
+    const _user2 = accounts[5];
+
   
 
     //instance declaration
@@ -25,7 +28,8 @@ contract('AnyRental', accounts => {
 
    async function debug(collectionAddress){
        console.log("-----------------------------------------------------------------------"); 
-       console.log("-- owner est :                        "+_owner);
+       console.log("-- contract owner est :                        "+_contractOwner);
+       console.log("-- _owner1 est :                     "+_owner1);
        console.log("-- _renter1 est :                     "+_renter1);
        const factory = await anyNFTFactoryInstance.owner();
        console.log("-- Le owner de anyNFTFactoryInstance est          "+factory)
@@ -35,30 +39,30 @@ contract('AnyRental', accounts => {
        console.log("-- l'adresse du contrat AnyRental est "+anyRentalInstance.address )
        
 
-    let collectionInstance = await AnyNFTCollection.at(collectionAddress);
-    const ownernft = await collectionInstance.owner.call();
-    const factoryAddress = await collectionInstance.factory.call();
-    console.log("-- Le owner de la collecion NFT crée est        "+ownernft)
-    console.log("-- La factory qui a crée la collection NFT est  "+factoryAddress)
+       let collectionInstance = await AnyNFTCollection.at(collectionAddress);
+       const ownernft = await collectionInstance.owner.call();
+       const factoryAddress = await collectionInstance.factory.call();
+       console.log("-- Le owner de la collecion NFT crée est        "+ownernft)
+       console.log("-- La factory qui a crée la collection NFT est  "+factoryAddress)
         
-        console.log("-----------------------------------------------------------------------");
+       console.log("-----------------------------------------------------------------------");
         
     }
 
     /**
      * Smart contract Deploiement
      */
-    describe('AnyRental: Deploiement', () => {
+      describe('AnyRental: Factory and Any Rental Deploiement', () => {
             beforeEach(async function () {
                 // new instance each time : new() not deploy().
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
             });
 
             it("...Should store the administrator address", async () => {
                 let owner = await anyRentalInstance.owner.call();
-                expect(owner).to.equal(_owner);
+                expect(owner).to.equal(_contractOwner);
             });
 
             it('...Should be instantiated and default values defined', async () => {
@@ -71,9 +75,9 @@ contract('AnyRental', accounts => {
      */
     describe('AnyRental: Permissions', () => {
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
             });
 
     });
@@ -84,14 +88,14 @@ contract('AnyRental', accounts => {
     describe('AnyRental:  NFTs collection management (a NFT Tool throw the factory)', () => {
         describe('-- create collection NFTs', () => {
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address, { from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address, { from: _contractOwner });
             });
 
             it("... owner should create a NFT collection", async () => {
-                let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _owner });
-                expectEvent(tx, 'NFTCollectionCreated', { renter: _owner, renterCollectionName:"Collection de test"  });
+                let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _renter2 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _renter2, renterCollectionName:"Collection de test"  });
             });
             it("... renter should create a NFT collection", async () => {
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _renter1 });
@@ -141,28 +145,28 @@ contract('AnyRental', accounts => {
         describe('-- delete a collection NFTs', () => {
             let collectionAddress;
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
-                let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _owner });
-                expectEvent(tx, 'NFTCollectionCreated', { renter: _owner, renterCollectionName:"Collection de test"  });
+                let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _owner1 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _owner1, renterCollectionName:"Collection de test"  });
 
                 collectionAddress = tx.logs[2].args.renterCollectionAddress;
             });
 
             it("... owner should delete a NFT collection", async () => {
 
-                const addressColBefore = await anyRentalInstance.getToolsCollectionAddress(_owner)
+                const addressColBefore = await anyRentalInstance.getToolsCollectionAddress(_owner1, { from: _user })
                 expect(addressColBefore).to.be.equal(collectionAddress);
 
                 const ownerAddress = await anyRentalInstance.owner.call();
-                expect(ownerAddress).to.be.equal(_owner);
+                expect(ownerAddress).to.be.equal(_contractOwner);
 
-                let tx = await anyRentalInstance.deleteCollection();
-                expectEvent(tx, 'NFTCollectionDeleted', { renter: _owner });
+                let tx = await anyRentalInstance.deleteCollection({ from: _owner1 });
+                expectEvent(tx, 'NFTCollectionDeleted', { renter: _owner1 });
 
-                const addressColl = await anyRentalInstance.getToolsCollectionAddress(_owner)
+                const addressColl = await anyRentalInstance.getToolsCollectionAddress(_owner1,  { from: _user })
                 expect(addressColl).to.be.equal("0x0000000000000000000000000000000000000000");
             });
         });
@@ -171,9 +175,9 @@ contract('AnyRental', accounts => {
         describe('-- add NFT to collection', () => {
             let collectionAddress;
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -231,9 +235,9 @@ contract('AnyRental', accounts => {
         describe('-- delegate NFT to a user', () => {
             let collectionAddress;
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -269,9 +273,9 @@ contract('AnyRental', accounts => {
             let tokenID = 1;
             let tokenURI = "https://www.example.com/tokenURI";
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -399,9 +403,9 @@ contract('AnyRental', accounts => {
             tokenURI = "https://www.example.com/tokenURI";
             
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
                 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -452,9 +456,9 @@ contract('AnyRental', accounts => {
             tokenURI = "https://www.example.com/tokenURI";
            
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
     
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -518,9 +522,9 @@ contract('AnyRental', accounts => {
 
         describe('-- user shoud send paiment for a rental', () => {
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -609,9 +613,9 @@ contract('AnyRental', accounts => {
         });
         describe('-- renter shoud validate a NFT delegation to a user (in order to validate the rental asking)', () => {
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -683,9 +687,9 @@ contract('AnyRental', accounts => {
         describe('-- user shoud validate a NFT reception (in order to validate the receipt of the tool in real life)', () => {
 
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -756,9 +760,9 @@ contract('AnyRental', accounts => {
         });
         describe('-- [After time...] user shoud give back the tool to end the rental', () => {
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -836,9 +840,9 @@ contract('AnyRental', accounts => {
         });
         describe('-- renter shoud validate the return of the tool and end the rental', () => {
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -921,9 +925,9 @@ contract('AnyRental', accounts => {
         describe('-- renter shoud refuse the return of the tool and create a dispute', () => {
             let msg = "Mon outils a été déterioré";
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -1006,9 +1010,9 @@ contract('AnyRental', accounts => {
             const disputeOwner = "Mon objet a été abimé";
             const disputeRenter = "c'est faux, il était comme ca avant";
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
@@ -1093,9 +1097,9 @@ contract('AnyRental', accounts => {
         });
         describe('-- user shoud redeem its payment (caution or rental decline)', () => {
             beforeEach(async function () {
-                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _owner});
-                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _owner });
-                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _owner });
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
 
                 let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _renter1 });
                 expectEvent(tx, 'NFTCollectionCreated', { renter: _renter1, renterCollectionName:"Collection de test"  });
