@@ -4,6 +4,9 @@ import { Text, Box, Heading, Flex, Button, Center , Image} from '@chakra-ui/reac
 export const Hero = () => {
     return (
         <Box className="hero">
+                <Box flex="1" align="center" >
+                <Image  maxWidth="500px" height="auto"  src="/assets/logo.png" alt="logo" />
+                </Box>
             <Flex>
                 <Box flex="1" >
                     <Heading className="text-gradient" p="2rem">Louez les outils que vous possedez</Heading>
