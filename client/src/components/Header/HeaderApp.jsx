@@ -10,14 +10,14 @@ export const HeaderApp = () => {
     return (
         <header>
         <Flex justifyContent="space-between" alignItems="center" height="10vh" width="100%" p="2rem">
-         <Link href="/">
+         <Link to="/">
                   <Image  maxWidth="100px" height="auto" src="/assets/logo.png" alt="logo" />
             </Link>
           <Flex width="30%" justifyContent="space-between" alignItems="center">
-              <Text className="text-white"><Link href="/">Accueil</Link></Text>
-              <Text className="text-white"><Link href="/tools-list">Louer</Link></Text>
-              <Text className="text-white"><Link href="/tools-list">Location</Link></Text>
-              <Text className="text-white"><Link href="/account">DAO</Link></Text>
+                <Text className="text-white"><Link to="/">Accueil</Link></Text>
+                <Text className="text-white"><Link to="/app/todo">Louer</Link></Text>
+                <Text className="text-white"><Link to="/app/location">Location</Link></Text>
+                <Text className="text-white"><Link to="/app/dao">DAO</Link></Text>
           </Flex>
           <Box className="navbar-end">
                     <div className="buttons">
