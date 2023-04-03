@@ -454,6 +454,7 @@ contract AnyRental is Ownable, IAnyRental{
         require(rental.rentalStatus == RentalStatus.COMPLETED_USER, "The rental status is incorrect.");
         
         rental.rentalStatus = RentalStatus.DISPUTE;
+        rental.rentalData.isToolReturned = true;
         rental.rentalData.isDispute = true;
         
         emit RentalDisputeCreated(rental.collection.owner, rental.renter,  rental.collection.collection, rental.tokenID, message, block.timestamp);
@@ -474,9 +475,9 @@ contract AnyRental is Ownable, IAnyRental{
         require(rental.renter==msg.sender, "Problem on the renter and thr one who asks");
         require(rental.rentalStatus == RentalStatus.DISPUTE, "The rental status is incorrect.");
                
-        rental.rentalData.isDispute = true;
+        rental.rentalData.isDisputeConfirmed = true;
 
-        emit RentalDisputelConfirmedByUser(rental.collection.owner, _renter,  rental.collection.collection, rental.tokenID, message, block.timestamp);
+        emit RentalDisputelConfirmedByUser(rental.collection.owner, msg.sender,  rental.collection.collection, rental.tokenID, message, block.timestamp);
 
      }
 
@@ -485,11 +486,11 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution is given back at the end of rental or because the renter refuse the rental
      * @dev user redeem its caution
      */
-     function redeemPaymentForRental(uint _rentalID, string memory message) external{
+     function redeemPaymentForRental(address _renter, uint _rentalID) external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
 
-        uint found = getRentalIndexByRenterAddressAndRentalID(msg.sender, _rentalID);
-        Rental storage rental = rentersRentals[msg.sender][found];
+        uint found = getRentalIndexByRenterAddressAndRentalID(_renter, _rentalID);
+        Rental storage rental = rentersRentals[_renter][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.rentalStatus == RentalStatus.RETURN_ACCEPTED_BY_OWNER, "The rental status is incorrect.");
         

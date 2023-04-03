@@ -298,6 +298,6 @@ interface IAnyRental {
      * - the caution is given back at the end of rental or because the renter refuse the rental
      * @dev user redeem its caution
      */
-     function redeemPaymentForRental(uint _rentalID, string memory message) external;  
+     function redeemPaymentForRental(address _renter, uint _rentalID) external;  
 
 }
