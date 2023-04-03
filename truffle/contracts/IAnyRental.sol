@@ -277,27 +277,27 @@ interface IAnyRental {
      * - the caution is given back
      * @dev renter validae the return of the tool
      */
-    // function validateReturnToolAfterRental(uint _rentalID) external;  
+     function validateReturnToolAfterRental(uint _rentalID) external;  
 
     /**
      * @notice renter doens't validate the return of the tool. Problem. dispute creation
      * - the caution still secured
      * @dev renter doesn't validate the return of the tool, because of a problem
      */
-   //  function refuseReturnToolAfterRental(uint _rentalID, string memory message) external;  
+     function refuseReturnToolAfterRental(uint _rentalID, string memory message) external;  
 
     /**
      * @notice user confirm dispute and expose its point of view
      * - the caution still secured
      * @dev user confirm dispute and expose its point of view
      */
-    // function confirmDisputeAfterRental(address _renter, uint _rentalID, string memory message) external;  
+     function confirmDisputeAfterRental(address _renter, uint _rentalID, string memory message) external;  
 
     /**
      * @notice user redeem its caution or caution and location
      * - the caution is given back at the end of rental or because the renter refuse the rental
      * @dev user redeem its caution
      */
-     //function redeemPaymentForRental(uint _rentalID, string memory message) external;  
+     function redeemPaymentForRental(uint _rentalID, string memory message) external;  
 
 }
