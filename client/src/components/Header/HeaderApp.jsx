@@ -14,9 +14,9 @@ export const HeaderApp = () => {
                   <Image  maxWidth="100px" height="auto" src="/assets/logo.png" alt="logo" />
             </Link>
           <Flex width="30%" justifyContent="space-between" alignItems="center">
-                <Text className="text-white"><Link to="/">Accueil</Link></Text>
-                <Text className="text-white"><Link to="/app/todo">Louer</Link></Text>
-                <Text className="text-white"><Link to="/app/location">Location</Link></Text>
+                {/*<Text className="text-white"><Link to="/">Accueil</Link></Text>*/}
+                <Text className="text-white"><Link to="/app/louer">Proprietaire</Link></Text>
+                <Text className="text-white"><Link to="/app/location">Locataire</Link></Text>
                 <Text className="text-white"><Link to="/app/dao">DAO</Link></Text>
           </Flex>
           <Box className="navbar-end">
