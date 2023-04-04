@@ -18,20 +18,10 @@ function EthProvider({ children }) {
         let isRenter = false;
         try {
           address = artifact.networks[networkID].address;
-          //txhash = artifact.networks[networkID].transactionHash;
+          txhash = artifact.networks[networkID].transactionHash;
           contract = new web3.eth.Contract(abi, address);
           if(contract && accounts){
-            //const owner = await contract.methods.owner().call({ from: accounts[0] });
-            //accounts[0] === owner ? isOwner=true : isOwner=false;
-          }
-          if(contract && accounts){
-              //const deployTx = await web3.eth.getTransaction(txhash)
-
-              ////Need to retrieve whitelist in events because getVoter is for OnlyVoter.
-              //const VoterRegisteredEvents = await contract.getPastEvents("VoterRegistered", {fromBlock:deployTx.blockNumber, toBlock:"latest"});
-              ////find if address is Whitelisted
-              //const whiteListVoterAddressEvent =  VoterRegisteredEvents.find((event)=>event.returnValues.voterAddress === accounts[0]);                   
-              //whiteListVoterAddressEvent ? isRenter= true : isRenter=false;;
+            isOwner = await contract.methods.isAddressOwner(accounts[0]).call({ from: accounts[0] });
           }
         } catch (err) {
           console.error(err);

@@ -1,5 +1,6 @@
 const actions = {
-  init: "INIT"
+  init: "INIT",
+  setIsOwner: "SET_IS_OWNER"
 };
 
 const initialState = {
@@ -18,6 +19,8 @@ const reducer = (state, action) => {
   switch (type) {
     case actions.init:
       return { ...state, ...data };
+    case actions.setIsOwner:
+      return { ...state, isOwner: data };
     default:
       throw new Error("Undefined reducer action type");
   }
