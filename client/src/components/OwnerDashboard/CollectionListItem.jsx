@@ -2,22 +2,19 @@
 import React from 'react';
 import { Heading, Box, Link, Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export const  CollectionListItem= ({tool}) => {
-  const history = useHistory();
+  let navigate = useNavigate();
   const { tokenID, serialID, title, description, tokenURI } = tool;
   
   const handleManage = () => {
-    history.push({
-      pathname: '/reservation',
-      state: { tool: tool }
-    });
+    navigate(`/app/reservation/${tool.tokenID}`, { state: { tool } });
   };
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" m={4} maxW='xs'>
-    <Card >
+    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" m={4} >
+    <Card maxW='sm'>
         <CardBody>
         <Image src="https://via.placeholder.com/250" borderRadius='lg'/>
 
@@ -37,7 +34,7 @@ export const  CollectionListItem= ({tool}) => {
         <Divider />
         <CardFooter>
           <ButtonGroup spacing='2'>
-            <Button variant='solid' colorScheme='blue'>
+            <Button variant='solid' colorScheme='blue' onClick={handleManage}>
               Réserver
             </Button>
             <Link href={tokenURI} isExternal>
