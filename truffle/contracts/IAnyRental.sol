@@ -17,6 +17,11 @@ interface IAnyRental {
         RENTAL_ENDED                       // Rental colpleted
     }
 
+  struct RentalReference {
+        address collection;
+        uint rentalID;
+   }
+
   struct CollectionNFT {
         address collection;
         address owner;
@@ -152,39 +157,41 @@ interface IAnyRental {
      *  Getters
      **************************************************** */
 
+    function isAddressOwner(address _renter) external view returns(bool);
+    function isAddressRenter(address _renter) external view returns(bool);
 
      //  getUserRentals
     // getUserRentalById  ?
 
     
      /** 
-     * @notice return the NFT Tools from a renter address
+     * @notice return the NFT Tools from a owner address
      * @dev get collection from renter Address
      * @return Tool[]  (NFT attributes)
      */
-     function getToolsCollection(address _renter) external returns(Utils.Tool[] memory);
+     function getToolsCollection(address _owner) external returns(Utils.Tool[] memory);
      
     /** 
-     * @notice return the NFT Collection address from a renter address
-     * @dev get collection address a from renter Address
+     * @notice return the NFT Collection address from a owner address
+     * @dev get collection address a from owner Address
      * @return address of the collection NFT
      */
-     function getToolsCollectionAddress(address _renter) external view returns(address);
+     function getToolsCollectionAddress(address _owner) external view returns(address);
      //function getCollections()external view returns(Utils.Tool[] memory){
     
     /** 
-     * @notice return the Rentals from a renter address
-     * @dev get collection from renter Address
+     * @notice return the Rentals from a owner address
+     * @dev get collection from owner Address
      * @return Rental[]
      */
-    function getRentalsByRenter(address _renter) external view returns(Rental[] memory);
+    function getRentalsByOwner(address _renter) external view returns(Rental[] memory);
     
       /** 
-     * @notice return the Rental by the renter address and rentalId
+     * @notice return the Rental by the owner address and rentalId
      * @dev return a rental from an address and a rentalID
      * @return Rental 
      */
-     function getRentalByRenterAddressAndRentalID(address renter, uint _rentalId) external view returns(Rental memory);
+     function getRentalByOwnerAddressAndRentalID(address _owner, uint _rentalId) external view returns(Rental memory);
   
     // getUserToolById     ?
     // getToolRental        // pour un tool, renter, user, duree caution, etc
@@ -218,7 +225,7 @@ interface IAnyRental {
     /**
      * @dev add a tool to collection . onlyRenter
      */
-     function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID, string memory _tokenURI) external;
+     function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID) external;
   
      /**
      * @dev update a tool into collection . onlyRenter
