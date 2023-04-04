@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Account } from '../Account/Account';
 import { useEth } from '../../contexts/EthContext';
@@ -7,6 +7,10 @@ import { Flex, Text, Button, Box , Image} from '@chakra-ui/react';
 export const HeaderApp = () => {
     const { state: { accounts, isOwner} } = useEth();
 
+    useEffect( () =>{    
+
+    }, [isOwner]);
+    
     return (
         <header>
         <Flex justifyContent="space-between" alignItems="center" height="10vh" width="100%" p="2rem">

@@ -25,14 +25,10 @@ export const OwnerCollectionForm = () => {
                 toastInfo("Compte de proprétaire crée !");
             }catch(error){
                 console.log(error)
-                toastError("Vous aveez déjà une collection ");
+                toastError("Vous avez déjà une collection ");
             }
         }
-
-        
-      };
-
-      
+      };  
 
     return (
         <>
@@ -40,10 +36,10 @@ export const OwnerCollectionForm = () => {
             <Text mt="4">Vous avez des objets qui ne servent pas souvent ? </Text>
             <Text mt="2">Devenez propriétaire pour pouvoir les mettre en location, les rentabiliser, générer des benefices et entrer dans la crypto !
             </Text>
-            <Box w="80%" mx="auto">
+            <Box w="80%" mx="auto" pt="4rem">
                 <Heading as="h3" size="lg">Créer votre propre collection</Heading>
 
-                    <VStack spacing="4">
+                    <VStack spacing="4" pt="2rem">
                         <FormControl isRequired>
                             <FormLabel>Nom de la collection NFT</FormLabel>
                             <Input
