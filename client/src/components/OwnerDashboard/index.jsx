@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useEth } from '../../contexts/EthContext';
 import { Heading, Box,  Flex, Text, Button } from '@chakra-ui/react';
 import { toastInfo, toastError } from '../../utils/utils';
-import { CollectionList } from './collectionList';
+import { CollectionList } from './CollectionList';
 import { CollectionItemForm } from './CollectionItemForm';
 import { Link } from "react-router-dom";
 
