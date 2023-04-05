@@ -5,10 +5,12 @@ const pinataSDK = require('@pinata/sdk');
 const pinata = new pinataSDK(key, secret);
 const fs = require('fs');
 
-// NFT a créer
-const nftFile1 = fs.createReadStream('./deployment/collection/img/1.jpg');
-const nftJson1 = fs.readFileSync('./deployment/collection/json/1.json');
 
+
+const NFTs = [
+    {img: "NFT_Tronco_JPG",json:"NFT_Tronco_JSON", ipath:"1.jpg", jpath:"1.json"},
+    {img: "NFT_Paddle_JPG",json:"NFT_Paddle_JSON", ipath:"2.png", jpath:"2.json"},
+]
 
 function generateOption(name){
     const options = {
@@ -22,22 +24,27 @@ function generateOption(name){
     return options;
 }
 
-pinata.pinFileToIPFS(nftFile1, generateOption("NFT_Tronco_JPG")).then((result) => {
-    const body  = JSON.parse(nftJson1);
+NFTs.forEach((element, index) => {
+    // NFT a créer
+    const nftFile1 = fs.createReadStream(`./deployment/collection/img/${NFTs[index].ipath}`);
+    const nftJson1 = fs.readFileSync(`./deployment/collection/json/${NFTs[index].jpath}`);
+
+    pinata.pinFileToIPFS(nftFile1, generateOption(NFTs[index].img)).then((result) => {
+        const body  = JSON.parse(nftJson1);
+        
+        body.image = body.image.replace("CID_TO_REPLACE",result.IpfsHash);
     
-    body.image = body.image.replace("CID_TO_REPLACE",result.IpfsHash);
-
-
-    pinata.pinJSONToIPFS(body, generateOption("NFT_Tronco_JSON")).then((json) => {
-        console.log(json);
-        console.log(json.IpfsHash);
-        console.log("ipfs://"+json.IpfsHash)
+    
+        pinata.pinJSONToIPFS(body, generateOption(NFTs[index].json)).then((json) => {
+            console.log(json);
+            console.log(json.IpfsHash);
+            console.log("ipfs://"+json.IpfsHash)
+        }).catch((err) => {
+            console.log(err);
+        });
+    
     }).catch((err) => {
         console.log(err);
-    });
-
-}).catch((err) => {
-    console.log(err);
-}); 
-
+    }); 
+});
 
