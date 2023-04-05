@@ -13,7 +13,8 @@ export const Dao = () => {
     return (
         <Box>
             <Heading as="h1">DAO</Heading>
-
+            {Math.random()}
+            {accounts ? accounts[0]:"not connected"}
             {accounts ? (
                 <>
                    DAO

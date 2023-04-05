@@ -25,7 +25,7 @@ contract AnyRental is Ownable, IAnyRental{
 
 
     // mapping of  a user address to the rented tools
-    mapping (address => Rental[]) private userRentals;
+    mapping (address => RentalReference) private userRentals;
 
 
 
@@ -55,49 +55,56 @@ contract AnyRental is Ownable, IAnyRental{
     * @dev Only renter can call
     */
 
-    modifier onlyRenter() {
-        require(rentersCollection[msg.sender].owner==msg.sender, "You are not the renter of the collection");
+    modifier onlyRentalOwner() {
+        require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");
         _;
     }
-    modifier renterMustExist(address _renter) {
-        require(renterExists(_renter), "Renter does not exist");
+    
+    /**
+     * Owner exist if exist in mapping NFT or mapping rental 
+    * @dev MUST exist int the both.... Except for creationCollection      
+     */
+    modifier ownerMustExist(address _owner) {
+        require(rentersCollection[_owner].collection != address(0), "Owner does not exist");
+        //require(rentersRentals[_owner].length>0, "Owner does not exist");
         _;
     }
              
 
 
+
+    /* ***********************************************
+    *   Setters 
+    *********************************************** */
+
     function setNbRentalMax(uint _nb) external onlyOwner{
         nbRentalMax = _nb;
     }
 
-    function renterExists(address _renter) internal view returns(bool) {
-        return rentersRentals[_renter].length>0;
-    }
+   
 
     /* ***********************************************
     *   Getters 
     *********************************************** */
      /** 
-     * @notice return the NFT Tools from a renter address
+     * @notice return the NFT Tools from a owner address
      * @dev get collection from renter Address
      * @return Tool[]  (NFT attributes)
      */
-    function getToolsCollection(address _renter) renterMustExist(_renter) external view returns(Utils.Tool[] memory){
+    function getToolsCollection(address _owner) ownerMustExist(_owner) external view returns(Utils.Tool[] memory){
         //return factory._rentersCollection().tools();
-        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[_renter].collection);
+        IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[_owner].collection);
         return collec.getTools();
     }
     /** 
-     * @notice return the NFT Collection address from a renter address
-     * @dev get collection address a from renter Address
+     * @notice return the NFT Collection address from a owner address
+     * @dev get collection address a from owner Address
      * @return address of the collection NFT
      */
-    function getToolsCollectionAddress(address _renter)  external view returns(address){
-        return rentersCollection[_renter].collection;
+    function getToolsCollectionAddress(address _owner) ownerMustExist(_owner) external view returns(address){
+        return rentersCollection[_owner].collection;
     }
     
-
-
     /*function getCollections()external view returns(Utils.Tool[] memory){
         // pour toutes les addresses
         // concatener les collections
@@ -106,33 +113,44 @@ contract AnyRental is Ownable, IAnyRental{
     }*/
 
     /** 
-     * @notice return the Rentals from a renter address
-     * @dev get rentals array from an renter address
+     * @notice return the Rentals from a owner address
+     * @dev get rentals array from an owner address
      * @return Rental[]
      */
-    function getRentalsByRenter(address _renter) renterMustExist(_renter) external view returns(Rental[] memory){
-        return rentersRentals[_renter];
+    function getRentalsByOwner(address _owner) ownerMustExist(_owner) external view returns(Rental[] memory){
+        return rentersRentals[_owner];
     }
 
     /** 
-     * @notice return the Rental by the renter address and rentalId
+     * @notice return the Rental by the owner address and rentalId
      * @dev return a rental from an address and a rentalID
      * @return Rental 
      */
-    function getRentalByRenterAddressAndRentalID(address _renter, uint _rentalId) renterMustExist(_renter) external view returns(Rental memory){
+    function getRentalByOwnerAddressAndRentalID(address _owner, uint _rentalId) ownerMustExist(_owner) external view returns(Rental memory){
         uint found;
-         for(uint i; i< rentersRentals[_renter].length; i++){
-            if(rentersRentals[_renter][i].rentalID == _rentalId){
+         for(uint i; i< rentersRentals[_owner].length; i++){
+            if(rentersRentals[_owner][i].rentalID == _rentalId){
                  found=i;
                  break;
             }   
         }
-        return rentersRentals[_renter][found];
+        return rentersRentals[_owner][found];
     }
-        function getRentalIndexByRenterAddressAndRentalID(address _renter, uint _rentalId) renterMustExist(_renter) internal view returns(uint){
+        function getRentalIndexByOwnerAddressAndRentalID(address _owner, uint _rentalId) ownerMustExist(_owner) internal view returns(uint){
         uint found;
-         for(uint i; i< rentersRentals[_renter].length; i++){
-            if(rentersRentals[_renter][i].rentalID == _rentalId){
+         for(uint i; i< rentersRentals[_owner].length; i++){
+            if(rentersRentals[_owner][i].rentalID == _rentalId){
+                 found=i;
+                 break;
+            }   
+        }
+        return found;
+    }
+
+    function getRentalIndexByOwnerAddressAndTokenID(address _owner, uint _tokenId) ownerMustExist(_owner) internal view returns(uint){
+        uint found;
+         for(uint i; i< rentersRentals[_owner].length; i++){
+            if(rentersRentals[_owner][i].tokenID == _tokenId){
                  found=i;
                  break;
             }   
@@ -159,6 +177,21 @@ contract AnyRental is Ownable, IAnyRental{
         return rentalFound;
      }*/
     
+    /**
+    * @notice return if the address is defined as an owner
+    * @dev return it th address is an entry in the map
+     */
+    function isAddressOwner(address _renter) public view returns(bool) {
+        return rentersCollection[_renter].owner != address(0);
+    }
+
+    /**
+    * @notice return if the address is defined as an renter
+    * @dev return it the address has some rentals in the map
+     */
+    function isAddressRenter(address _renter) public view returns(bool) {
+        return userRentals[_renter].collection != address(0);
+    }
 
 
 
@@ -192,7 +225,7 @@ contract AnyRental is Ownable, IAnyRental{
     /**
      * @notice renter delete its NFT Collection of a
      */
-    function deleteCollection() external {
+    function deleteCollection() external onlyRentalOwner{
         require(msg.sender != address(0), "address zero is not valid");
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
       
@@ -221,22 +254,36 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
 
-    function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external returns(uint tokenId){
+    function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description ) external onlyRentalOwner returns(uint tokenId){
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         require(rentersRentals[msg.sender].length < nbRentalMax, "Maximum number of tools reached");
         
         IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[msg.sender].collection);
         uint256 tokenID = collec.mint(_tokenURI, _serialId, _title, _description, msg.sender);
 
+        uint newRentalIds = rentalIds.current();
+        Rental memory rental;
+        CollectionNFT memory collecNFT;
+        collecNFT.collection = rentersCollection[msg.sender].collection;
+        collecNFT.owner = rentersCollection[msg.sender].owner;
+
+        rental.rentalID = newRentalIds;
+        rental.collection = collecNFT;
+
+        rental.tokenID = tokenID;
+        rental.tokenURI = _tokenURI;
+        rentalIds.increment();
+
+        rentersRentals[msg.sender].push(rental);
 
         emit NFTToolAddedToCollection(msg.sender, rentersCollection[msg.sender].collection, tokenID, block.timestamp);
         return tokenID;
     }
 
       /**
-     * @dev delegate the NFT to a user . onlyRenter
+     * @dev delegate the NFT to a user . onlyRentalOwner
      */
-    function delegateNFT(uint _tokenId, address _to, uint64 _expires) external {
+    function delegateNFT(uint _tokenId, address _to, uint64 _expires) external onlyRentalOwner {
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");
 
@@ -255,41 +302,31 @@ contract AnyRental is Ownable, IAnyRental{
     *   Functions  - Rental Managment
     *********************************************** */
 
-    function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID, string memory _tokenURI) external {
+    function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID) external onlyRentalOwner {
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         require(rentersRentals[msg.sender].length < nbRentalMax, "Maximum number of tools reached");
         require(_dayPrice > 0, "number must be > 0");
         require(_caution > 0, "number must be > 0");
 
-         uint newRentalIds = rentalIds.current();
-
-        CollectionNFT memory collec;
-        collec.collection = rentersCollection[msg.sender].collection;
-        collec.owner = rentersCollection[msg.sender].owner;
 
         //All rentalData.is* false by default
         RentalData memory rentalData;
 
-        Rental memory rental;
-        rental.rentalID = newRentalIds;
+        uint found = getRentalIndexByOwnerAddressAndTokenID(msg.sender, _tokenID);
+        Rental storage rental = rentersRentals[msg.sender][found];
+  
         rental.dayPrice =_dayPrice;
         rental.caution = _caution;
         rental.rentalStatus = RentalStatus.AVAILABLE;
         rental.rentalData = rentalData;
-        rental.collection = collec;
-        rental.tokenID = _tokenID;
-        rental.tokenURI = _tokenURI; 
-
-        rentersRentals[msg.sender].push(rental);
-
-        rentalIds.increment();
-        emit ToolAddedToRentals(msg.sender, newRentalIds , _tokenID, block.timestamp);
+                
+        emit ToolAddedToRentals(msg.sender, rental.rentalID , rental.tokenID, block.timestamp);
     }
 
      /**
-     * @dev update a tool into collection . onlyRenter
+     * @dev update a tool into collection . onlyRentalOwner
      */
-     function updateToolIntoRentals(uint _rentalID, uint64 _dayPrice, uint64 _caution) external{
+     function updateToolIntoRentals(uint _rentalID, uint64 _dayPrice, uint64 _caution) external onlyRentalOwner{
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         require(_dayPrice > 0, "number must be > 0");
         require(_caution > 0, "number must be > 0");
@@ -305,9 +342,9 @@ contract AnyRental is Ownable, IAnyRental{
         emit ToolUpdatedFromRentals(msg.sender, _rentalID, block.timestamp);
      }
       /**
-     * @dev delete a tool into collection . onlyRenter
+     * @dev delete a tool into collection . onlyRentalOwner
      */
-     function deleteToolIntoRentals(uint _rentalID) external{
+     function deleteToolIntoRentals(uint _rentalID) external onlyRentalOwner{
          require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         require(rentersRentals[msg.sender].length < nbRentalMax, "Maximum number of tools reached");
         
@@ -330,19 +367,19 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution and location is secured until
      * @dev user send caution and location price for rent a Rental
      */
-     function sendPaiementForRental(address _renter, uint _rentalID, uint64 _begin, uint64 _end) renterMustExist(_renter) external{
+     function sendPaiementForRental(address _owner, uint _rentalID, uint64 _begin, uint64 _end) ownerMustExist(_owner) external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
          require(_begin > 0, "begin must be a valid date");
          require(_end > 0, "end must be a valid date");
          require(_begin < _end, "End of rental can't be before begin");
 
-         uint found = getRentalIndexByRenterAddressAndRentalID(_renter, _rentalID);
-        Rental storage rental = rentersRentals[_renter][found];
-        require(rental.rentalID == _rentalID, "The rental is not available.");
-        require(rental.rentalStatus == RentalStatus.AVAILABLE, "The rental status is incorrect.");
+         uint found = getRentalIndexByOwnerAddressAndRentalID(_owner, _rentalID);
+         Rental storage rental = rentersRentals[_owner][found];
+         require(rental.rentalID == _rentalID, "The rental is not available.");
+         require(rental.rentalStatus == RentalStatus.AVAILABLE, "The rental status is incorrect.");
         
         //gestion caution et paiement
-
+     
         rental.start = _begin;
         rental.end = _end;
         rental.rentalStatus = RentalStatus.RENTAL_REQUESTED;
@@ -357,12 +394,12 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution and location is still secured
      * @dev renter validate the delagation of the NFT
      */
-     function validateNFTDelegationForRental(uint _rentalID, uint _tokenID) renterMustExist(msg.sender)  external{
+     function validateNFTDelegationForRental(uint _rentalID, uint _tokenID) ownerMustExist(msg.sender)  external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
          require(_tokenID > 0, "token ID must be valid");
 
 
-        uint found = getRentalIndexByRenterAddressAndRentalID(msg.sender, _rentalID);
+        uint found = getRentalIndexByOwnerAddressAndRentalID(msg.sender, _rentalID);
         Rental storage rental = rentersRentals[msg.sender][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.tokenID == _tokenID, "Error... the tokenId isn't the correct one.");
@@ -380,10 +417,10 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution is still secured, the location is payed
      * @dev user validate having the NFT, annd receipt the tool
      */
-     function validateNFTandToolReception(address _renter, uint _rentalID) renterMustExist(_renter)  external{
+     function validateNFTandToolReception(address _renter, uint _rentalID) ownerMustExist(_renter)  external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
  
-        uint found = getRentalIndexByRenterAddressAndRentalID(_renter, _rentalID);
+        uint found = getRentalIndexByOwnerAddressAndRentalID(_renter, _rentalID);
         Rental storage rental = rentersRentals[_renter][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.renter==msg.sender, "Problem on the renter and the one who asks");
@@ -402,10 +439,10 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution is still secured, the location is already payed
      * @dev user give bak th etool
      */
-     function giveBackToolAfterRental(address _renter, uint _rentalID) renterMustExist(_renter) external{
+     function giveBackToolAfterRental(address _renter, uint _rentalID) ownerMustExist(_renter) external{
         require(rentalIds.current() >= _rentalID, "Tool does not exist");
 
-        uint found = getRentalIndexByRenterAddressAndRentalID(_renter, _rentalID);
+        uint found = getRentalIndexByOwnerAddressAndRentalID(_renter, _rentalID);
         Rental storage rental = rentersRentals[_renter][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.renter==msg.sender, "Problem on the renter and the one who asks");
@@ -425,10 +462,10 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution is given back
      * @dev renter validae the return of the tool
      */
-     function validateReturnToolAfterRental(uint _rentalID)renterMustExist(msg.sender)  external{
+     function validateReturnToolAfterRental(uint _rentalID) ownerMustExist(msg.sender)  external{
         require(rentalIds.current() >= _rentalID, "Tool does not exist");
 
-        uint found = getRentalIndexByRenterAddressAndRentalID(msg.sender, _rentalID);
+        uint found = getRentalIndexByOwnerAddressAndRentalID(msg.sender, _rentalID);
         Rental storage rental = rentersRentals[msg.sender][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.rentalStatus == RentalStatus.COMPLETED_USER, "The rental status is incorrect.");
@@ -445,10 +482,10 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution still secured
      * @dev renter doesn't validate the return of the tool, because of a problem
      */
-     function refuseReturnToolAfterRental(uint _rentalID, string memory message)renterMustExist(msg.sender)  external{
+     function refuseReturnToolAfterRental(uint _rentalID, string memory message)ownerMustExist(msg.sender)  external{
         require(rentalIds.current() >= _rentalID, "Tool does not exist");
 
-        uint found = getRentalIndexByRenterAddressAndRentalID(msg.sender, _rentalID);
+        uint found = getRentalIndexByOwnerAddressAndRentalID(msg.sender, _rentalID);
         Rental storage rental = rentersRentals[msg.sender][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.rentalStatus == RentalStatus.COMPLETED_USER, "The rental status is incorrect.");
@@ -466,10 +503,10 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution still secured
      * @dev user confirm dispute and expose its point of view
      */
-     function confirmDisputeAfterRental(address _renter, uint _rentalID, string memory message)renterMustExist(_renter)  external{
+     function confirmDisputeAfterRental(address _renter, uint _rentalID, string memory message)ownerMustExist(_renter)  external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
 
-        uint found = getRentalIndexByRenterAddressAndRentalID(_renter, _rentalID);
+        uint found = getRentalIndexByOwnerAddressAndRentalID(_renter, _rentalID);
         Rental storage rental = rentersRentals[_renter][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.renter==msg.sender, "Problem on the renter and thr one who asks");
@@ -489,7 +526,7 @@ contract AnyRental is Ownable, IAnyRental{
      function redeemPaymentForRental(address _renter, uint _rentalID) external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
 
-        uint found = getRentalIndexByRenterAddressAndRentalID(_renter, _rentalID);
+        uint found = getRentalIndexByOwnerAddressAndRentalID(_renter, _rentalID);
         Rental storage rental = rentersRentals[_renter][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.rentalStatus == RentalStatus.RETURN_ACCEPTED_BY_OWNER, "The rental status is incorrect.");

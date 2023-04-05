@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@chakra-ui/react';
+import { SettingsIcon } from '@chakra-ui/icons'
+import { Link } from 'react-router-dom';
 
 export const Account = ({accounts, isOwner}) => {
     
@@ -20,10 +22,12 @@ export const Account = ({accounts, isOwner}) => {
         <div>
             { isOwner===true ?(
                 <>
-                <span className="icon is-large"><i className="fa fa-user"></i></span>
-                 <a className="button is-primary">
-                        {user}
-                </a>
+              
+                    <Button leftIcon={<SettingsIcon />} as={Link} to="/app/admin" colorScheme='whiteAlpha' variant='solid'>
+                     {user}
+                    </Button>
+
+           
                 </>
             ) : user!== "not connected" ? (
                  <Button width="8rem">    
