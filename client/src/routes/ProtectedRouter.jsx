@@ -7,6 +7,7 @@ import { EthProvider } from "../contexts/EthContext";
 import { NotFound } from '../pages/NotFound';
 import { ReservationPage } from '../pages/protected/ReservationPage';
 import { Owner } from '../pages/protected/owner';
+import { Admin } from '../pages/protected/Admin';
 import { CollectionItemForm } from '../components/OwnerDashboard/CollectionItemForm';
 
 export const ProtectedRouter = () => {
@@ -21,8 +22,8 @@ export const ProtectedRouter = () => {
                     <Route path="/louer/add" element={<CollectionItemForm />} />
                     <Route path="/location" element={<Renter />} />
                     <Route path="/dao" element={<Dao />} />
-                     <Route path="/reservation/:tokenID" element={<ReservationPage />} />
-                    {/*<Route path="/reservation" component={<ReservationPage />} />*/}
+                    <Route path="/reservation/:tokenID" element={<ReservationPage />} />
+                    <Route path="/admin" element={<Admin />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Routes>
