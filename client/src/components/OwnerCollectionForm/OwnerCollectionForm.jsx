@@ -61,11 +61,7 @@ export const OwnerCollectionForm = () => {
                         </FormControl>
 
                         <Button mt="4" colorScheme="purple" onClick={handleSubmit}> Devenir propriétaire </Button>
-                    </VStack>
-            
-
-
-              
+                    </VStack>             
             </Box>
         </>
     );

@@ -3,16 +3,17 @@ import { useEth } from '../../contexts/EthContext';
 import { Heading, Box,  Flex, Text, Button } from '@chakra-ui/react';
 import { toastInfo, toastError } from '../../utils/utils';
 import { CollectionList } from './collectionList';
+import { CollectionItemForm } from './CollectionItemForm';
 
 
 export const OwnerDashboard = () => {
     const { state: { contract, accounts, isOwner} } = useEth();
 
     const [collectionNFT, setCollectionNFT] = useState('')
-
+/*
     const [test, setTest] = useState([
         {
-            tokenID: 1,
+          tokenID: 1,
           serialID: 1001,
           title: "Hammer",
           description: "A tool used for pounding nails",
@@ -66,10 +67,11 @@ export const OwnerDashboard = () => {
             isAvailable: true,
           },
       ]);
-
+*/
     const retrieveCollectionData = async () => {
         try{
             let colNFTs = await contract.methods.getToolsCollection(accounts[0]).call({ from: accounts[0] });
+            colNFTs = colNFTs.filter((tool)=>tool.isAvailable);
             setCollectionNFT(colNFTs);
             //let collectionAddress = await contract.methods.getToolsCollectionAddress(accounts[0]).call({ from: accounts[0] });
             
@@ -103,13 +105,14 @@ export const OwnerDashboard = () => {
         <>
         <Box >
             <Heading as="h3">Votre collection</Heading>
-            <Text>Ma collection</Text>
-            { collectionNFT.length ==0 ? "voous n'avez pas de collecction, créez en une" : <CollectionList tools={test} />}
             
-            <Text mt="4">
-            Ajoutez-y des objets à louer.
-            </Text>
-            <Button mt="4" colorScheme="purple">Ajouter un objet </Button>
+            { collectionNFT.length == 0 ?  (
+                <Text>vous n'avez pas encore d'outils à dispo.</Text>
+                
+            
+            ) : <CollectionList tools={collectionNFT} />}
+            
+            <CollectionItemForm />
         </Box>
         </>
     );
