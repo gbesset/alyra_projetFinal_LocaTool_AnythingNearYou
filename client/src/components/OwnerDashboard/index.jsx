@@ -4,13 +4,13 @@ import { Heading, Box,  Flex, Text, Button } from '@chakra-ui/react';
 import { toastInfo, toastError } from '../../utils/utils';
 import { CollectionList } from './collectionList';
 import { CollectionItemForm } from './CollectionItemForm';
-
+import { Link } from "react-router-dom";
 
 export const OwnerDashboard = () => {
     const { state: { contract, accounts, isOwner} } = useEth();
 
     const [collectionNFT, setCollectionNFT] = useState('')
-/*
+
     const [test, setTest] = useState([
         {
           tokenID: 1,
@@ -67,12 +67,13 @@ export const OwnerDashboard = () => {
             isAvailable: true,
           },
       ]);
-*/
+
     const retrieveCollectionData = async () => {
         try{
             let colNFTs = await contract.methods.getToolsCollection(accounts[0]).call({ from: accounts[0] });
             colNFTs = colNFTs.filter((tool)=>tool.isAvailable);
             setCollectionNFT(colNFTs);
+            setCollectionNFT(test)
             //let collectionAddress = await contract.methods.getToolsCollectionAddress(accounts[0]).call({ from: accounts[0] });
             
         }
@@ -104,15 +105,17 @@ export const OwnerDashboard = () => {
     return (
         <>
         <Box >
-            <Heading as="h3">Votre collection</Heading>
             
             { collectionNFT.length == 0 ?  (
+              <Box>
+                <Heading as="h3">Votre collection</Heading>
                 <Text>vous n'avez pas encore d'outils à dispo.</Text>
-                
+
+                <Button mt="4" colorScheme="purple" as={Link} to="/app/louer/add"> Ajouter un Objet </Button>
+              </Box>
+            ) : 
+            <CollectionList tools={collectionNFT} />}
             
-            ) : <CollectionList tools={collectionNFT} />}
-            
-            <CollectionItemForm />
         </Box>
         </>
     );

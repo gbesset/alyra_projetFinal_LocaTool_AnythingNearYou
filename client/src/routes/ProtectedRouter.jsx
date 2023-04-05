@@ -7,6 +7,7 @@ import { EthProvider } from "../contexts/EthContext";
 import { NotFound } from '../pages/NotFound';
 import { ReservationPage } from '../pages/protected/ReservationPage';
 import { Owner } from '../pages/protected/owner';
+import { CollectionItemForm } from '../components/OwnerDashboard/CollectionItemForm';
 
 export const ProtectedRouter = () => {
     const location = useLocation();
@@ -16,7 +17,8 @@ export const ProtectedRouter = () => {
         <EthProvider>
             <Routes>
                 <Route element={<ProtectedLayout/>}>
-                    <Route path="/louer" element={<Owner/>} /> 
+                    <Route path="/louer" element={<Owner/>} />
+                    <Route path="/louer/add" element={<CollectionItemForm />} />
                     <Route path="/location" element={<Renter />} />
                     <Route path="/dao" element={<Dao />} />
                      <Route path="/reservation/:tokenID" element={<ReservationPage />} />
