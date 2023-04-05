@@ -6,7 +6,7 @@ import { Dao } from '../pages/protected/Dao';
 import { EthProvider } from "../contexts/EthContext";
 import { NotFound } from '../pages/NotFound';
 import { ReservationPage } from '../pages/protected/ReservationPage';
-import { Owner } from '../pages/protected/owner';
+import { Owner } from '../pages/protected/Owner';
 import { Admin } from '../pages/protected/Admin';
 import { CollectionItemForm } from '../components/OwnerDashboard/CollectionItemForm';
 
