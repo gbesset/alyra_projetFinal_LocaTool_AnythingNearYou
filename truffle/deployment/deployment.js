@@ -24,27 +24,31 @@ function generateOption(name){
     return options;
 }
 
-NFTs.forEach((element, index) => {
-    // NFT a créer
-    const nftFile1 = fs.createReadStream(`./deployment/collection/img/${NFTs[index].ipath}`);
-    const nftJson1 = fs.readFileSync(`./deployment/collection/json/${NFTs[index].jpath}`);
+async function processNFTs() {
+    for(const nft of NFTs){
+        try{
+            // NFT a créer
+            const nftFile1 = fs.createReadStream(`./deployment/collection/img/${nft.ipath}`);
+            const nftJson1 = fs.readFileSync(`./deployment/collection/json/${nft.jpath}`);
 
-    pinata.pinFileToIPFS(nftFile1, generateOption(NFTs[index].img)).then((result) => {
-        const body  = JSON.parse(nftJson1);
-        
-        body.image = body.image.replace("CID_TO_REPLACE",result.IpfsHash);
-    
-    
-        pinata.pinJSONToIPFS(body, generateOption(NFTs[index].json)).then((json) => {
+            result = await pinata.pinFileToIPFS(nftFile1, generateOption(nft.img))
+            
+            const body  = JSON.parse(nftJson1);
+            body.image = body.image.replace("CID_TO_REPLACE",result.IpfsHash);
+            
+            
+            const json = await pinata.pinJSONToIPFS(body, generateOption(nft.json))
             console.log(json);
             console.log(json.IpfsHash);
             console.log("ipfs://"+json.IpfsHash)
-        }).catch((err) => {
-            console.log(err);
-        });
-    
-    }).catch((err) => {
-        console.log(err);
-    }); 
-});
 
+        }
+        catch(error){
+            console.error("Error upload NFT pinata ",error)
+        }
+    
+    };
+    console.log("=============================")
+}
+
+processNFTs();
