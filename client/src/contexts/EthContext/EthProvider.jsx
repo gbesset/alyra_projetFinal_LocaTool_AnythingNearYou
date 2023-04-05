@@ -15,6 +15,7 @@ function EthProvider({ children }) {
         const { abi } = artifact;
         let address, contract, txhash;
         let isOwner = false;
+        let ownerAddress = '';
         let isRenter = false;
         try {
           address = artifact.networks[networkID].address;
@@ -22,13 +23,16 @@ function EthProvider({ children }) {
           contract = new web3.eth.Contract(abi, address);
           if(contract && accounts){
             isOwner = await contract.methods.isAddressOwner(accounts[0]).call({ from: accounts[0] });
+            if(isOwner){
+              ownerAddress =  await contract.methods.getToolsCollectionAddress(accounts[0]).call({ from: accounts[0] });
+            }
           }
         } catch (err) {
           console.error(err);
         }
         dispatch({
           type: actions.init,
-          data: { artifact, web3, accounts, networkID, contract, isOwner, isRenter, txhash }
+          data: { artifact, web3, accounts, networkID, contract, isOwner, ownerAddress, isRenter, txhash }
         });
       }
     }, []);

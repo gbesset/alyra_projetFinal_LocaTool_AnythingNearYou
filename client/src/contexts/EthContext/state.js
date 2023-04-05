@@ -10,6 +10,7 @@ const initialState = {
   networkID: null,
   contract: null,
   isOwner: null,
+  ownerAddress: null,
   isRenter:null,
   txhash:null
 };
