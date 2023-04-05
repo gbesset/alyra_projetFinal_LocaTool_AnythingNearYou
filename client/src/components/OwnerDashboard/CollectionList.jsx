@@ -14,7 +14,7 @@ export const CollectionList= ({tools}) => {
           <Button mt="4" colorScheme="purple" as={Link} to="/app/louer/add"> Ajouter un Objet </Button>
 
          <Heading as="h3" mt="2rem">Votre collection</Heading>
-         <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(400px, 1fr))'>
+         <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'>
          {tools.map((tool, index) => (
             <CollectionListItem  key={index} tool={tool} />
         ))}

@@ -13,8 +13,8 @@ export const  CollectionListItem= ({tool}) => {
   };
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" m={4} >
-    <Card maxW='sm'>
+    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" m={4} mx="auto">
+    <Card maxW='sm' >
         <CardBody>
         <Image src="https://via.placeholder.com/250" borderRadius='lg'/>
 
