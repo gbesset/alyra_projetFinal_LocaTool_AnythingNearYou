@@ -30,7 +30,7 @@ export const Account = ({accounts, isOwner}) => {
            
                 </>
             ) : user!== "not connected" ? (
-                 <Button width="8rem">    
+                 <Button width="8rem" as={Link} to="/app/admin">    
                          {user}
                 </Button>
             ) : (
