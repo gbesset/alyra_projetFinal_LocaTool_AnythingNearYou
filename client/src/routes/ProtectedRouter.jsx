@@ -13,7 +13,7 @@ import { Rentals } from '../components/RentalsList';
 
 export const ProtectedRouter = () => {
     const location = useLocation();
-    const tool = location.state ? location.state.tool : null;
+    const rental = location.state ? location.state.rental : null;
 
     return (
         <EthProvider>

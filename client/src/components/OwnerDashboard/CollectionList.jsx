@@ -5,7 +5,7 @@ import { Box, Heading, Text, Button } from '@chakra-ui/react';
 import { SimpleGrid} from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
-export const CollectionList= ({tools}) => {
+export const CollectionList= ({rentals}) => {
   
   return (
     
@@ -15,8 +15,8 @@ export const CollectionList= ({tools}) => {
 
          <Heading as="h3" mt="2rem">Votre collection</Heading>
          <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'>
-         {tools.map((tool, index) => (
-            <CollectionListItem  key={index} tool={tool} />
+         {rentals.map((rental, index) => (
+            <CollectionListItem  key={index} rental={rental} />
         ))}
          </SimpleGrid>
         </Box>

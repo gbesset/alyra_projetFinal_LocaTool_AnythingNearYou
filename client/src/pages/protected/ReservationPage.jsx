@@ -3,20 +3,20 @@ import { useLocation } from 'react-router-dom';
 
 export const ReservationPage = () => {
    const location = useLocation();
-   const { tool } = location?.state;
+   const { rental } = location?.state;
   
   return (
     <div className="text-white">
-        {tool ? (<>
-                <h1>Réserver l'outil {tool.tokenID}</h1>
+        {rental ? (<>
+                <h1>Réserver l'outil {rental.tokenID}</h1>
                 <div>
                 <h1>Réserver</h1>
-                <p>Titre : {tool.title}</p>
-                <p>Description : {tool.description}</p>
-                <p>Token ID : {tool.tokenID}</p>
-                <p>dayPrice : {tool.dayPrice}</p>
-                <p>caution : {tool.caution}</p>
-                <p>url : {tool.tokenImgURI}</p>
+                <p>Titre : {rental.title}</p>
+                <p>Description : {rental.description}</p>
+                <p>Token ID : {rental.tokenID}</p>
+                <p>dayPrice : {rental.dayPrice}</p>
+                <p>caution : {rental.caution}</p>
+                <p>url : {rental.tokenImgURI}</p>
                 
                 </div>
       </>

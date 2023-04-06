@@ -4,12 +4,12 @@ import { Heading, Box, Flex, Link, Image, Text, Button, Stack, Divider, ButtonGr
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
 
-export const  CollectionListItem= ({tool}) => {
+export const  CollectionListItem= ({rental}) => {
   let navigate = useNavigate();
-  const { tokenID, serialID, title, description, tokenImgURI, tokenURI, dayPrice, caution } = tool;
+  const { tokenID, serialID, title, description, tokenImgURI, tokenURI, dayPrice, caution } = rental;
   
   const handleManage = () => {
-    navigate(`/app/reservation/${tool.tokenID}`, { state: { tool } });
+    navigate(`/app/reservation/${rental.tokenID}`, { state: { rental } });
   };
 
   return (

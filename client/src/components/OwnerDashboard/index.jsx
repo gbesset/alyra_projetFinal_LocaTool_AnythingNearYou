@@ -63,7 +63,7 @@ export const OwnerDashboard = () => {
                 <Button mt="4" colorScheme="purple" as={Link} to="/app/louer/add"> Ajouter un Objet </Button>
               </Box>
             ) : 
-            <CollectionList tools={collectionNFT} />}
+            <CollectionList rentals={collectionNFT} />}
             
         </Box>
         </>
