@@ -5809,10 +5809,73 @@
       "links": {},
       "address": "0x665d38AE4c468EE4222a7617A5Ca812D055d7bBC",
       "transactionHash": "0xc0d77ccfae94cf6e27cec376a8e3cd0ef9e10de704cd90ac76ca186d257e70f1"
+    },
+    "1680792189327": {
+      "events": {
+        "0xbd6a0cb2cc43300f5337ae96695cf21f13aeb0f35b48539e72ae96722cd9d293": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "renter",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "renterCollectionName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "renterCollectionSymbol",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "renterCollectionAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            }
+          ],
+          "name": "NFTCollectionCreated",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x8dBA749f55394fc2b38e26290A0Aaa4a00389eBf",
+      "transactionHash": "0x621db49213c4498f5f2a957cee3ca2dacf26ae288721d265be9c8814ce781a25"
     }
   },
   "schemaVersion": "3.4.11",
-  "updatedAt": "2023-04-06T08:53:22.481Z",
+  "updatedAt": "2023-04-06T18:56:29.538Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
