@@ -441,12 +441,12 @@ contract('AnyRental', accounts => {
 
             it("... after the NFT creation, owner can add a Rental - should emit ToolAddedToRentals", async () => {
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, tokenID, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN( ), tokenID: new BN(tokenID) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN( ), tokenID: new BN(tokenID) });
             });
 
             it("... after the NFT creation, owner can add a Rental -  should emit 2 ToolAddedToRentals ", async () => {
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, tokenID, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rentalID), tokenID: new BN(tokenID) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rentalID), tokenID: new BN(tokenID) });
                 
                 tokenID++;
                 rentalID++;
@@ -454,7 +454,7 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(tokenID) });
 
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 54, 800,  tokenID, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rentalID), tokenID: new BN(tokenID) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rentalID), tokenID: new BN(tokenID) });
 
             });
             
@@ -534,7 +534,7 @@ contract('AnyRental', accounts => {
         
                 expectEvent(receipt, "ToolAddedToRentals", {
                     renter: _owner1,
-                    toolID: new BN(0)
+                    rentalID: new BN(0)
                 });
             });
         
@@ -559,7 +559,7 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(tokenID) });
                 
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, tokenID, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(0) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(0) });
                 
                 rentalExpected = {
                     "rentalID": 0, 
@@ -616,7 +616,7 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(tokenID) });
     
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, tokenID, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rentalID),  tokenID: new BN(tokenID) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rentalID),  tokenID: new BN(tokenID) });
              
                 tokenID++;
                 rentalID++;
@@ -625,7 +625,7 @@ contract('AnyRental', accounts => {
 
 
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 22, 420, tokenID, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rentalID), tokenID: new BN(tokenID) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rentalID), tokenID: new BN(tokenID) });
     
                 tokenID++;
                 rentalID++;
@@ -633,7 +633,7 @@ contract('AnyRental', accounts => {
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(tokenID) });
 
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 33, 350, tokenID, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rentalID), tokenID: new BN(tokenID) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rentalID), tokenID: new BN(tokenID) });
             });
     
     
@@ -696,13 +696,13 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
 
                  // add second tool
                  tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
-                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
 
                 // add a colelction to owner2 to have another one
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
@@ -712,7 +712,7 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
 
 
             });
@@ -787,13 +787,13 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
 
                  // add second tool
                  tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
-                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
 
 
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
@@ -803,7 +803,7 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
                 tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
@@ -861,13 +861,13 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
 
                  // add second tool
                  tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
-                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
 
 
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
@@ -877,7 +877,7 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
                 tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
@@ -934,13 +934,13 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
 
                  // add second tool
                  tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
-                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
 
 
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
@@ -950,7 +950,7 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
                 tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
@@ -1014,13 +1014,13 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
 
                  // add second tool
                  tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
-                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
 
 
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
@@ -1030,7 +1030,7 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
                 tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
@@ -1099,13 +1099,13 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
 
                  // add second tool
                  tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
-                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
 
 
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
@@ -1115,7 +1115,7 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
                 tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
@@ -1184,13 +1184,13 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
 
                  // add second tool
                  tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
-                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
 
 
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
@@ -1200,7 +1200,7 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
                 tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
@@ -1271,13 +1271,13 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental1) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
 
                  // add second tool
                  tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
                  expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
                  tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
-                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  toolID: new BN(rental2) });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
 
 
                  let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
@@ -1287,7 +1287,7 @@ contract('AnyRental', accounts => {
                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
-                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  toolID: new BN(rental3) });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
 
                 //  user 1 rent renter 1 object
                 tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
