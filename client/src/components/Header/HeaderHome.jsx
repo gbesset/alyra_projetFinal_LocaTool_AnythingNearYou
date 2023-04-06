@@ -9,7 +9,7 @@ export const HeaderHome = () => {
           <Flex justifyContent="space-between" alignItems="center" height="10vh" width="100%" p="2rem">
             <Text></Text>
             <Flex width="30%" justifyContent="space-between" alignItems="center">
-                <Text className="text-white"><Link to="/app/louer">Proprietaire</Link></Text>
+                <Text className="text-white"><Link to="/app/louer">Loueur</Link></Text>
                 <Text className="text-white"><Link to="/app/location">Locatataire</Link></Text>
                 <Text className="text-white"><Link to="/app/dao">DAO</Link></Text>
             </Flex>

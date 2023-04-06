@@ -19,7 +19,7 @@ export const HeaderApp = () => {
             </Link>
           <Flex width="30%" justifyContent="space-between" alignItems="center">
                 {/*<Text className="text-white"><Link to="/">Accueil</Link></Text>*/}
-                <Text className="text-white"><Link to="/app/louer">Proprietaire</Link></Text>
+                <Text className="text-white"><Link to="/app/louer">Loueur</Link></Text>
                 <Text className="text-white"><Link to="/app/location">Locataire</Link></Text>
                 <Text className="text-white"><Link to="/app/dao">DAO</Link></Text>
           </Flex>
