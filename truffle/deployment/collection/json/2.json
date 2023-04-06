@@ -1,0 +1,20 @@
+{
+    "description":"Tronçonneuse",
+    "image":"https://gateway.pinata.cloud/ipfs/CID_TO_REPLACE/1.png",
+    "name":"CollectionProprio_1",
+    "attribute": [
+        {
+            "trait_type":"serialID",
+            "value":"862419541651855"
+        },
+        {
+            "trait_type":"title",
+            "value":"Paddle gonflable"
+        },
+        { 
+            "trait_type":"description",
+            "value":"Taille: 11’5 x 32′′ x 6′′ ( 348 x 82 x 15cm)\n\nUtilisation débutant sans problème., 2 adultes max :160kg total .\nNe pas tenter de réparer un crevaison vous même.\nUn forfait de réparation et prévu avec la caution (5 euros si réparable : petite fuite).\nCe paddle est fournis avec :\n-Pagaie \n-Leash \n-Pompe \n-Sac à dos"
+        }
+    ]
+
+}

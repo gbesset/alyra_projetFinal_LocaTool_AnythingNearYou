@@ -1,0 +1,20 @@
+{
+    "description":"Pistolet peinture airless basse pression",
+    "image":"https://gateway.pinata.cloud/ipfs/CID_TO_REPLACE/1.png",
+    "name":"Pistolet peinture",
+    "attribute": [
+        {
+            "trait_type":"serialID",
+            "value":"96654486655"
+        },
+        {
+            "trait_type":"title",
+            "value":"Pistolet peinture airless basse pression"
+        },
+        { 
+            "trait_type":"description",
+            "value":"Pression max 110 bar. Permet de pulvériser avec un haut niveau de contrôle et de performances avec une pression réduite. Jusqu’à 55% de réduction de l’effet de brouillard, moins d’usure de la machine et des accessoires.\n\nPour peintures murales, laques et lasures. Pompe Airless à piston pour de moyens à très grands projets. Une pression de pulvérisation plus faible met moins de pression sur le système."
+        }
+    ]
+
+}

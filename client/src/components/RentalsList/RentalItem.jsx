@@ -4,12 +4,12 @@ import { Heading, Box, Flex, Link, Image, Text, Button, Stack, Divider, ButtonGr
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
 
-export const  CollectionListItem= ({rental}) => {
+export const  RentalItem= ({rental}) => {
   let navigate = useNavigate();
-  const { tokenID, serialID, title, description, tokenImgURI, tokenURI, dayPrice, caution } = rental;
+  const { rentalID, title, description, tokenImgURI, dayPrice, caution , rentalStatus, renter, start, end, rentalData} = rental;
   
   const handleManage = () => {
-    navigate(`/app/reservation/${rental.tokenID}`, { state: { rental } });
+    navigate(`/app/reservation/${rental.rentalID}`, { state: { rental } });
   };
 
   return (
@@ -30,9 +30,6 @@ export const  CollectionListItem= ({rental}) => {
                 </Text>
             </Flex>
            
-            <Text>
-              tokenid: {tokenID}
-            </Text>
             <Text as="h4" fontWeight="bold" textDecor="underline">Description</Text>
             <Text whiteSpace="pre-wrap">
             {description.slice(0,130) + "\n..."}
@@ -40,17 +37,10 @@ export const  CollectionListItem= ({rental}) => {
           </Stack>
         </CardBody>
         <Divider />
-        <CardFooter>
-          <ButtonGroup spacing='2'>
-            <Button variant='solid' colorScheme='blue' onClick={handleManage}>
-              Réserver
-            </Button>
-            <Link href={tokenURI} isExternal>
-            <Button variant='ghost' colorScheme='blue'>
-              plus d'info
-            </Button>
-            </Link>
-          </ButtonGroup>
+        <CardFooter justify="center">
+          <Button variant='solid' colorScheme='blue' onClick={handleManage}>
+            Détails
+          </Button>
         </CardFooter>
       </Card>
     </Box>

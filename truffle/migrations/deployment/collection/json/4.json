@@ -1,0 +1,20 @@
+{
+    "description":"Tronçonneuse description",
+    "image":"https://gateway.pinata.cloud/ipfs/CID_TO_REPLACE/1.png",
+    "name":"Tronçonneuse",
+    "attribute": [
+        {
+            "trait_type":"serialID",
+            "value":"16565266695453"
+        },
+        {
+            "trait_type":"title",
+            "value":"Tronçonneuse GT garden"
+        },
+        { 
+            "trait_type":"description",
+            "value":"Elle est ainsi équipée d’un moteur 58 cm3 2 temps. Elle est donc capable de tronçonner les bois les plus tenaces. C’est une tronçonneuse thermique, elle fonctionne donc au mélange huile/essence 4 %..\nDémarrage facile et sans effort. La longueur de sa lame est de 50 cm.\n-POIDS:6,4kg"
+        }
+    ]
+
+}

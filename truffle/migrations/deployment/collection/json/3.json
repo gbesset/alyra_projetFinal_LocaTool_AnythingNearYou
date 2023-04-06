@@ -1,0 +1,20 @@
+{
+    "description":"Bétonnière description",
+    "image":"https://gateway.pinata.cloud/ipfs/CID_TO_REPLACE/1.png",
+    "name":"Bétonnière",
+    "attribute": [
+        {
+            "trait_type":"serialID",
+            "value":"000000000000"
+        },
+        {
+            "trait_type":"title",
+            "value":"Bétonnière"
+        },
+        { 
+            "trait_type":"description",
+            "value":"Caractéristiques :\n- Bétonnière bricolage cuve 160L - Capacité de malaxage 130L\n- Moteur monophasé 230V/50Hz - Puissance 700 W\n- Protection IP44\n- Roues pleines diamètre 200mm - 3/4 sac de ciment de 35kg"
+        }
+    ]
+
+}
