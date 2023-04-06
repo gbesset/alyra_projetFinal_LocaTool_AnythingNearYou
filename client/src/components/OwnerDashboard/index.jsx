@@ -11,7 +11,8 @@ export const OwnerDashboard = () => {
 
     const [collectionNFT, setCollectionNFT] = useState('')
 
-    const [test, setTest] = useState([
+    
+   /* const [test, setTest] = useState([
         {
           tokenID: 1,
           serialID: 1001,
@@ -66,16 +67,22 @@ export const OwnerDashboard = () => {
             tokenURI: "https://example.com/images/wrench.jpg",
             isAvailable: true,
           },
-      ]);
+      ]);*/
 
     const retrieveCollectionData = async () => {
         try{
-            let colNFTs = await contract.methods.getToolsCollection(accounts[0]).call({ from: accounts[0] });
-            colNFTs = colNFTs.filter((tool)=>tool.isAvailable);
-            setCollectionNFT(colNFTs);
-            setCollectionNFT(test)
-            //let collectionAddress = await contract.methods.getToolsCollectionAddress(accounts[0]).call({ from: accounts[0] });
+            let rentals = await contract.methods.getRentalsByOwner(accounts[0]).call({ from: accounts[0] });
+            let nfts = await contract.methods.getToolsCollection(accounts[0]).call({ from: accounts[0] });
             
+            nfts = nfts.filter((tool)=>tool.isAvailable);
+            
+            let rentalComplete = nfts.map( tool =>{
+                let rental = rentals.find(rental => rental.tokenID === tool.tokenID);
+                return {...tool, ...rental};
+            })
+
+            setCollectionNFT(rentalComplete);
+
         }
         catch(error){
             console.log(error)

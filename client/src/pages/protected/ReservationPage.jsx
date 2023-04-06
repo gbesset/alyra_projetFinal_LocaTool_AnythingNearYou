@@ -14,6 +14,9 @@ export const ReservationPage = () => {
                 <p>Titre : {tool.title}</p>
                 <p>Description : {tool.description}</p>
                 <p>Token ID : {tool.tokenID}</p>
+                <p>dayPrice : {tool.dayPrice}</p>
+                <p>caution : {tool.caution}</p>
+                <p>url : {tool.tokenImgURI}</p>
                 
                 </div>
       </>
