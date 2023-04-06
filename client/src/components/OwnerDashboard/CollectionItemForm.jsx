@@ -3,11 +3,12 @@ import { useState } from "react";
 import { useEth } from '../../contexts/EthContext';
 import { Heading, Box,  Flex, Text } from '@chakra-ui/react';
 import {FormControl, FormLabel, Input, Button, VStack, HStack , Textarea, InputGroup, InputLeftElement} from "@chakra-ui/react";
-import { toastInfo, toastError } from '../../utils/utils';
+import { toastInfo, toastError, isImageValid } from '../../utils/utils';
 import { FaEuroSign } from "react-icons/fa"
+import { pinFileToPinata } from '../../utils/pinata'
 
 export const CollectionItemForm = () => {
-  const { state: { contract, accounts} } = useEth();
+  const { state: { contract, accounts, isOwner} } = useEth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [serial, setSerial] = useState("");
@@ -15,12 +16,13 @@ export const CollectionItemForm = () => {
   const [caution, setCaution] = useState("");
   const [image, setImage] = useState(null);
 
+  const [loading, setLoading] = useState(false);
   
   function canSubmit() {
     return name && description && serial && dayPrice && caution && image;
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     
     if(!canSubmit()) {
@@ -35,6 +37,29 @@ export const CollectionItemForm = () => {
       toastError("Les champs 'Prix par jour' et 'Caution' doivent être des nombres");
       return;
     }
+    if (!isImageValid(image)) {
+      toastError("L'image doit etre de type png, jpg,, jpeg et < 5Mo");
+      return;
+    }
+    
+    if(contract && isOwner){
+        try{
+            setLoading(true);
+            const imgCID = await pinFileToPinata(image);
+            setLoading(false);
+            toastInfo("Image uploadé, NFT crée sur pinata !");
+
+            //check if addProposal would work
+            //await contract.methods.addVoter(address).call({ from: accounts[0] });
+            //await contract.methods.addVoter(address).send({from:accounts[0]});
+
+        }
+        catch(error){
+          toastError("Erreur durant l'upload NFT, et son mint...........");
+          console.log(error)
+        }
+
+    }
 
     console.log({ dayPrice, caution, image });
   };
@@ -44,10 +69,10 @@ export const CollectionItemForm = () => {
     const droppedImage = e.dataTransfer.files[0];
     setImage(droppedImage);
   };
-  
+  /*
   const handleImageChange = (event) => {
     setImage(event.target.files[0]);
-  };
+  };*/
   
   return (
     <>
@@ -126,11 +151,11 @@ export const CollectionItemForm = () => {
                                 <Text>Drop your image here</Text>
                               )}
                             </Box>
-                      {/*  <Input type="file" onChange={handleImageChange} />*/}
+                      {/*  <Input type="file" accept=".jpg, .jpeg, .png" onChange={handleImageChange} />*/}
                       </FormControl>
                     </Flex>
 
-                    <Button mt="4" colorScheme="purple" onClick={handleSubmit} isDisabled={!canSubmit()}> Ajouter mon Objet </Button>
+                    <Button isLoading={loading} mt="4" colorScheme="purple" onClick={handleSubmit} isDisabled={!canSubmit()}> Ajouter mon Objet </Button>
                 </VStack>
 
             </Box>
