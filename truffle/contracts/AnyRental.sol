@@ -112,6 +112,16 @@ contract AnyRental is Ownable, IAnyRental{
         //ou en js appeler les differentes collections pour les addresses..?
     }*/
 
+
+    /** 
+     * @notice return the Rentals Owners
+     * @dev get owners 
+     * @return address[]
+     */
+    function getRentalsOwner() external view returns(address[] memory){
+        return rentersList;
+    }
+
     /** 
      * @notice return the Rentals from a owner address
      * @dev get rentals array from an owner address
@@ -270,6 +280,8 @@ contract AnyRental is Ownable, IAnyRental{
         collecNFT.owner = rentersCollection[msg.sender].owner;
 
         rental.rentalID = newRentalIds;
+        rental.title=_title;
+        rental.description=_description;
         rental.collection = collecNFT;
 
         rental.tokenID = tokenID;
@@ -322,7 +334,7 @@ contract AnyRental is Ownable, IAnyRental{
         rental.rentalStatus = RentalStatus.AVAILABLE;
         rental.rentalData = rentalData;
                 
-        emit ToolAddedToRentals(msg.sender, rental.rentalID , rental.tokenID, block.timestamp);
+        emit ToolAddedToRentals(msg.sender, rental.rentalID , rental.tokenID, rental.title, rental.description, _tokenImgURI, _dayPrice, _caution, block.timestamp);
     }
 
      /**

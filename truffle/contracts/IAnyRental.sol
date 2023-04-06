@@ -41,6 +41,8 @@ interface IAnyRental {
 
     struct Rental {
         uint256 rentalID;
+        string title;
+        string description;
         uint64 dayPrice;
         uint64 caution;
         uint64 start;
@@ -77,7 +79,7 @@ interface IAnyRental {
        /**
      * @dev Emitted when a renter add a tool to its NFT Collection.
      */
-    event ToolAddedToRentals(address renter, uint toolID, uint tokenID, uint timestamp);
+    event ToolAddedToRentals(address renter, uint rentalID, uint tokenID, string title, string description, string tokenImgURI, uint dayPrice, uint caution, uint timestamp);
     
     /**
      * @dev Emitted when a renter delete a tool into its NFT Collection.
