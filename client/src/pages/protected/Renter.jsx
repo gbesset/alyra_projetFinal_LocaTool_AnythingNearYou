@@ -31,13 +31,11 @@ export const Renter = () => {
 
     return (
         <Box>
-            {Math.random()}
-            {accounts ? accounts[0]:"not connected"}
             <Heading as="h1">Mes locations</Heading>
 
             {accounts ? (
                 <>
-                    alors Locations
+                    todo
                    
                   </>
                 ) : (
