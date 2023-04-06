@@ -80,7 +80,7 @@ module.exports = async function (deployer, _network, accounts) {
           owner1 = accounts[1]
           owner2 = "0x3F1E285ee6BEc3E7df60854E9db428bB934646d2"  //addresse Vincent
           owner3 = accounts[1]  //addresse Thomas
-          owner4 = accounts[1]  //addresse Sylvie
+          owner4 = "0xd85ae51d3E3E49da2702f98E1BDBE842Bd4d9817"  //addresse Sylvie
           
           //4 collections
           collections = [
