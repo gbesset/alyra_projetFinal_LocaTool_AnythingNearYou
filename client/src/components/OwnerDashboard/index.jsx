@@ -11,64 +11,6 @@ export const OwnerDashboard = () => {
 
     const [collectionNFT, setCollectionNFT] = useState('')
 
-    
-   /* const [test, setTest] = useState([
-        {
-          tokenID: 1,
-          serialID: 1001,
-          title: "Hammer",
-          description: "A tool used for pounding nails",
-          tokenURI: "https://example.com/images/hammer.jpg",
-          isAvailable: true,
-        },
-        {
-          tokenID: 2,
-          serialID: 1002,
-          title: "Screwdriver",
-          description: "A tool used for turning screws",
-          tokenURI: "https://example.com/images/screwdriver.jpg",
-          isAvailable: false,
-        },
-        {
-          tokenID: 3,
-          serialID: 1003,
-          title: "Wrench",
-          description: "A tool used for tightening bolts and nuts",
-          tokenURI: "https://example.com/images/wrench.jpg",
-          isAvailable: true,
-        },    {
-            tokenID: 2,
-            serialID: 1002,
-            title: "Screwdriver",
-            description: "A tool used for turning screws",
-            tokenURI: "https://example.com/images/screwdriver.jpg",
-            isAvailable: false,
-          },
-          {
-            tokenID: 3,
-            serialID: 1003,
-            title: "Wrench",
-            description: "A tool used for tightening bolts and nuts",
-            tokenURI: "https://example.com/images/wrench.jpg",
-            isAvailable: true,
-          },    {
-            tokenID: 2,
-            serialID: 1002,
-            title: "Screwdriver",
-            description: "A tool used for turning screws",
-            tokenURI: "https://example.com/images/screwdriver.jpg",
-            isAvailable: false,
-          },
-          {
-            tokenID: 3,
-            serialID: 1003,
-            title: "Wrench",
-            description: "A tool used for tightening bolts and nuts",
-            tokenURI: "https://example.com/images/wrench.jpg",
-            isAvailable: true,
-          },
-      ]);*/
-
     const retrieveCollectionData = async () => {
         try{
             let rentals = await contract.methods.getRentalsByOwner(accounts[0]).call({ from: accounts[0] });

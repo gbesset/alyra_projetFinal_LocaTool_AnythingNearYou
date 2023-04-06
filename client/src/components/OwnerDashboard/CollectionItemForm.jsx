@@ -2,13 +2,17 @@
 import { useState } from "react";
 import { useEth } from '../../contexts/EthContext';
 import { Heading, Box,  Flex, Text } from '@chakra-ui/react';
-import {FormControl, FormLabel, Input, Button, VStack, HStack , Textarea, InputGroup, InputLeftElement} from "@chakra-ui/react";
+import {FormControl, FormLabel, Input, Button, VStack, List, ListIcon, ListItem , Textarea, InputGroup, InputLeftElement} from "@chakra-ui/react";
 import { toastInfo, toastError, isImageValid } from '../../utils/utils';
-import { FaEuroSign } from "react-icons/fa"
-import { pinFileToPinata } from '../../utils/pinata'
+import { FaEuroSign, FaCheck } from "react-icons/fa"
+import { pinFileToPinata, pinJsonToPinata } from '../../utils/pinata'
+import { useNavigate } from 'react-router-dom';
 
 export const CollectionItemForm = () => {
   const { state: { contract, accounts, isOwner} } = useEth();
+  const navigate = useNavigate();
+
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [serial, setSerial] = useState("");
@@ -46,17 +50,52 @@ export const CollectionItemForm = () => {
         try{
             setLoading(true);
             const imgCID = await pinFileToPinata(image);
-            setLoading(false);
-            toastInfo("Image uploadé, NFT crée sur pinata !");
+            let jsonCID= ''
+            if(imgCID){
+              
+              let u = accounts[0].substring(0,5)+"..."+accounts[0].substring(accounts[0].length-4,accounts[0].length);
+              let nftName= u+"_"+name;
+              jsonCID = await pinJsonToPinata(nftName, imgCID, name, serial, name, description);
 
-            //check if addProposal would work
-            //await contract.methods.addVoter(address).call({ from: accounts[0] });
-            //await contract.methods.addVoter(address).send({from:accounts[0]});
+              toastInfo("NFT crée sur pinata !");
 
+
+              // Ecoute de l'evenement de creation du NFT pour declencher la cration du Renal
+              contract.events.NFTToolAddedToCollection({ filter: { renter: accounts[0] } })
+                .once('data', async (eventData) => {
+                    toastInfo("Felicitations ! votre NFT a été mint !");
+                    const tokenID = eventData.returnValues.tokenId;
+                    
+                    let urlImg = `${process.env.PINATA_URL}/${imgCID}`
+                    await contract.methods.addToolToRentals(urlImg,parseInt(dayPrice),parseInt(caution), parseInt(tokenID)).call({from: accounts[0]})
+                    await contract.methods.addToolToRentals(urlImg,parseInt(dayPrice),parseInt(caution), parseInt(tokenID)).send({from: accounts[0]})
+                  });
+
+                  //Ecoute dee l'evenement de creation du rental pour rediriger
+              contract.events.ToolAddedToRentals({ filter: { renter: accounts[0] } })
+                .once('data', () => {
+
+                      setLoading(false);
+                      setTimeout(()=>{
+                        navigate("/app/louer")    ;
+                      }, 2000)
+                      toastInfo("Felicitations ! votre annonce en lien avec votre NFT a été crée !");
+                  });
+            
+              await contract.methods.addToolToCollection(jsonCID, parseInt(serial), name, description).call({from:accounts[0]});
+              await contract.methods.addToolToCollection(jsonCID, parseInt(serial), name, description).send({from:accounts[0]});
+
+            }
+            else{
+             throw new Error("img CID null")
+            }
+          setLoading(false);
+        
         }
         catch(error){
-          toastError("Erreur durant l'upload NFT, et son mint...........");
+          toastError("Erreur durant l'upload NFT ou son mint...........");
           console.log(error)
+          setLoading(false);
         }
 
     }
@@ -70,7 +109,7 @@ export const CollectionItemForm = () => {
     setImage(droppedImage);
   };
   /*
-  const handleImageChange = (event) => {
+  const handleImageChange = async (event) => {
     setImage(event.target.files[0]);
   };*/
   
@@ -78,7 +117,19 @@ export const CollectionItemForm = () => {
     <>
          <Box w="80%" mx="auto" pt="4rem">
             <Heading as="h3" size="lg">Ajouter un element à votre collection</Heading>
-
+              <Box ml="2rem" mt="2rem">
+                <Text>L'ajout se déroule en deux étapes</Text>
+                <List spacing={3}>
+                    <ListItem>
+                      <ListIcon as={FaCheck} color='purple.500' />
+                      Mint votre NFT sur votre collection, il pourra être utilisé partout et bientôt servir à d'autres usages...
+                    </ListItem>
+                    <ListItem>
+                      <ListIcon as={FaCheck} color='purple.500' />
+                      Déposez votre annonce sur le contrat de location
+                    </ListItem>
+                /</List>
+              </Box>
                 <VStack spacing="4" pt="2rem">
                     <FormControl isRequired>
                         <FormLabel>Nom</FormLabel>
@@ -105,7 +156,7 @@ export const CollectionItemForm = () => {
                                   pointerEvents='none'
                                   children={<FaEuroSign color='gray.300' />}
                                 />
-                                <Input type='number' value={serial} onChange={(e) => setSerial(e.target.value)} placeholder='Prix de location par jour' />
+                                <Input type='number' value={serial} onChange={(e) => setSerial(e.target.value)} placeholder='Numero de série' />
                               </InputGroup>
                         </FormControl>
                     <Flex width="100%">
@@ -151,7 +202,7 @@ export const CollectionItemForm = () => {
                                 <Text>Drop your image here</Text>
                               )}
                             </Box>
-                      {/*  <Input type="file" accept=".jpg, .jpeg, .png" onChange={handleImageChange} />*/}
+                       {/* <Input type="file" accept=".jpg, .jpeg, .png" onChange={handleImageChange} /> */}
                       </FormControl>
                     </Flex>
 
