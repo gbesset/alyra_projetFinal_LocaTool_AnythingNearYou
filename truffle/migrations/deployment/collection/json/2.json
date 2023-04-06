@@ -1,19 +1,19 @@
 {
-    "description":"Tronçonneuse",
+    "description":"Pistolet peinture airless basse pression",
     "image":"https://gateway.pinata.cloud/ipfs/CID_TO_REPLACE/1.png",
-    "name":"CollectionProprio_1",
+    "name":"Pistolet peinture",
     "attribute": [
         {
             "trait_type":"serialID",
-            "value":"862419541651855"
+            "value":"96654486655"
         },
         {
             "trait_type":"title",
-            "value":"Paddle gonflable"
+            "value":"Pistolet peinture airless basse pression"
         },
         { 
             "trait_type":"description",
-            "value":"Taille: 11’5 x 32′′ x 6′′ ( 348 x 82 x 15cm)\n\nUtilisation débutant sans problème., 2 adultes max :160kg total .\nNe pas tenter de réparer un crevaison vous même.\nUn forfait de réparation et prévu avec la caution (5 euros si réparable : petite fuite).\nCe paddle est fournis avec :\n-Pagaie \n-Leash \n-Pompe \n-Sac à dos"
+            "value":"Pression max 110 bar. Permet de pulvériser avec un haut niveau de contrôle et de performances avec une pression réduite. Jusqu’à 55% de réduction de l’effet de brouillard, moins d’usure de la machine et des accessoires.\n\nPour peintures murales, laques et lasures. Pompe Airless à piston pour de moyens à très grands projets. Une pression de pulvérisation plus faible met moins de pression sur le système."
         }
     ]
 

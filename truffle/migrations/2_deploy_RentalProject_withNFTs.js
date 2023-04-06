@@ -8,6 +8,8 @@ const isDeployNFT = true;
 module.exports = async function (deployer, _network, accounts) {
   let owner1;
   let owner2;
+  let owner3;
+  let owner4;
   /** 
    * Récupération de l'adresse de déploiement réalisée par le script 1
    */
@@ -20,6 +22,7 @@ module.exports = async function (deployer, _network, accounts) {
   console.log("AnyRental deploiment address : ", contractAddress)
  
 
+  //Instanciation du contrat
   const anyRental = await AnyRental.at(contractAddress) 
 
   
@@ -45,115 +48,156 @@ module.exports = async function (deployer, _network, accounts) {
       /** 
      * Defini les parametres des NFTs a créer
      */   
-    let CIDs = [];
-
-    let collections = [
-      {name:"Colletion Proprio 1", symbol:"CP1"},
-      {name:"Colletion Proprio 2", symbol:"CP2"}
-    ]
+    // definies en fonction du network
+    let collections = []
     let NFTs = [];
 
     if(_network === 'development') {
-    
-      console.log('     -----> Development network');
-      NFTs = [
-          {img: "NFT_Tronco_IMG",json:"NFT_Tronco_JSON", ipath:"1.png", jpath:"1.json", dayPrice:"1", caution:"2", serialID:"16565266695453", owner:"owner1"},
-          {img: "NFT_Paddle_IMG",json:"NFT_Paddle_JSON", ipath:"2.png", jpath:"2.json",dayPrice:"3", caution:"4", serialID:"862419541651855", owner:"owner2"},
-      ]
+        console.log('     -----> Development network');
+        
+        owner1 = accounts[1];
+        owner2 = accounts[1]
+        owner3 = accounts[1]
+        owner4 = accounts[3]
+        
+        //Seulement 2 collections
+        collections = [
+          {name:"Colletion Proprio 1", symbol:"CP1", owner:owner1},
+          {name:"Colletion Proprio 2", symbol:"CP2", owner:owner4 }
+        ]
 
-      owner1 = accounts[1];
-      owner2 = accounts[2]
+        NFTs = [
+            {img: "NFT_Paddle_IMG",json:"NFT_Paddle_JSON", ipath:"1.png", jpath:"1.json",dayPrice:"3", caution:"4", serialID:"862419541651855", owner:owner1},
+            {img: "NFT_PistoletPeinture_IMG",json:"NFT_PistoletPeinture_JSON", ipath:"2.png", jpath:"2.json",dayPrice:"5", caution:"9", serialID:"96654486655", owner:owner2},
+            {img: "NFT_Betoniere_IMG",json:"NFT_Betoniere_JSON", ipath:"3.png", jpath:"3.json",dayPrice:"6", caution:"9", serialID:"000000000000", owner:owner3},
+            {img: "NFT_Tronco_IMG",json:"NFT_Tronco_JSON", ipath:"4.png", jpath:"4.json", dayPrice:"1", caution:"2", serialID:"16565266695453", owner:owner4},
+        ]
       
     }
     if(_network === "goerli" || _network ==="mumbai-fork"){
-      console.log('     -----> Goerli or Mumbai network');
-      NFTs = [
-          {img: "NFT_Tronco_IMG",json:"NFT_Tronco_JSON", ipath:"1.png", jpath:"1.json", dayPrice:"0.0001", caution:"0.01"},
-          {img: "NFT_Paddle_IMG",json:"NFT_Paddle_JSON", ipath:"2.png", jpath:"2.json",dayPrice:"0.0002", caution:"0.002"},
-      ]
-      owner1 = accounts[1]
-      owner2 = accounts[1]
-    }
-    console.log("     => Ajout des NFTs suivants")
+          console.log('     -----> Goerli or Mumbai network');
+
+          owner1 = accounts[1]
+          owner2 = "0x3F1E285ee6BEc3E7df60854E9db428bB934646d2"  //addresse Vincent
+          owner3 = accounts[1]  //addresse Thomas
+          owner4 = accounts[1]  //addresse Sylvie
+          
+          //4 collections
+          collections = [
+            {name:"Collection Guillaume", symbol:"ANY_1", owner: owner1},
+            {name:"Collection Vincent", symbol:"ANY_2", owner: owner2},
+            {name:"Collection Thomas", symbol:"ANY_3", owner: owner3 },
+            {name:"Collection Sylvie", symbol:"ANY_4", owner: owner4 },
+          ]
+          //Seulement le prix et la caution sont différent..
+          NFTs = [
+            {img: "NFT_Paddle_IMG",json:"NFT_Paddle_JSON", ipath:"1.png", jpath:"1.json",dayPrice:"0.0002", caution:"0.002", serialID:"862419541651855", owner:owner1},
+            {img: "NFT_PistoletPeinture_IMG",json:"NFT_PistoletPeinture_JSON", ipath:"2.png", jpath:"2.json",dayPrice:"0.0005", caution:"0.008", serialID:"96654486655", owner:owner2},
+            {img: "NFT_Betoniere_IMG",json:"NFT_Betoniere_JSON", ipath:"3.png", jpath:"3.json",dayPrice:"0.0006", caution:"009", serialID:"000000000000", owner:owner3},
+            {img: "NFT_Tronco_IMG",json:"NFT_Tronco_JSON", ipath:"4.png", jpath:"4.json", dayPrice:"0.0001", caution:"0.001", serialID:"16565266695453", owner:owner4},
+          ]
+
+      }
+    console.log("\n     => il  faudra ajouter les NFTs suivants")
+    console.table(collections)
     console.table(NFTs)
     console.log("     => owner 1", owner1)
     console.log("     => owner 2", owner2)
+    console.log("     => owner 3", owner3)
+    console.log("     => owner 4", owner4)
 
     /** 
     * Deploiement des NFTs sur pinata et récupération des CIDs
     */
+    // Rempli a l'issu de l'envo sur Pinana
+    let imgCIDs = [];
+    let jsonCIDs = [];
     async function processNFTs() {
+
       for(const nft of NFTs){
           try{
               // NFT a créer
-              const nftFile1 = fs.createReadStream(`./migrations/deployment/collection/img/${nft.ipath}`);
-              const nftJson1 = fs.readFileSync(`./migrations/deployment/collection/json/${nft.jpath}`);
+              const nftImg = fs.createReadStream(`./migrations/deployment/collection/img/${nft.ipath}`);
+              const nftJson = fs.readFileSync(`./migrations/deployment/collection/json/${nft.jpath}`);
   
-              result = await pinata.pinFileToIPFS(nftFile1, generateOption(nft.img))
+              result = await pinata.pinFileToIPFS(nftImg, generateOption(nft.img))
               
-              const body  = JSON.parse(nftJson1);
+              const body  = JSON.parse(nftJson);
               body.image = body.image.replace("CID_TO_REPLACE",result.IpfsHash);
-              
+              imgCIDs.push(`https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`)
               
               const json = await pinata.pinJSONToIPFS(body, generateOption(nft.json))
-              console.log(json);
-              console.log(json.IpfsHash);
-              console.log(`ipfs://${json.IpfsHash}`)
-              CIDs.push(`ipfs://${json.IpfsHash}`)
+              //console.log(json);
+              //console.log(json.IpfsHash);
+              //console.log(`ipfs://${json.IpfsHash}`)
+              jsonCIDs.push(`ipfs://${json.IpfsHash}`)
   
           }
           catch(error){
               console.error("Error upload NFT pinata ",error)
           }
       };
-
   }
   
+    console.log("\n     [x] Upload des fichiers sur pinata")
     await processNFTs();       
        
 
     console.log("     => Les CIDs suivants ont été crées")
-    console.table(CIDs)
+    console.table(imgCIDs)
+    console.table(jsonCIDs)
 
 
     /** 
     * Creation collection et ajout NFTs
     */
+   console.log("\n     => Creation des Collections dans le smart contract")
 
-    const nft1 = JSON.parse(fs.readFileSync(`./deployment/collection/json/1.json`));
-    const nft2 = JSON.parse(fs.readFileSync(`./deployment/collection/json/2.json`));
+    async function collectionCreation() {
 
-    console.log("Creation des collections")
-    await anyRental.createCollection(collections[0].name, collections[0].symbol, { from: owner1 })
-    await anyRental.createCollection(collections[1].name, collections[1].symbol, { from: owner2 })
+      for(const collectionToCreate of collections){
+        try{
+            await anyRental.createCollection(collectionToCreate.name, collectionToCreate.symbol, { from: collectionToCreate.owner })
+            console.log(`                - Creation de la collection ${collectionToCreate.name}`)
+        }
+        catch(error){
+            console.error("Error Creation des collections ",error)
+        }
+      }
+    }
 
-    console.log("Ajout des NFTs")
-    // ajout NF 1
-    let tx = await anyRental.addToolToCollection(CIDs[0], parseInt(nft1.attribute[0].value), nft1.attribute[1].value,nft1.attribute[2].value, {from:owner1});
-    let tokenID = tx.logs[0].args.tokenId.words[0];
-    console.log('token ID NFT : ', tokenID)
-    await anyRental.addToolToRentals(parseInt(NFTs[0].dayPrice),parseInt(NFTs[0].caution), parseInt(tokenID), {from: owner1})
-    
-    // ajout NF 2
-    tx = await anyRental.addToolToCollection(CIDs[1], parseInt(nft2.attribute[0].value), nft2.attribute[1].value,nft2.attribute[2].value, {from:owner2});
-    tokenID = tx.logs[0].args.tokenId.words[0];
-    console.log('token ID NFT : ', tokenID)
-    await anyRental.addToolToRentals(parseInt(NFTs[1].dayPrice), parseInt(NFTs[1].caution), parseInt(tokenID), {from: owner2})
+    await collectionCreation();
+    console.log("\n     [x] Creation des Collections dans le smart contract")
 
-    console.log("..............Fin de la création des Colections et mint des NFTs")
+
+    console.log("\n     => Mint des NFTs dans le smart contract")
+    async function mintNFTs() {
+      let index =0;
+
+      for(const nft of NFTs){
+        try{
+          const nftJson = JSON.parse(fs.readFileSync(`./migrations/deployment/collection/json/${nft.jpath}`));
+
+          let tx = await anyRental.addToolToCollection(jsonCIDs[index], parseInt(nft.serialID), nftJson.attribute[1].value,nftJson.attribute[2].value, {from:nft.owner});
+          let tokenID = tx.logs[0].args.tokenId.words[0];
+          console.log('token ID NFT : ', tokenID)
+
+          await anyRental.addToolToRentals(parseInt(nft.dayPrice),parseInt(nft.caution), parseInt(tokenID), {from: nft.owner})
+  
+        }
+        catch(error){
+            console.error("Error mint des NFTs ",error)
+        }
+        index++;
+      }
+    }
+
+    await mintNFTs();
+    console.log("\n     [x] Mint des NFTs dans le smart contract")
+
+    console.log("\n\n..............Fin de la création des Colections et mint des NFTs")
   }
   
-
-
-
-  //let tx = await instance.createCollection("First Collection", { from: ownerAddress });
-
-
-  //console.log(tx) log 0 ou 1 ?
-  //let collectionAddress = tx.logs[0].address;
-  //console.log(tx)
-  //console.log("NFT Collection deployed at address : ", collectionAddress);
-
 
 };
 
