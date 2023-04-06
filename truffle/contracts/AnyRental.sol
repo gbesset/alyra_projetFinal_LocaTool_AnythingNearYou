@@ -213,6 +213,8 @@ contract AnyRental is Ownable, IAnyRental{
         // update Renters Collection
         rentersCollection[msg.sender].collection = collectionAddress;
         rentersCollection[msg.sender].owner =  msg.sender;
+        rentersCollection[msg.sender].name=_collectionName;
+        rentersCollection[msg.sender].symbol=_collectionSymbol;
 
         //update the list of renters
         rentersList.push(msg.sender);
@@ -271,7 +273,6 @@ contract AnyRental is Ownable, IAnyRental{
         rental.collection = collecNFT;
 
         rental.tokenID = tokenID;
-        rental.tokenURI = _tokenURI;
         rentalIds.increment();
 
         rentersRentals[msg.sender].push(rental);
@@ -302,7 +303,7 @@ contract AnyRental is Ownable, IAnyRental{
     *   Functions  - Rental Managment
     *********************************************** */
 
-    function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID) external onlyRentalOwner {
+    function addToolToRentals(string calldata _tokenImgURI, uint64 _dayPrice, uint64 _caution, uint _tokenID) external onlyRentalOwner {
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         require(rentersRentals[msg.sender].length < nbRentalMax, "Maximum number of tools reached");
         require(_dayPrice > 0, "number must be > 0");
@@ -315,6 +316,7 @@ contract AnyRental is Ownable, IAnyRental{
         uint found = getRentalIndexByOwnerAddressAndTokenID(msg.sender, _tokenID);
         Rental storage rental = rentersRentals[msg.sender][found];
   
+        rental.tokenImgURI = _tokenImgURI;
         rental.dayPrice =_dayPrice;
         rental.caution = _caution;
         rental.rentalStatus = RentalStatus.AVAILABLE;

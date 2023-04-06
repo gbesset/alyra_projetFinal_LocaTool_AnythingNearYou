@@ -3,7 +3,7 @@ const AnyRental = artifacts.require("AnyRental");
 const AnyNFTCollectionFactory = artifacts.require("AnyNFTCollectionFactory");
 
 
-const isDeployNFT = true;
+const isDeployNFT = false;
 
 module.exports = async function (deployer, _network, accounts) {
   let owner1;
@@ -182,7 +182,7 @@ module.exports = async function (deployer, _network, accounts) {
           let tokenID = tx.logs[0].args.tokenId.words[0];
           console.log('token ID NFT : ', tokenID)
 
-          await anyRental.addToolToRentals(parseInt(nft.dayPrice),parseInt(nft.caution), parseInt(tokenID), {from: nft.owner})
+          await anyRental.addToolToRentals(imgCIDs[index],parseInt(nft.dayPrice),parseInt(nft.caution), parseInt(tokenID), {from: nft.owner})
   
         }
         catch(error){

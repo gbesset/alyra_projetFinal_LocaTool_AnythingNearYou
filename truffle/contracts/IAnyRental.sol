@@ -25,6 +25,8 @@ interface IAnyRental {
   struct CollectionNFT {
         address collection;
         address owner;
+        string name;
+        string symbol;
    }
 
      struct RentalData {
@@ -48,7 +50,7 @@ interface IAnyRental {
         address renter;
         CollectionNFT collection;
         uint tokenID;
-        string tokenURI; 
+        string tokenImgURI; 
     }
 
 
@@ -225,7 +227,7 @@ interface IAnyRental {
     /**
      * @dev add a tool to collection . onlyRenter
      */
-     function addToolToRentals(uint64 _dayPrice, uint64 _caution, uint _tokenID) external;
+     function addToolToRentals(string calldata _tokenImgURI, uint64 _dayPrice, uint64 _caution, uint _tokenID) external;
   
      /**
      * @dev update a tool into collection . onlyRenter
