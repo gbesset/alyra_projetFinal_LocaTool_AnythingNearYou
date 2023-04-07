@@ -1,27 +1,33 @@
+import React, {useState} from 'react';
 import { useParams } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
+import { useEth } from '../../contexts/EthContext';
+import { Heading, Box, Tabs, TabList, Tab, TabPanels, TabPanel,Flex, Link, Icon, Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
+import { Authent } from '../../components/Authent/Authent';
+import { ReservationDashboard } from '../../components/Reservation';
 
 export const ReservationPage = () => {
+  const { state: {  accounts} } = useEth();
    const location = useLocation();
    const { rental } = location?.state;
   
   return (
-    <div className="text-white">
-        {rental ? (<>
-                <h1>Réserver l'outil {rental.tokenID}</h1>
-                <div>
-                <h1>Réserver</h1>
-                <p>Titre : {rental.title}</p>
-                <p>Description : {rental.description}</p>
-                <p>Token ID : {rental.tokenID}</p>
-                <p>dayPrice : {rental.dayPrice}</p>
-                <p>caution : {rental.caution}</p>
-                <p>url : {rental.tokenImgURI}</p>
+    <Box className="text-white">
+          {accounts ? (
+              <>
+                 <Heading as="h2">Suivi de la location</Heading>
+                  <Box p="4">
+                    <ReservationDashboard rental={rental} /> 
+                  </Box>
                 
-                </div>
-      </>
-   
-        ) : "aucun outils selectionné " }
-    </div>
+                </>
+              ) : (
+                  <>
+                  <Authent />
+                  </>
+              )
+              }
+      </Box>
+
   );
 }
