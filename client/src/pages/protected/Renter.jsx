@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useEth } from '../../contexts/EthContext';
 import { Heading, Box } from '@chakra-ui/react';
 import { Authent } from '../../components/Authent/Authent';
@@ -31,13 +31,9 @@ export const Renter = () => {
 
     return (
         <Box>
-            {Math.random()}
-            {accounts ? accounts[0]:"not connected"}
-            <Heading as="h1">Mes locations</Heading>
-
-            {accounts ? (
-                <>
-                    alors Locations
+           {accounts ? (
+                <> <Heading as="h1">Mes locations</Heading>
+                    todo
                    
                   </>
                 ) : (

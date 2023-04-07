@@ -9,20 +9,22 @@ import { ReservationPage } from '../pages/protected/ReservationPage';
 import { Owner } from '../pages/protected/Owner';
 import { Admin } from '../pages/protected/Admin';
 import { CollectionItemForm } from '../components/OwnerDashboard/CollectionItemForm';
+import { Rentals } from '../components/RentalsList';
 
 export const ProtectedRouter = () => {
     const location = useLocation();
-    const tool = location.state ? location.state.tool : null;
+    const rental = location.state ? location.state.rental : null;
 
     return (
         <EthProvider>
             <Routes>
                 <Route element={<ProtectedLayout/>}>
+                    <Route path="/rentals" element={<Rentals />} />
                     <Route path="/louer" element={<Owner/>} />
                     <Route path="/louer/add" element={<CollectionItemForm />} />
                     <Route path="/location" element={<Renter />} />
                     <Route path="/dao" element={<Dao />} />
-                    <Route path="/reservation/:tokenID" element={<ReservationPage />} />
+                    <Route path="/reservation/:rentalID" element={<ReservationPage />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>

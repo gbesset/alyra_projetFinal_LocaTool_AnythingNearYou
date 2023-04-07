@@ -5,6 +5,7 @@ const actions = {
 
 const initialState = {
   artifact: null,
+  artifactCollection: null,
   web3: null,
   accounts: null,
   networkID: null,
