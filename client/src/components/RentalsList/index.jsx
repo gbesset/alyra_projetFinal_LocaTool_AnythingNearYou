@@ -37,10 +37,9 @@ export const Rentals = () => {
     return (
         <>
         <Box >
-            <Heading as="h3">Annonces publiées</Heading>
-            
+
             {accounts ? (
-                <>
+                <>      <Heading as="h3">Annonces publiées</Heading>
                         { rentals  ?  (            
                             <RentalList rentals={rentals} />
                         ):

@@ -58,8 +58,6 @@ export const Owner = () => {
                     </>
                 )
                 }
-
-
         </Box>
     );
 };

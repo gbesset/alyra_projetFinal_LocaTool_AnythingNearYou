@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import { useParams } from "react-router-dom";
+import React, {useEffect} from 'react';
 import { useLocation } from 'react-router-dom';
 import { useEth } from '../../contexts/EthContext';
 import { Heading, Box, Tabs, TabList, Tab, TabPanels, TabPanel,Flex, Link, Icon, Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
@@ -11,6 +10,10 @@ export const ReservationPage = () => {
    const location = useLocation();
    const { rental } = location?.state;
   
+   useEffect( () =>{    
+  
+}, [accounts]);
+
   return (
     <Box className="text-white">
           {accounts ? (

@@ -31,10 +31,8 @@ export const Renter = () => {
 
     return (
         <Box>
-            <Heading as="h1">Mes locations</Heading>
-
-            {accounts ? (
-                <>
+           {accounts ? (
+                <> <Heading as="h1">Mes locations</Heading>
                     todo
                    
                   </>
