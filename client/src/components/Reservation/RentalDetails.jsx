@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Heading, Box, Flex, Link, Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
+import { Heading, Box,  Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
+import { Card,  CardBody, CardFooter } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
+
 
 export const  RentalDetails= ({rental}) => {
   let navigate = useNavigate();
