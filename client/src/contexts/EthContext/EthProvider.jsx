@@ -7,8 +7,8 @@ function EthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const init = useCallback(
-    async artifact => {
-      if (artifact) {
+    async (artifact, artifactCollection) => {
+      if (artifact && artifactCollection) {
         const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
         const accounts = await web3.eth.requestAccounts();
         const networkID = await web3.eth.net.getId();
@@ -16,6 +16,7 @@ function EthProvider({ children }) {
         let address, contract, txhash;
         let isOwner = false;
         let ownerAddress = '';
+        let contractCollection = '';
         let isRenter = false;
         try {
           address = artifact.networks[networkID].address;
@@ -32,7 +33,7 @@ function EthProvider({ children }) {
         }
         dispatch({
           type: actions.init,
-          data: { artifact, web3, accounts, networkID, contract, isOwner, ownerAddress, isRenter, txhash }
+          data: { artifact, artifactCollection, web3, accounts, networkID, contract, isOwner, ownerAddress, isRenter, txhash }
         });
       }
     }, []);
@@ -41,7 +42,8 @@ function EthProvider({ children }) {
     const tryInit = async () => {
       try {
         const artifact = require("../../contracts/AnyRental.json");
-        init(artifact);
+        const artifactCollection = require("../../contracts/AnyNFTCollection.json");
+        init(artifact, artifactCollection);
       } catch (err) {
         console.error(err);
       }
@@ -53,14 +55,14 @@ function EthProvider({ children }) {
   useEffect(() => {
     const events = ["chainChanged", "accountsChanged"];
     const handleChange = () => {
-      init(state.artifact);
+      init(state.artifact, state.artifactCollection);
     };
 
     events.forEach(e => window.ethereum.on(e, handleChange));
     return () => {
       events.forEach(e => window.ethereum.removeListener(e, handleChange));
     };
-  }, [init, state.artifact]);
+  }, [init, state.artifact, state.artifactCollection]);
 
   return (
     <EthContext.Provider value={{

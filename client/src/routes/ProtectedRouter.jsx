@@ -24,7 +24,7 @@ export const ProtectedRouter = () => {
                     <Route path="/louer/add" element={<CollectionItemForm />} />
                     <Route path="/location" element={<Renter />} />
                     <Route path="/dao" element={<Dao />} />
-                    <Route path="/reservation/:tokenID" element={<ReservationPage />} />
+                    <Route path="/reservation/:rentalID" element={<ReservationPage />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>

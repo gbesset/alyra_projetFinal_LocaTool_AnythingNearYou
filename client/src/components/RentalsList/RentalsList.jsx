@@ -12,7 +12,7 @@ export const RentalList= ({rentals}) => {
          <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'>
 
          {rentals && rentals.map((rental, index) => (
-            <RentalItem rental={rental} />
+            <RentalItem  key={index} rental={rental} />
         ))}
          </SimpleGrid>
         </Box>

@@ -157,6 +157,27 @@ contract AnyRental is Ownable, IAnyRental{
         return found;
     }
 
+        /** 
+     * @notice return the Rental by rentalId
+     * @dev Compexity not good. Added because trouble for the front in the last day...
+     * @return Rental 
+     */
+    function getRentalByRentalID( uint _rentalId) external view returns(Rental memory){
+        uint found;
+        address foundOw;
+        for(uint r; r<rentersList.length; r++){
+            address ow = rentersList[r];
+            for(uint i; i< rentersRentals[ow].length; i++){
+                if(rentersRentals[ow][i].rentalID == _rentalId){
+                     found=i;
+                     foundOw=ow;
+                    break;
+                }   
+            }
+        }
+        return rentersRentals[foundOw][found];
+    }
+
     function getRentalIndexByOwnerAddressAndTokenID(address _owner, uint _tokenId) ownerMustExist(_owner) internal view returns(uint){
         uint found;
          for(uint i; i< rentersRentals[_owner].length; i++){

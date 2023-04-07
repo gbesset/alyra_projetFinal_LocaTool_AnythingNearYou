@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Footer } from '../../components/Footer/Footer';
 import { HeaderApp } from '../../components/Header/HeaderApp';
-import {Flex, Divider, Box } from "@chakra-ui/react"
+import {Flex, Box } from "@chakra-ui/react"
 export const ProtectedLayout = () => {
     return (
         <>
@@ -16,7 +16,7 @@ export const ProtectedLayout = () => {
                 </Box>
             </Flex>
             
-            <Divider />
+
            <Footer />
 
         </div>

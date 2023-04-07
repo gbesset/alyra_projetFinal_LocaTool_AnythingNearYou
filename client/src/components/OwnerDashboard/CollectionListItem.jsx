@@ -9,7 +9,7 @@ export const  CollectionListItem= ({rental}) => {
   const { tokenID, serialID, title, description, tokenImgURI, tokenURI, dayPrice, caution } = rental;
   
   const handleManage = () => {
-    navigate(`/app/reservation/${rental.tokenID}`, { state: { rental } });
+    navigate(`/app/reservation/${rental.rentalID}`, { state: { rental } });
   };
 
   return (
@@ -43,7 +43,7 @@ export const  CollectionListItem= ({rental}) => {
         <CardFooter>
           <ButtonGroup spacing='2'>
             <Button variant='solid' colorScheme='blue' onClick={handleManage}>
-              Réserver
+              Suivre
             </Button>
             <Link href={tokenURI} isExternal>
             <Button variant='ghost' colorScheme='blue'>
