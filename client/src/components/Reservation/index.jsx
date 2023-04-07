@@ -12,6 +12,7 @@ export const ReservationDashboard = () => {
     const { rentalID } = useParams();
     const [rental, setRental] = useState('')
     const [rentalStatus, setRentalStatus]=useState(0)
+    const [refreshStatus, setRefreshStatus] =useState(false);
     const [rentalOwner, setRentalOwner] =useState(false);
     
     const [tabIndex, setTabIndex] = useState(0)
@@ -25,8 +26,14 @@ export const ReservationDashboard = () => {
         return rentalStatus==status;
     }
    
+    async function handleStatusChange(){
+        alert("coucou")
+        await(retrieveRental);
+    }
+
     const retrieveRental = async () => {
         try{
+            console.log("et oui.........")
             let rent = await contract.methods.getRentalByRentalID(rentalID).call({ from: accounts[0] });
             let nfts = await contract.methods.getToolsCollection(rent.collection.owner).call({ from: accounts[0] });
             
@@ -35,21 +42,22 @@ export const ReservationDashboard = () => {
             let rentalComplete ={...nfts, ...rent};
             
             setRental(rentalComplete);
-            setRentalStatus(rental.rentalStatus)
+            setRentalStatus(rental.rentalStatus) 
             setRentalOwner(rental.collection.owner==accounts[0])
 
         }
         catch(error){
-            console.log(error)
-            toastError("Erreur pour récupérer la location")
+            //console.log(error)
+            //toastError("Erreur pour récupérer la location")
         }
     }
     
       useEffect( () =>{    
+        console.log("je met a jour")
         retrieveRental();
         setTabIndex(parseInt(rentalStatus));
 
-    }, [accounts, contract, rentalStatus]);
+    }, [rentalStatus, refreshStatus]);
 
     return (
         <Box> 
@@ -69,7 +77,7 @@ export const ReservationDashboard = () => {
             </TabList>
             <TabPanels>
                 <TabPanel>
-                       <Reservation rental={rental} rentalOwner={rentalOwner} />
+                       <Reservation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
                 <TabPanel>
                 <p>2</p>

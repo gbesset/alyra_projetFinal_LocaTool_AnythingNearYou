@@ -5,7 +5,7 @@ import {calculateDurationBetween2Dates, toastError, toastInfo} from '../../utils
 import moment from 'moment';
 import { useEth } from '../../contexts/EthContext';
 
-export const Reservation = ({rental, rentalOwner}) => {
+export const Reservation = ({rental, rentalOwner, updateStatus}) => {
     const { state: { contract, accounts, web3, isOwner} } = useEth();
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -47,8 +47,11 @@ export const Reservation = ({rental, rentalOwner}) => {
                 const endTs = moment(endDate, "YYYY-MM-DD").unix();
 
                 contract.events.RentalRequested({ filter: { renter: accounts[0] } })
-                .once('data', () => {
+                .on('data', () => {
                       toastInfo("Votre demande a été effectuée");
+                     /* setTimeout(()=>
+                      updateStatus(),2000)*/
+                      updateStatus()
                   });
 
 
