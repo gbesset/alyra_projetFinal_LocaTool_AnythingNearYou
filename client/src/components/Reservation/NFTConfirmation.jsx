@@ -3,7 +3,7 @@ import { RentalDetails } from './RentalDetails';
 import { Heading, Box, Text, Center, Icon, Button,  Card, CardHeader, CardBody, VStack, HStack } from '@chakra-ui/react';
 import { useEth } from '../../contexts/EthContext';
 import { toastError, toastInfo} from '../../utils/utils'
-import { FaCheckCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaUserShield } from 'react-icons/fa';
 
 export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
     const { state: { contract, accounts, web3, isOwner, artifactCollection} } = useEth();
@@ -30,15 +30,22 @@ export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
 
     const handleConfirmNFT = async () =>{
     
-        contract.events.RentalNFTToolDelegated({ filter: { renter: accounts[0] } })
-        .on('data', () => {
-                toastInfo("Votre Validation a été effectuée");
-                updateStatus()
-            });
+        try{       
+            contract.events.RentalNFTToolDelegated({ filter: { renter: accounts[0] } })
+            .on('data', () => {
+                    toastInfo("Votre Validation a été effectuée");
+                    updateStatus()
+                });
 
 
-        await contract.methods.validateNFTandToolReception(rental.collection.owner, parseInt(rental.rentalID)).send({from:accounts[0]});
+            await contract.methods.validateNFTandToolReception(rental.collection.owner, parseInt(rental.rentalID)).call({from:accounts[0]});
+            await contract.methods.validateNFTandToolReception(rental.collection.owner, parseInt(rental.rentalID)).send({from:accounts[0]});
 
+        }
+        catch(error){
+            console.log(error)
+            toastError("Erreur lors de la demande.. ");
+        }
     }
 
     return (
@@ -49,7 +56,10 @@ export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
 
         { rentalOwner && (<>
             <Box mt="2rem">
-                <Heading as="h3" size="lg">En attente de confirmation</Heading>
+                <Heading as="h3" size="lg">
+                    <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> 
+                    En attente de confirmation
+                </Heading>
                 <Text mt="2rem">Votre demande a été envoyée, il faut attendre la validation du locataire</Text>
                 
             </Box>
