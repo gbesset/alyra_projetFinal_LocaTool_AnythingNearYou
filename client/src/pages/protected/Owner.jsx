@@ -43,9 +43,6 @@ export const Owner = () => {
 
     return (
         <Box>
-            {Math.random()}<br/>
-            {accounts ? accounts[0]:"not connected"}
-            {isOwner ? "tue s owner !" :"tu n'es pas owner"}
             {accounts ? (
                 <>
                     <Heading as="h1">Bienvenue sur votre page de propriétaire</Heading>

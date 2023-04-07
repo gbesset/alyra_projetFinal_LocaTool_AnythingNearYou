@@ -79,11 +79,12 @@ export const CollectionItemForm = () => {
                       setTimeout(()=>{
                         navigate("/app/louer")    ;
                       }, 2000)
-                      toastInfo("Felicitations ! votre annonce en lien avec votre NFT a été crée !");
+                      toastInfo("Felicitations! votre annonce en lien avec votre NFT a été crée!");
                   });
             
-              await contract.methods.addToolToCollection(jsonCID, parseInt(serial), name, description).call({from:accounts[0]});
-              await contract.methods.addToolToCollection(jsonCID, parseInt(serial), name, description).send({from:accounts[0]});
+              let urlJson = `${process.env.PINATA_URL}/${jsonCID}`
+              await contract.methods.addToolToCollection(urlJson, parseInt(serial), name, description).call({from:accounts[0]});
+              await contract.methods.addToolToCollection(urlJson, parseInt(serial), name, description).send({from:accounts[0]});
 
             }
             else{

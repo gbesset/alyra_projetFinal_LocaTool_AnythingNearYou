@@ -43,7 +43,7 @@ export const  CollectionListItem= ({rental}) => {
         <CardFooter>
           <ButtonGroup spacing='2'>
             <Button variant='solid' colorScheme='blue' onClick={handleManage}>
-              Réserver
+              Suivre
             </Button>
             <Link href={tokenURI} isExternal>
             <Button variant='ghost' colorScheme='blue'>
