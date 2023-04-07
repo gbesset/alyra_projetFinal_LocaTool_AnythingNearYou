@@ -9,6 +9,8 @@ import { ReservationConfirmation } from './ReservationConfirmation';
 import { NFTConfirmation } from './NFTConfirmation';
 import { Location } from './Location';
 import { RetourValidation } from './RetourValidation';
+import { ConfirmRetourValidation } from './ConfirmRetourValidation';
+
 import { RentalStatus, toastError } from '../../utils/Enum';
 
 export const ReservationDashboard = () => {
@@ -95,6 +97,9 @@ export const ReservationDashboard = () => {
                 </TabPanel>
                 <TabPanel>
                      <RetourValidation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
+                </TabPanel>
+                <TabPanel>
+                    <ConfirmRetourValidation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
             </TabPanels>
             </Tabs>

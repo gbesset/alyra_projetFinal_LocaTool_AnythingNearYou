@@ -73,7 +73,7 @@ export const ReservationConfirmation = ({rental, rentalOwner, updateStatus}) => 
 
         { rentalOwner && (<>
     
-            <VStack>
+            <VStack mt="2rem">
                     <Heading as="h3" size="lg">
                         {rentalOwner &&  <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> }
                         Valider la demande de location
