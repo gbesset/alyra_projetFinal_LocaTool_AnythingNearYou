@@ -9,7 +9,7 @@ export const  CollectionListItem= ({rental}) => {
   const { tokenID, serialID, title, description, tokenImgURI, tokenURI, dayPrice, caution } = rental;
   
   const handleManage = () => {
-    navigate(`/app/reservation/${rental.tokenID}`, { state: { rental } });
+    navigate(`/app/reservation/${rental.rentalID}`, { state: { rental } });
   };
 
   return (

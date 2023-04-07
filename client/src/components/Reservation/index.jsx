@@ -5,13 +5,14 @@ import { useEth } from '../../contexts/EthContext';
 import { Heading, Box, Tabs, TabList, Tab, TabPanels, TabPanel,Flex, Link, Icon, Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
 import { FaUserShield } from 'react-icons/fa';
 import { Reservation } from './Reservation';
-import { RentalStatus } from '../../utils/Enum';
+import { RentalStatus, toastError } from '../../utils/Enum';
 
-export const ReservationDashboard = ({rental}) => {
-    const { state: { contract, accounts, isOwner} } = useEth();
-
-    const [collectionNFT, setCollectionNFT] = useState('')
-    const [rentalStatus, setRentalStatus]=useState(rental.rentalStatus)
+export const ReservationDashboard = () => {
+    const { state: { contract, accounts} } = useEth();
+    const { rentalID } = useParams();
+    const [rental, setRental] = useState('')
+    const [rentalStatus, setRentalStatus]=useState(0)
+    const [rentalOwner, setRentalOwner] =useState(false);
     
     const [tabIndex, setTabIndex] = useState(0)
     const handleTabsChange = (index) => {
@@ -24,15 +25,36 @@ export const ReservationDashboard = ({rental}) => {
         return rentalStatus==status;
     }
    
+    const retrieveRental = async () => {
+        try{
+            let rent = await contract.methods.getRentalByRentalID(rentalID).call({ from: accounts[0] });
+            let nfts = await contract.methods.getToolsCollection(rent.collection.owner).call({ from: accounts[0] });
+            
+            nfts = nfts.filter((tool)=>tool.tokenID===rent.tokenID);
+            
+            let rentalComplete ={...nfts, ...rent};
+            
+            setRental(rentalComplete);
+            setRentalStatus(rental.rentalStatus)
+            setRentalOwner(rental.collection.owner==accounts[0])
+
+        }
+        catch(error){
+            console.log(error)
+            toastError("Erreur pour récupérer la location")
+        }
+    }
+    
       useEffect( () =>{    
-          setTabIndex(parseInt(rentalStatus));
+        retrieveRental();
+        setTabIndex(parseInt(rentalStatus));
 
     }, [accounts, contract, rentalStatus]);
 
     return (
-        <Box>
+        <Box> 
           {rental && (
-              <>
+                <>
               Status : {rentalStatus}
             <Tabs mt="3rem" variant='enclosed' colorScheme='white' isFitted index={tabIndex} onChange={handleTabsChange}>
             <TabList>
@@ -47,7 +69,7 @@ export const ReservationDashboard = ({rental}) => {
             </TabList>
             <TabPanels>
                 <TabPanel>
-                       <Reservation rental={rental} />
+                       <Reservation rental={rental} rentalOwner={rentalOwner} />
                 </TabPanel>
                 <TabPanel>
                 <p>2</p>

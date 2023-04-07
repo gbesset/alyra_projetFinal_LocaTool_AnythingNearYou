@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
 import { RentalDetails } from './RentalDetails';
 import { Heading, Box, FormLabel, Center, Input,Button, HStack, FormControl, Card, CardHeader, CardBody } from '@chakra-ui/react';
-import {calculateDurationBetween2Dates, toastError} from '../../utils/utils'
+import {calculateDurationBetween2Dates, toastError, toastInfo} from '../../utils/utils'
 import moment from 'moment';
+import { useEth } from '../../contexts/EthContext';
 
-export const Reservation = ({rental}) => {
+export const Reservation = ({rental, rentalOwner}) => {
+    const { state: { contract, accounts, web3, isOwner} } = useEth();
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [price, setPrice] = useState("");
@@ -33,24 +35,38 @@ export const Reservation = ({rental}) => {
         
         console.log(`Start date: ${startDate}, End date: ${endDate}`);
         
-        if(!canSubmit()) {
-            console.log("cannot")
-          return;
-        }
-    
-        if (startDate && endDate ) {
-            let dateObject = new Date(startDate);
-            const timestampStart = dateObject.getTime()/1000;
+        if(canSubmit() && contract) {
+            
+            if (!web3.utils.isAddress(rental.collection.owner)) {
+                toastError("l'adresse du loueur a un probleme....");
+                return;
+            }
 
-            dateObject = new Date(endDate);
-            const timestampEnd = dateObject.getTime()/1000;
+            try{
+                const beginTs = moment(startDate, "YYYY-MM-DD").unix();
+                const endTs = moment(endDate, "YYYY-MM-DD").unix();
 
-            console.log(`Start date: ${timestampStart}, End date: ${timestampEnd}`);
-            const differenceInMilliseconds = Math.abs(timestampEnd - timestampStart);
-            const differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24) *1000;
-            console.log(differenceInDays);
+                contract.events.RentalRequested({ filter: { renter: accounts[0] } })
+                .once('data', () => {
+                      toastInfo("Votre demande a été effectuée");
+                  });
+
+
+                await contract.methods.sendPaiementForRental(rental.collection.owner, parseInt(rental.rentalID),parseInt(beginTs), parseInt(endTs)).send({from:accounts[0]});
+
+            }catch(error){
+                console.log(error)
+                toastError("Erreur lors de la demande.. ");
+            }
+           /* 
+            */
+
+
+
         }
-        console.log("ennnnnd")
+        else{
+            toastError("Il faut deux dates au bon format")
+        }
     }
 
     function calculateDuration() {
@@ -67,65 +83,69 @@ export const Reservation = ({rental}) => {
 
     return (
         <>
-        <Box>
-            <RentalDetails rental={rental} />
-        </Box>
-        <Box mt="2rem">
-        <Heading as="h3" size="lg">Réserver</Heading>
-        
-        <HStack spacing="4" pt="2rem" width="80%" mx="auto">
-            <FormControl isRequired>
-                <FormLabel>Date de début</FormLabel>
-                <Input
-                    type="date"
-                    value={startDate}
-                    onChange={handleChangeStartDate}
-                />
-            </FormControl>
-            <FormControl isRequired>
-                <FormLabel>Date de fin</FormLabel>
-                <Input
-                    type="date"
-                    value={endDate}
-                    onChange={handleChangeEndDate}
-                />
-            </FormControl>
-            </HStack>
-        <Box>
-            {duration && (
-
-                        <Card align='center'  mt="2rem" width="60%" variant="filled" mx="auto">
-                        <CardHeader>
-                         <Heading size='md'>Récapitulatif</Heading>
-                        </CardHeader>
-                        <CardBody>
-                        <HStack>
-                            <Box mr="4rem">Durée :  {duration} jours.</Box>
-                            <Box>Couts: {price} euros.</Box>
-
-                        </HStack>
-                        </CardBody>
-                        </Card>
-           
-   
-            )}
-        </Box>
+            <Box>
+                <RentalDetails rental={rental} />
+            </Box>
+       
+        { !rentalOwner && (<>
+            <Box mt="2rem">
+                <Heading as="h3" size="lg">Réserver</Heading>
             
-            <Center>
-            <Button  mt="4"  variant='outline' colorScheme="white" onClick={calculateDuration} mr="2rem"> Calculer</Button>
-            <Button  mt="4" colorScheme="purple" onClick={handleSubmit} isDisabled={!canSubmit()}> Réserver</Button>
-            </Center>
+                <HStack spacing="4" pt="2rem" width="80%" mx="auto">
+                    <FormControl isRequired>
+                        <FormLabel>Date de début</FormLabel>
+                        <Input
+                            type="date"
+                            value={startDate}
+                            onChange={handleChangeStartDate}
+                        />
+                    </FormControl>
+                    <FormControl isRequired>
+                        <FormLabel>Date de fin</FormLabel>
+                        <Input
+                            type="date"
+                            value={endDate}
+                            onChange={handleChangeEndDate}
+                        />
+                    </FormControl>
+                </HStack>
+                <Box>
+                    {duration && (
+
+                                <Card align='center'  mt="2rem" width="60%" variant="filled" mx="auto">
+                                <CardHeader>
+                                <Heading size='md'>Récapitulatif</Heading>
+                                </CardHeader>
+                                <CardBody>
+                                <HStack>
+                                    <Box mr="3rem">Durée :  {duration} jours.</Box>
+                                    <Box mr="3rem">Couts: {price} euros.</Box>
+                                    <Box>Caution: {rental.caution} euros.</Box>
+
+                                </HStack>
+                                </CardBody>
+                                </Card>
+                
+        
+                            )}
+                </Box>
+                    
+                <Center>
+                    <Button  mt="4"  variant='outline' colorScheme="white" onClick={calculateDuration} mr="2rem"> Calculer</Button>
+                    <Button  mt="4" colorScheme="purple" onClick={handleSubmit} isDisabled={!canSubmit()}> Réserver</Button>
+                </Center>
 
 
-        </Box>
-            <h1>Réserver l'outil {rental.tokenID}</h1>
-            <h1>Réserver</h1>
-            <p>Titre : {rental.title}</p>
-            <p>Description : {rental.description}</p>
-            <p>Token ID : {rental.tokenID}</p>
-            <p>dayPrice : {rental.dayPrice}</p>
-            <p>caution : {rental.caution}</p>
-            <p>url : {rental.tokenImgURI}</p>
+            </Box>
+
+            </>
+            )}
+
+        { rentalOwner && (<>
+    
+            <Box mt="2rem">Ps de location en cours.....</Box>
+            </>
+            )}
         </>
     );
 };
