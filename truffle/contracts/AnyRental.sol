@@ -452,11 +452,11 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution is still secured, the location is payed
      * @dev user validate having the NFT, annd receipt the tool
      */
-     function validateNFTandToolReception(address _owner, uint _rentalID) ownerMustExist(_renter)  external{
+     function validateNFTandToolReception(address _owner, uint _rentalID) ownerMustExist(_owner)  external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
  
-        uint found = getRentalIndexByOwnerAddressAndRentalID(_renter, _rentalID);
-        Rental storage rental = rentersRentals[_renter][found];
+        uint found = getRentalIndexByOwnerAddressAndRentalID(_owner, _rentalID);
+        Rental storage rental = rentersRentals[_owner][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.renter==msg.sender, "Problem on the renter and the one who asks");
         require(rental.rentalStatus == RentalStatus.RENTAL_ACCEPTED_NFT_SENT, "The rental status is incorrect.");
@@ -470,15 +470,15 @@ contract AnyRental is Ownable, IAnyRental{
      }
 
     /**
-     * @notice user give back the toool at the end of renting
+     * @notice user give back the tool at the end of renting
      * - the caution is still secured, the location is already payed
-     * @dev user give bak th etool
+     * @dev user give bak the tool
      */
-     function giveBackToolAfterRental(address _renter, uint _rentalID) ownerMustExist(_renter) external{
+     function giveBackToolAfterRental(address _owner, uint _rentalID) ownerMustExist(_owner) external{
         require(rentalIds.current() >= _rentalID, "Tool does not exist");
 
-        uint found = getRentalIndexByOwnerAddressAndRentalID(_renter, _rentalID);
-        Rental storage rental = rentersRentals[_renter][found];
+        uint found = getRentalIndexByOwnerAddressAndRentalID(_owner, _rentalID);
+        Rental storage rental = rentersRentals[_owner][found];
         require(rental.rentalID == _rentalID, "The rental is not available.");
         require(rental.renter==msg.sender, "Problem on the renter and the one who asks");
         require(rental.rentalStatus == RentalStatus.VALIDATE_RECEIPT_PAYMENT, "The rental status is incorrect.");
