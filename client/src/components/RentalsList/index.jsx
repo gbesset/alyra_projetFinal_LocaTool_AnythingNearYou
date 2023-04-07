@@ -18,7 +18,7 @@ export const Rentals = () => {
                 const deployTx = await web3.eth.getTransaction(txhash)
                 //retrieve all past events
                 const rentalsAdded = await contract.getPastEvents("ToolAddedToRentals", {fromBlock:deployTx.blockNumber , toBlock:"latest"});
-              
+
                 //retrieve all past events IDs
                 const rentals = rentalsAdded.map(
                     (event)=>{

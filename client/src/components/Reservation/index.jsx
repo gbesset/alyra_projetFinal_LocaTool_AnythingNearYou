@@ -6,6 +6,11 @@ import { Heading, Box, Tabs, TabList, Tab, TabPanels, TabPanel,Flex, Link, Icon,
 import { FaUserShield } from 'react-icons/fa';
 import { Reservation } from './Reservation';
 import { ReservationConfirmation } from './ReservationConfirmation';
+import { NFTConfirmation } from './NFTConfirmation';
+import { Location } from './Location';
+import { RetourValidation } from './RetourValidation';
+import { ConfirmRetourValidation } from './ConfirmRetourValidation';
+
 import { RentalStatus, toastError } from '../../utils/Enum';
 
 export const ReservationDashboard = () => {
@@ -28,7 +33,7 @@ export const ReservationDashboard = () => {
     }
    
     async function handleStatusChange(){
-        alert("coucou")
+        console.log("declenchement")
         setRefreshStatus(true)
         await retrieveRental();
     }
@@ -82,17 +87,19 @@ export const ReservationDashboard = () => {
                        <Reservation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
                 <TabPanel>
-                    <ReservationConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
-                </TabPanel>
-
-                <TabPanel>
-                <p>3</p>
+                     <ReservationConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
                 <TabPanel>
-                <p>4</p>
+                    <NFTConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
                 <TabPanel>
-                <p>5</p>
+                    <Location rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
+                </TabPanel>
+                <TabPanel>
+                     <RetourValidation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
+                </TabPanel>
+                <TabPanel>
+                    <ConfirmRetourValidation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
             </TabPanels>
             </Tabs>

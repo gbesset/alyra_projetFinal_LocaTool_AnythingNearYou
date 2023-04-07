@@ -5,54 +5,48 @@ import { useEth } from '../../contexts/EthContext';
 import { toastError, toastInfo} from '../../utils/utils'
 import { FaCheckCircle, FaUserShield } from 'react-icons/fa';
 
-export const ReservationConfirmation = ({rental, rentalOwner, updateStatus}) => {
+export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
     const { state: { contract, accounts, web3, isOwner, artifactCollection} } = useEth();
-    const [isDelegate, setIsDelegate] = useState(false);
+
     
-    const handleConfirmDelegateNFT = async () =>{
+    const handleConfirmRetour = async () =>{
         try{
-            if(isDelegate){
-                contract.events.RentalAccepted({ filter: { renter: accounts[0] } })
+
+                contract.events.RentalCompletedByRenter({ filter: { renter: accounts[0] } })
                 .on('data', () => {
-                    toastInfo("Votre Validation a été effectuée");
+                    toastInfo("Votre Validation a été prise en compte (Acceptation)");
                     updateStatus()
                 });
 
 
-                await contract.methods.validateNFTDelegationForRental(parseInt(rental.rentalID), parseInt(rental.tokenID)).call({from:accounts[0]});
-                await contract.methods.validateNFTDelegationForRental(parseInt(rental.rentalID), parseInt(rental.tokenID)).send({from:accounts[0]});
+                await contract.methods.validateReturnToolAfterRental(parseInt(rental.rentalID)).call({from:accounts[0]});
+                await contract.methods.validateReturnToolAfterRental(parseInt(rental.rentalID)).send({from:accounts[0]});
 
-            }
+
         }catch(error){
             console.log(error)
             toastError("Erreur lors du transfer.. ");
         }
     }
 
-      const handleDelegateNFT = async (event) => {
+    const handleRefuseRetour = async () =>{
         try{
 
-            const contractCollection = new web3.eth.Contract(artifactCollection.abi, rental.collection.collection);            
-
-            console.log(contract)
-            if (web3.utils.isAddress(rental.renter) && contract && contractCollection) {
-
-                console.log("delegate")
-
-                contractCollection.events.UpdateDelegation({ filter: { renter: accounts[0] } })
+                contract.events.RentalDisputeCreated({ filter: { renter: accounts[0] } })
                 .on('data', () => {
-                    toastInfo("Le transfert du NFT a été effecuté");
-                    setIsDelegate(true);
+                    toastInfo("Votre Validation a bien été prise en compte (REFUS)");
+                    updateStatus()
                 });
 
-                await contractCollection.methods.rentTool(parseInt(rental.tokenID), rental.renter, parseInt(rental.end), accounts[0]).call({from:accounts[0]});
-                await contractCollection.methods.rentTool(parseInt(rental.tokenID), rental.renter, parseInt(rental.end), accounts[0]).send({from:accounts[0]});
-            }
+
+                await contract.methods.refuseReturnToolAfterRental(parseInt(rental.rentalID)).call({from:accounts[0]});
+                await contract.methods.refuseReturnToolAfterRental(parseInt(rental.rentalID)).send({from:accounts[0]});
+
+
         }catch(error){
             console.log(error)
             toastError("Erreur lors du transfer.. ");
         }
-      
     }
 
     return (
@@ -73,7 +67,7 @@ export const ReservationConfirmation = ({rental, rentalOwner, updateStatus}) => 
 
         { rentalOwner && (<>
     
-            <VStack mt="2rem">
+            <VStack mt="1rem">
                     <Heading as="h3" size="lg">
                         {rentalOwner &&  <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> }
                         Valider la demande de location
@@ -84,8 +78,8 @@ export const ReservationConfirmation = ({rental, rentalOwner, updateStatus}) => 
 
                     </Box>
                     <Center>
-                        <Button  mt="4"  variant='outline' colorScheme="white" onClick={handleDelegateNFT} mr="2rem"> Deleguer le NFT</Button>
-                        <Button  mt="4" colorScheme="purple" onClick={handleConfirmDelegateNFT} isDisabled={!isDelegate}> Confirmer Delegation</Button>
+                        <Button  mt="4"  colorScheme="purple" onClick={handleConfirmRetour} mr="2rem"> Confirmer le retour</Button>
+                        <Button  mt="4" colorScheme="red" onClick={handleRefuseRetour} > Refuser le retour</Button>
                     </Center>
             </VStack>
 

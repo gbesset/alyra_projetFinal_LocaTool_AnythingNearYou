@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
 import { RentalDetails } from './RentalDetails';
-import { Heading, Box, FormLabel, Center, Input,Button, HStack, FormControl, Card, CardHeader, CardBody } from '@chakra-ui/react';
+import { Heading, Box, Icon, FormLabel, Center, Input,Button, HStack, FormControl, Card, CardHeader, CardBody } from '@chakra-ui/react';
 import {calculateDurationBetween2Dates, toastError, toastInfo} from '../../utils/utils'
 import moment from 'moment';
 import { useEth } from '../../contexts/EthContext';
+import { FaUserShield } from 'react-icons/fa';
 
 export const Reservation = ({rental, rentalOwner, updateStatus}) => {
     const { state: { contract, accounts, web3, isOwner} } = useEth();
@@ -55,7 +56,8 @@ export const Reservation = ({rental, rentalOwner, updateStatus}) => {
                   });
 
 
-                await contract.methods.sendPaiementForRental(rental.collection.owner, parseInt(rental.rentalID),parseInt(beginTs), parseInt(endTs)).send({from:accounts[0]});
+                  await contract.methods.sendPaiementForRental(rental.collection.owner, parseInt(rental.rentalID),parseInt(beginTs), parseInt(endTs)).call({from:accounts[0]});
+                  await contract.methods.sendPaiementForRental(rental.collection.owner, parseInt(rental.rentalID),parseInt(beginTs), parseInt(endTs)).send({from:accounts[0]});
 
             }catch(error){
                 console.log(error)
@@ -140,7 +142,10 @@ export const Reservation = ({rental, rentalOwner, updateStatus}) => {
             )}
 
         { rentalOwner && (<>
-    
+            <Heading as="h3" size="lg">
+            {rentalOwner &&  <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> }
+             Réservations</Heading>
+            
             <Box mt="2rem">Ps de location en cours.....</Box>
             </>
             )}
