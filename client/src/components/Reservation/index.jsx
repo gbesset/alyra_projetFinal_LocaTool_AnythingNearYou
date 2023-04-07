@@ -6,6 +6,7 @@ import { Heading, Box, Tabs, TabList, Tab, TabPanels, TabPanel,Flex, Link, Icon,
 import { FaUserShield } from 'react-icons/fa';
 import { Reservation } from './Reservation';
 import { ReservationConfirmation } from './ReservationConfirmation';
+import { NFTConfirmation } from './NFTConfirmation';
 import { RentalStatus, toastError } from '../../utils/Enum';
 
 export const ReservationDashboard = () => {
@@ -82,11 +83,10 @@ export const ReservationDashboard = () => {
                        <Reservation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
                 <TabPanel>
-                    <ReservationConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
+                     <ReservationConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
-
                 <TabPanel>
-                <p>3</p>
+                    <NFTConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
                 <TabPanel>
                 <p>4</p>

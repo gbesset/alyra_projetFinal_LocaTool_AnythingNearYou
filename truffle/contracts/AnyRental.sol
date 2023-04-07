@@ -452,7 +452,7 @@ contract AnyRental is Ownable, IAnyRental{
      * - the caution is still secured, the location is payed
      * @dev user validate having the NFT, annd receipt the tool
      */
-     function validateNFTandToolReception(address _renter, uint _rentalID) ownerMustExist(_renter)  external{
+     function validateNFTandToolReception(address _owner, uint _rentalID) ownerMustExist(_renter)  external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
  
         uint found = getRentalIndexByOwnerAddressAndRentalID(_renter, _rentalID);
