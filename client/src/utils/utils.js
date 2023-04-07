@@ -1,4 +1,5 @@
 import { createStandaloneToast } from '@chakra-ui/toast'
+import moment from 'moment';
 
 const { toast } = createStandaloneToast()
 
@@ -33,3 +34,10 @@ export function isImageValid(file) {
 function getFileExtension(filename) {
   return filename.split(".").pop();
 }
+
+export function calculateDurationBetween2Dates(startDate, endDate) {
+  const start = moment(startDate, "YYYY-MM-DD");
+  const end = moment(endDate, "YYYY-MM-DD");
+  const diffDays = end.diff(start, 'days');
+  return diffDays;
+};

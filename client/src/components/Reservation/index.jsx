@@ -11,7 +11,7 @@ export const ReservationDashboard = ({rental}) => {
     const { state: { contract, accounts, isOwner} } = useEth();
 
     const [collectionNFT, setCollectionNFT] = useState('')
-    const [rentalStatus, setRentalStatus]=useState(0)
+    const [rentalStatus, setRentalStatus]=useState(rental.rentalStatus)
     
     const [tabIndex, setTabIndex] = useState(0)
     const handleTabsChange = (index) => {
@@ -34,10 +34,10 @@ export const ReservationDashboard = ({rental}) => {
           {rental && (
               <>
               Status : {rentalStatus}
-            <Tabs mt="3rem" variant='enclosed' colorScheme='purple' isFitted index={tabIndex} onChange={handleTabsChange}>
+            <Tabs mt="3rem" variant='enclosed' colorScheme='white' isFitted index={tabIndex} onChange={handleTabsChange}>
             <TabList>
                 {/* _selected={isTabActive(RentalStatus.AVAILABLE)?selectedTab:undefined} */}
-                <Tab isDisabled={!isTabActive(RentalStatus.AVAILABLE)}>Réserver</Tab>
+                <Tab isDisabled={!isTabActive(RentalStatus.AVAILABLE)} className="text-white">Réserver</Tab>
                 <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_REQUESTED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider</Tab>
                 <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ACCEPTED_NFT_SENT)}>Confirmer NFT</Tab>
                 <Tab isDisabled={!isTabActive(RentalStatus.VALIDATE_RECEIPT_PAYMENT)}>Location</Tab>
