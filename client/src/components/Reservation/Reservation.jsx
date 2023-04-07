@@ -61,11 +61,6 @@ export const Reservation = ({rental, rentalOwner, updateStatus}) => {
                 console.log(error)
                 toastError("Erreur lors de la demande.. ");
             }
-           /* 
-            */
-
-
-
         }
         else{
             toastError("Il faut deux dates au bon format")

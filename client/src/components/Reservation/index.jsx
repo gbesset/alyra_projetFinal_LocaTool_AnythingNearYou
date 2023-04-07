@@ -5,6 +5,7 @@ import { useEth } from '../../contexts/EthContext';
 import { Heading, Box, Tabs, TabList, Tab, TabPanels, TabPanel,Flex, Link, Icon, Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
 import { FaUserShield } from 'react-icons/fa';
 import { Reservation } from './Reservation';
+import { ReservationConfirmation } from './ReservationConfirmation';
 import { RentalStatus, toastError } from '../../utils/Enum';
 
 export const ReservationDashboard = () => {
@@ -28,7 +29,8 @@ export const ReservationDashboard = () => {
    
     async function handleStatusChange(){
         alert("coucou")
-        await(retrieveRental);
+        setRefreshStatus(true)
+        await retrieveRental();
     }
 
     const retrieveRental = async () => {
@@ -57,7 +59,7 @@ export const ReservationDashboard = () => {
         retrieveRental();
         setTabIndex(parseInt(rentalStatus));
 
-    }, [rentalStatus, refreshStatus]);
+    }, [accounts, contract, rentalStatus, refreshStatus]);
 
     return (
         <Box> 
@@ -80,7 +82,7 @@ export const ReservationDashboard = () => {
                        <Reservation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
                 <TabPanel>
-                <p>2</p>
+                    <ReservationConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
                 </TabPanel>
 
                 <TabPanel>

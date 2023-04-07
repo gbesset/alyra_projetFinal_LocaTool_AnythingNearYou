@@ -1,7 +1,6 @@
 const axios = require('axios')
 
 export const checkAuthent = async (file) => {
-    const JWT = `Bearer ${process.env.PINATA_JWT}`
     
     let config = {
         method: 'get',
@@ -18,14 +17,11 @@ export const checkAuthent = async (file) => {
 export const pinFileToPinata = async (file) => {
     if(file){
         //const pinata = new pinataSDK(process.env.PINATA_KEY, process.env.PINATA_SECRET);
-        const JWT = `Bearer ${process.env.PINATA_JWT}`
-
         const formData = new FormData();
         formData.append('file', file)
 
           
         //const options = generateOptions(file.name)
-        //formData.append('pinataOptions', options);
 
         try{
             const res = await axios({
@@ -50,9 +46,6 @@ export const pinFileToPinata = async (file) => {
 };
 
 export const pinJsonToPinata = async (nftName, fileCID, description, attributeSerialID, attributeTitle, attributDescription) => {
-
-    //const pinata = new pinataSDK(process.env.PINATA_KEY, process.env.PINATA_SECRET);
-    const JWT = `Bearer ${process.env.PINATA_JWT}`
        
     const nftMetadata = {
         name: `NFT_${nftName}`,
@@ -75,7 +68,6 @@ export const pinJsonToPinata = async (nftName, fileCID, description, attributeSe
     };
         
         //const options = generateOptions(file.name)
-        //formData.append('pinataOptions', options);
         try{
 
             const res = await axios({
@@ -102,7 +94,7 @@ export const pinJsonToPinata = async (nftName, fileCID, description, attributeSe
           return null;
      
 };
-
+/*
 function generateOptions(name){
     const options = {
         pinataMetadata: {
@@ -113,4 +105,4 @@ function generateOptions(name){
         }
     };
     return options;
-  }
+  }*/
