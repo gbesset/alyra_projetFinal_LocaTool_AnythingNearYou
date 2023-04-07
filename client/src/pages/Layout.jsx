@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import {Footer } from '../components/Footer/Footer';
 import { HeaderHome } from '../components/Header/HeaderHome';
 
-import {Flex, Divider} from '@chakra-ui/react';
+import {Flex} from '@chakra-ui/react';
 
 export const Layout = () => {
     return (
@@ -16,7 +16,6 @@ export const Layout = () => {
                     <Outlet/>
                 </Flex>
                 
-                <Divider />
                <Footer />
     
             </div>

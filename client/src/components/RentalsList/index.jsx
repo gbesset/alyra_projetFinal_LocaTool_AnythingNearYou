@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useEth } from '../../contexts/EthContext';
 import { Heading, Box,  Flex, Text, Button } from '@chakra-ui/react';
 import { toastInfo, toastError } from '../../utils/utils';
-
+import { Authent } from '../../components/Authent/Authent';
 import { Link } from "react-router-dom";
 import { RentalList } from './RentalsList';
 
@@ -38,9 +38,23 @@ export const Rentals = () => {
         <>
         <Box >
             <Heading as="h3">Annonces publiées</Heading>
-            { rentals.length  &&  (            
-                <RentalList rentals={rentals} />
-            )}
+            
+            {accounts ? (
+                <>
+                        { rentals  ?  (            
+                            <RentalList rentals={rentals} />
+                        ):
+                        (
+                        <Text>Aucune n'annonce n'a encore été publiée..... :(</Text>
+                        )}
+                </>
+            ) : (
+                <>
+                <Authent />
+                </>
+            )
+            }
+            
         </Box>
         </>
     );
