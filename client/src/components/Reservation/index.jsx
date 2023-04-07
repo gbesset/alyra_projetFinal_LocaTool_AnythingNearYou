@@ -33,7 +33,7 @@ export const ReservationDashboard = () => {
     }
    
     async function handleStatusChange(){
-        alert("coucou")
+        console.log("declenchement")
         setRefreshStatus(true)
         await retrieveRental();
     }
