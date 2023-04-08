@@ -19,7 +19,7 @@ export const Admin = () => {
                 
                     <FormControl display="flex" alignItems="center" mb={4}>
                         <FormLabel htmlFor="owner-switch" mb="0">
-                        Êtes-vous propriétaire ?
+                        Êtes-vous Loueur ?
                         </FormLabel>
                         <Switch
                         id="owner-switch"

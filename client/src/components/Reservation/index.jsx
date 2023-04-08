@@ -12,16 +12,18 @@ import { RetourValidation } from './RetourValidation';
 import { ConfirmRetourValidation } from './ConfirmRetourValidation';
 
 import { RentalStatus, toastError } from '../../utils/Enum';
+import { ReRent } from './ReRent';
 
 export const ReservationDashboard = () => {
     const { state: { contract, accounts} } = useEth();
     const { rentalID } = useParams();
     const [rental, setRental] = useState('')
     const [rentalStatus, setRentalStatus]=useState(0)
-    const [refreshStatus, setRefreshStatus] =useState(false);
-    const [rentalOwner, setRentalOwner] =useState(false);
-    
+    const [isRentalAvailable, setIsRentalAvailable] =useState(false);
+    const [isRentalOwner, setIsRentalOwner] =useState(false);
+    const [isRenter, setIsRenter] =useState(false);
     const [tabIndex, setTabIndex] = useState(0)
+
     const handleTabsChange = (index) => {
         setTabIndex(index)
       }
@@ -32,10 +34,23 @@ export const ReservationDashboard = () => {
         return rentalStatus==status;
     }
    
+    const isRentalStatusAvailable = () =>{
+        setIsRentalAvailable(rental.rentalStatus==RentalStatus.AVAILABLE)
+    }
+
     async function handleStatusChange(){
         console.log("declenchement")
-        setRefreshStatus(true)
-        await retrieveRental();
+        //setRefreshStatus(refreshStatus+1)
+        setRentalStatus(rental.rentalStatus+1) 
+    }
+
+    const setTabIndexFromRental= (status) => {
+        setTabIndex(status);
+        if(status==RentalStatus.DISPUTE || status==RentalStatus.DISPUTE_SOLVED )
+            setTabIndex(6);
+        else if(status==RentalStatus.RENTAL_ENDED)
+            setTabIndex(6);
+
     }
 
     const retrieveRental = async () => {
@@ -50,8 +65,9 @@ export const ReservationDashboard = () => {
             
             setRental(rentalComplete);
             setRentalStatus(rental.rentalStatus) 
-            setRentalOwner(rental.collection.owner==accounts[0])
-
+            setIsRentalOwner(rental.collection.owner==accounts[0])
+            setIsRenter(rental.renter===accounts[0])
+            isRentalStatusAvailable();
         }
         catch(error){
             //console.log(error)
@@ -62,51 +78,59 @@ export const ReservationDashboard = () => {
       useEffect( () =>{    
         console.log("je met a jour")
         retrieveRental();
-        setTabIndex(parseInt(rentalStatus));
+        setTabIndexFromRental(parseInt(rentalStatus))
 
-    }, [accounts, contract, rentalStatus, refreshStatus]);
+    }, [accounts, contract, rentalStatus]);
 
     return (
         <Box> 
-          {rental && (
-                <>
-              Status : {rentalStatus}
-            <Tabs mt="3rem" variant='enclosed' colorScheme='white' isFitted index={tabIndex} onChange={handleTabsChange}>
-            <TabList>
-                {/* _selected={isTabActive(RentalStatus.AVAILABLE)?selectedTab:undefined} */}
-                <Tab isDisabled={!isTabActive(RentalStatus.AVAILABLE)} className="text-white">Réserver</Tab>
-                <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_REQUESTED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider</Tab>
-                <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ACCEPTED_NFT_SENT)}>Confirmer NFT</Tab>
-                <Tab isDisabled={!isTabActive(RentalStatus.VALIDATE_RECEIPT_PAYMENT)}>Location</Tab>
-                <Tab isDisabled={!isTabActive(RentalStatus.VALIDATE_RECEIPT_PAYMENT)}>Restituer</Tab>
-                <Tab isDisabled={!isTabActive(RentalStatus.COMPLETED_USER)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider retour</Tab>
-                <Tab isDisabled={!isTabActive(RentalStatus.RETURN_ACCEPTED_BY_OWNER) && !isTabActive(RentalStatus.DISPUTE) }>Confirmer retour</Tab>
-            </TabList>
-            <TabPanels>
-                <TabPanel>
-                       <Reservation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
-                </TabPanel>
-                <TabPanel>
-                     <ReservationConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
-                </TabPanel>
-                <TabPanel>
-                    <NFTConfirmation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
-                </TabPanel>
-                <TabPanel>
-                    <Location rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
-                </TabPanel>
-                <TabPanel>
-                     <RetourValidation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
-                </TabPanel>
-                <TabPanel>
-                    <ConfirmRetourValidation rental={rental} rentalOwner={rentalOwner} updateStatus={handleStatusChange} />
-                </TabPanel>
-            </TabPanels>
-            </Tabs>
-      </>
-
-
-          )}
+            Status : {rentalStatus}  index {tabIndex} 
+          { (isRentalAvailable || (isRenter || isRentalOwner) ) && (<> 
+                    {rental && (
+                            <>
+                        <Tabs mt="3rem" variant='enclosed' colorScheme='white' isFitted index={tabIndex} onChange={handleTabsChange}>
+                        <TabList>
+                            {/* _selected={isTabActive(RentalStatus.AVAILABLE)?selectedTab:undefined} */}
+                            <Tab isDisabled={!isTabActive(RentalStatus.AVAILABLE)} className="text-white">Réserver</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_REQUESTED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ACCEPTED_NFT_SENT)}>Confirmer NFT</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.VALIDATE_RECEIPT_PAYMENT)}>Location</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.COMPLETED_USER)}>Restituer</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.RETURN_ACCEPTED_BY_OWNER)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider retour</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ENDED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Relouer</Tab>
+                        </TabList>
+                        <TabPanels>
+                            <TabPanel>
+                                <Reservation rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                            </TabPanel>
+                            <TabPanel>
+                                <ReservationConfirmation rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                            </TabPanel>
+                            <TabPanel>
+                                <NFTConfirmation rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                            </TabPanel>
+                            <TabPanel>
+                                <Location rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                            </TabPanel>
+                            <TabPanel>
+                                <RetourValidation rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                            </TabPanel>
+                            <TabPanel>
+                                <ConfirmRetourValidation rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                            </TabPanel>
+                            <TabPanel>
+                                <ReRent rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                            </TabPanel>
+                        </TabPanels>
+                        </Tabs>
+                    </>
+                    )}
+                
+         </>
+        )}
+            {(!isRentalAvailable && !isRenter && !isRentalOwner) && (
+                <Text>L'objet est en cours de location......</Text>
+            )}
          </Box>
   
     );

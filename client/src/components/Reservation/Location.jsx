@@ -36,7 +36,9 @@ export const Location = ({rental, rentalOwner, updateStatus}) => {
                 contract.events.RentalCompletedByUser({ filter: { renter: accounts[0] } })
                 .on('data', () => {
                         toastInfo("Votre Validation a été effectuée");
-                        updateStatus()
+                        setTimeout(()=>{
+                            updateStatus()
+                        },2000)
                     });
 
                 await contract.methods.giveBackToolAfterRental(rental.collection.owner, parseInt(rental.rentalID)).call({from:accounts[0]});

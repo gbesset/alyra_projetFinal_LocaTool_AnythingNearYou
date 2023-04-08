@@ -577,7 +577,30 @@ contract AnyRental is Ownable, IAnyRental{
 
      }  
 
+  /**
+     * @notice user redeem its caution or caution and location
+     * - the caution is given back at the end of rental or because the renter refuse the rental
+     * @dev user redeem its caution
+     */
+     function rentAgainRental(uint _rentalID) ownerMustExist(msg.sender)  external{
+      require(rentalIds.current() >= _rentalID, "Tool does not exist");
 
+        uint found = getRentalIndexByOwnerAddressAndRentalID(msg.sender, _rentalID);
+        Rental storage rental = rentersRentals[msg.sender][found];
+        require(rental.rentalID == _rentalID, "The rental is not available.");
+        require(rental.rentalStatus == RentalStatus.RENTAL_ENDED, "The rental status is incorrect.");
+        
+        //initialisation
+        rental.start = 0;
+        rental.end = 0;
+        rental.rentalStatus = RentalStatus.AVAILABLE;
+        rental.rentalData.isCautionDeposed = false;
+        rental.renter = address(0);
+        rental.rentalData = RentalData(false, false, false, false, false, false, false);
+        
+        
+        emit RentalReAvailable(rental.collection.owner, rental.renter,  rental.collection.collection, rental.tokenID, block.timestamp);
+         }  
   
   
 }

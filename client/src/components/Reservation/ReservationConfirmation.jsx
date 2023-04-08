@@ -15,7 +15,9 @@ export const ReservationConfirmation = ({rental, rentalOwner, updateStatus}) => 
                 contract.events.RentalAccepted({ filter: { renter: accounts[0] } })
                 .on('data', () => {
                     toastInfo("Votre Validation a été effectuée");
-                    updateStatus()
+                    setTimeout(()=>{
+                        updateStatus()
+                    },2000)
                 });
 
 
@@ -64,7 +66,7 @@ export const ReservationConfirmation = ({rental, rentalOwner, updateStatus}) => 
         { !rentalOwner && (<>
             <Box mt="2rem">
                 <Heading as="h3" size="lg">En attente de confirmation</Heading>
-                <Text mt="2rem">Votre demande a été envoyée, il faut attendre la validation du propriétaire</Text>
+                <Text mt="2rem">Votre demande a été envoyée, il faut attendre la validation du Loueur</Text>
                 
             </Box>
 

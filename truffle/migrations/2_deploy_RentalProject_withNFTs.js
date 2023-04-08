@@ -3,7 +3,7 @@ const AnyRental = artifacts.require("AnyRental");
 const AnyNFTCollectionFactory = artifacts.require("AnyNFTCollectionFactory");
 
 
-const isDeployNFT = false;
+const isDeployNFT = true;
 
 module.exports = async function (deployer, _network, accounts) {
   let owner1;
@@ -29,6 +29,11 @@ module.exports = async function (deployer, _network, accounts) {
   if(!isDeployNFT){
     console.log('\n-----------------------------------')
     console.log("  Pas de deploiement de NFTs activé...............")
+    console.log('-----------------------------------')
+  }
+  else if(_network ==="mumbai-fork"){
+    console.log('\n-----------------------------------')
+    console.log("  Pas de deploiement (mumbai-fork)...............")
     console.log('-----------------------------------')
   }
   else{
@@ -62,8 +67,8 @@ module.exports = async function (deployer, _network, accounts) {
         
         //Seulement 2 collections
         collections = [
-          {name:"Colletion Proprio 1", symbol:"CP1", owner:owner1},
-          {name:"Colletion Proprio 2", symbol:"CP2", owner:owner4 }
+          {name:"Collection Proprio 1", symbol:"CP1", owner:owner1},
+          {name:"Collection Proprio 2", symbol:"CP2", owner:owner4 }
         ]
 
         NFTs = [
@@ -74,27 +79,28 @@ module.exports = async function (deployer, _network, accounts) {
         ]
       
     }
-    if(_network === "goerli" || _network ==="mumbai-fork"){
+    if(_network === "goerli" || _network ==="mumbai-fork" || _network ==="mumbai"){
           console.log('     -----> Goerli or Mumbai network');
 
           owner1 = accounts[1]
           owner2 = "0x3F1E285ee6BEc3E7df60854E9db428bB934646d2"  //addresse Vincent
-          owner3 = accounts[1]  //addresse Thomas
+          //owner3 = accounts[1]  //addresse Thomas
+          owner3 = "0xDF3E3f8fc4Aa92e41c61Abb1e9CFe68880Fd53BC"
           owner4 = "0xd85ae51d3E3E49da2702f98E1BDBE842Bd4d9817"  //addresse Sylvie
           
           //4 collections
           collections = [
             {name:"Collection Guillaume", symbol:"ANY_1", owner: owner1},
-            {name:"Collection Vincent", symbol:"ANY_2", owner: owner2},
-            {name:"Collection Thomas", symbol:"ANY_3", owner: owner3 },
-            {name:"Collection Sylvie", symbol:"ANY_4", owner: owner4 },
+           // {name:"Collection Vincent", symbol:"ANY_2", owner: owner2},
+           // {name:"Collection Thomas", symbol:"ANY_3", owner: owner3 },
+           // {name:"Collection Sylvie", symbol:"ANY_4", owner: owner4 },
           ]
           //Seulement le prix et la caution sont différent..
           NFTs = [
-            {img: "NFT_Paddle_IMG",json:"NFT_Paddle_JSON", ipath:"1.png", jpath:"1.json",dayPrice:"0.0002", caution:"0.002", serialID:"862419541651855", owner:owner1},
-            {img: "NFT_PistoletPeinture_IMG",json:"NFT_PistoletPeinture_JSON", ipath:"2.png", jpath:"2.json",dayPrice:"0.0005", caution:"0.008", serialID:"96654486655", owner:owner2},
-            {img: "NFT_Betoniere_IMG",json:"NFT_Betoniere_JSON", ipath:"3.png", jpath:"3.json",dayPrice:"0.0006", caution:"009", serialID:"000000000000", owner:owner3},
-            {img: "NFT_Tronco_IMG",json:"NFT_Tronco_JSON", ipath:"4.png", jpath:"4.json", dayPrice:"0.0001", caution:"0.001", serialID:"16565266695453", owner:owner4},
+            {img: "NFT_Paddle_IMG",json:"NFT_Paddle_JSON", ipath:"1.png", jpath:"1.json",dayPrice:"50", caution:"150", serialID:"862419541651855", owner:owner1},
+ //           {img: "NFT_PistoletPeinture_IMG",json:"NFT_PistoletPeinture_JSON", ipath:"2.png", jpath:"2.json",dayPrice:"40", caution:"120", serialID:"96654486655", owner:owner1},
+ //           {img: "NFT_Betoniere_IMG",json:"NFT_Betoniere_JSON", ipath:"3.png", jpath:"3.json",dayPrice:"100", caution:"300", serialID:"000000000000", owner:owner1},
+ //           {img: "NFT_Tronco_IMG",json:"NFT_Tronco_JSON", ipath:"4.png", jpath:"4.json", dayPrice:"55", caution:"200", serialID:"16565266695453", owner:owner1},
           ]
 
       }
