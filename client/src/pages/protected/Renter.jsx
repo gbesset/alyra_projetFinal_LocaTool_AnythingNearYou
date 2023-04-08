@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useEth } from '../../contexts/EthContext';
-import { Heading, Box } from '@chakra-ui/react';
+import { Heading, Box, Text} from '@chakra-ui/react';
 import { Authent } from '../../components/Authent/Authent';
 
 export const Renter = () => {
@@ -33,8 +33,11 @@ export const Renter = () => {
         <Box>
            {accounts ? (
                 <> <Heading as="h1">Mes locations</Heading>
-                    todo
-                   
+                  
+                  <Text className="text-white" pl="3rem" pt="1rem">
+                   En constuction....
+                    </Text>
+
                   </>
                 ) : (
                     <>
