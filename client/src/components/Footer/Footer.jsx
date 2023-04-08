@@ -10,9 +10,9 @@ export const Footer = () => {
           <Flex direction="column" justifyContent="center" alignItems="center" height="10vh" width="100%" p="2rem" >
   
               <Flex width="40%" justifyContent="space-between" alignItems="center">
-                  <Text><Link href="/lien">CGV</Link></Text>
-                  <Text><Link href="/lien">WhitePaper</Link></Text>
-                  <Text><Link href="/lien">?</Link></Text>
+                  <Text><Link to="/">Accueil</Link></Text>
+                  <Text><Link to="/cgu">CGU</Link></Text>
+                  <Text><Link to="/whitepaper">WhitePaper</Link></Text>
               
             </Flex>    
             <Box pt="1rem">

@@ -40,7 +40,7 @@ export const Rentals = () => {
 
             {accounts ? (
                 <>      <Heading as="h3">Annonces publiées</Heading>
-                        { rentals  ?  (            
+                        { (rentals && rentals.length)  ?  (            
                             <RentalList rentals={rentals} />
                         ):
                         (

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text, Box, Heading} from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 
-export const Whitepaper = () => {
+export const CGU = () => {
     return (
         
   
@@ -9,7 +10,7 @@ export const Whitepaper = () => {
                 
             <Heading className="text-gradient" p="2rem" >CGU</Heading>
             <Box height="100vh">
-            <object data="/assets/pdf/anything_near_you21.pdf" type="application/pdf" width="100%" height="100%">
+            <object data="/assets/pdf/cgu_dapp.pdf" type="application/pdf" width="100%" height="100%">
                 <Text>CGU </Text>
             </object>
             </Box>
