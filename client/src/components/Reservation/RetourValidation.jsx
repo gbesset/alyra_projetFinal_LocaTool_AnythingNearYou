@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { RentalDetails } from './RentalDetails';
-import { Heading, Box, Text, Icon, Center, Button,  VStack } from '@chakra-ui/react';
+import { Heading, Box, Text, Icon, Center, Button,FormLabel, Textarea,  VStack, HStack } from '@chakra-ui/react';
 import { useEth } from '../../contexts/EthContext';
 import { toastError, toastInfo} from '../../utils/utils'
 import {  FaUserShield } from 'react-icons/fa';
 
 export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
     const { state: { contract, accounts} } = useEth();
+    const [description, setDescription] = useState("");
+    const [isDispute, setIsDispute] = useState(false);
 
     
     const handleConfirmRetour = async () =>{
@@ -31,9 +33,12 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
         }
     }
 
+    const displayRefuseMessage = () =>{
+        setIsDispute(!isDispute);
+    };
+
     const handleRefuseRetour = async () =>{
         try{
-
                 contract.events.RentalDisputeCreated({ filter: { renter: accounts[0] } })
                 .on('data', () => {
                     toastInfo("Votre Validation a bien été prise en compte (REFUS)");
@@ -41,9 +46,8 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
                 });
 
 
-                await contract.methods.refuseReturnToolAfterRental(parseInt(rental.rentalID)).call({from:accounts[0]});
-                await contract.methods.refuseReturnToolAfterRental(parseInt(rental.rentalID)).send({from:accounts[0]});
-
+                await contract.methods.refuseReturnToolAfterRental(parseInt(rental.rentalID), description).call({from:accounts[0]});
+                await contract.methods.refuseReturnToolAfterRental(parseInt(rental.rentalID), description).send({from:accounts[0]});
 
         }catch(error){
             console.log(error)
@@ -79,9 +83,23 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
                     <Text>Si l'objet a été détérioré ete que vous n'êtes pas d'accords, il faudra déclencher un litige et faire examiner le problème par les membres de la DAO</Text>
 
                     </Box>
+                    {isDispute && (
+                    <Box width="80%">
+                        <FormLabel>Litige</FormLabel>
+                        <HStack>
+                            <Textarea 
+                                placeholder="Saisissez une description au litige"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                            <Button  mt="4" colorScheme="red" onClick={handleRefuseRetour} > Refuser le retour</Button>
+                        </HStack>
+                    </Box>
+                    )}
                     <Center>
                         <Button  mt="4"  colorScheme="purple" onClick={handleConfirmRetour} mr="2rem"> Confirmer le retour</Button>
-                        <Button  mt="4" colorScheme="red" onClick={handleRefuseRetour} > Refuser le retour</Button>
+                        <Button  mt="4" colorScheme="red" onClick={displayRefuseMessage} > Refuser le retour</Button>
+                        
                     </Center>
             </VStack>
 

@@ -41,9 +41,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv({
-      systemvars: true
-    }),
+    new Dotenv(),
     new EslintWebpackPlugin({ extensions }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",

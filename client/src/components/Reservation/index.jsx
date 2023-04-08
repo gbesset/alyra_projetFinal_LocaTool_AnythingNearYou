@@ -10,6 +10,8 @@ import { Location } from './Location';
 import { RetourValidation } from './RetourValidation';
 import { ConfirmRetourValidation } from './ConfirmRetourValidation';
 import { ReRent } from './ReRent';
+import { Dispute } from './Dispute';
+import { DisputeDeclared } from './DisputeDeclared';
 import { RentalStatus } from '../../utils/Enum';
 
 export const ReservationDashboard = () => {
@@ -35,6 +37,14 @@ export const ReservationDashboard = () => {
         setIsRentalAvailable(rental.rentalStatus==RentalStatus.AVAILABLE)
     }
 
+    const isRentalStatusDispute = () =>{
+       return (rental.rentalStatus==RentalStatus.DISPUTE || rental.rentalStatus==RentalStatus.DISPUTE_SOLVED)?true:false;
+        
+    }
+    const isRentalStatusDisputeConfirmed = () =>{
+        return (rental.rentalStatus==RentalStatus.DISPUTE && rental.rentalData.isDisputeConfirmed )?true:false;
+         
+     }
     async function handleStatusChange(){
         console.log("declenchement")
         setRentalStatus(rental.rentalStatus+1) 
@@ -42,10 +52,10 @@ export const ReservationDashboard = () => {
 
     const setTabIndexFromRental= (status) => {
         setTabIndex(status);
-        if(status==RentalStatus.DISPUTE || status==RentalStatus.DISPUTE_SOLVED )
+        if( status==RentalStatus.DISPUTE || status==RentalStatus.DISPUTE_SOLVED )
             setTabIndex(6);
-        else if(status==RentalStatus.RENTAL_ENDED)
-            setTabIndex(6);
+        else if(status==RentalStatus.RENTAL_ENDED || (isRentalStatusDisputeConfirmed() ))
+            setTabIndex(7);
 
     }
 
@@ -78,7 +88,7 @@ export const ReservationDashboard = () => {
 
     return (
         <Box> 
-
+{rental.rentalStatus}
           { (isRentalAvailable || (isRenter || isRentalOwner) ) && (<> 
                     {rental && (
                             <>
@@ -91,7 +101,9 @@ export const ReservationDashboard = () => {
                             <Tab isDisabled={!isTabActive(RentalStatus.VALIDATE_RECEIPT_PAYMENT)}>Location</Tab>
                             <Tab isDisabled={!isTabActive(RentalStatus.COMPLETED_USER)}>Restituer</Tab>
                             <Tab isDisabled={!isTabActive(RentalStatus.RETURN_ACCEPTED_BY_OWNER)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider retour</Tab>
-                            <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ENDED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Relouer</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.DISPUTE) }> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" />Litige</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ENDED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" />Relouer</Tab>
+                            
                         </TabList>
                         <TabPanels>
                             <TabPanel>
@@ -113,7 +125,11 @@ export const ReservationDashboard = () => {
                                 <ConfirmRetourValidation rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
                             </TabPanel>
                             <TabPanel>
-                                <ReRent rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                                    {!isRentalStatusDisputeConfirmed() &&<DisputeDeclared rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />}
+                                    {isRentalStatusDisputeConfirmed() && <Dispute rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />}
+                            </TabPanel>
+                            <TabPanel>
+                                    {!isRentalStatusDispute() && <ReRent rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />}                                    
                             </TabPanel>
                         </TabPanels>
                         </Tabs>

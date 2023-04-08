@@ -3,12 +3,12 @@ import { RentalDetails } from './RentalDetails';
 import { Heading, Box, Text, Icon, Center, Button, VStack } from '@chakra-ui/react';
 import { useEth } from '../../contexts/EthContext';
 import { toastError, toastInfo} from '../../utils/utils'
-import {  FaUserShield } from 'react-icons/fa';
+import { FaUserShield } from 'react-icons/fa';
 import { RentalStatus } from '../../utils/Enum';
 
 
 export const ConfirmRetourValidation = ({rental, rentalOwner, updateStatus}) => {
-    const { state: { contract, accounts, web3, isOwner, artifactCollection} } = useEth();
+    const { state: { contract, accounts} } = useEth();
     const [litige, setLitige] = useState('')
     
     const handleReedem = async () =>{
