@@ -32,9 +32,9 @@ export const OwnerCollectionForm = () => {
 
     return (
         <>
-          <Heading as="h3">Devenez propriétaire</Heading>
+          <Heading as="h3">Devenez Loueur</Heading>
             <Text mt="4">Vous avez des objets qui ne servent pas souvent ? </Text>
-            <Text mt="2">Devenez propriétaire pour pouvoir les mettre en location, les rentabiliser, générer des benefices et entrer dans la crypto !
+            <Text mt="2">Devenez Loueur pour pouvoir les mettre en location, les rentabiliser, générer des benefices et entrer dans la crypto !
             </Text>
             <Box w="80%" mx="auto" pt="4rem">
                 <Heading as="h3" size="lg">Créer votre propre collection</Heading>
@@ -60,7 +60,7 @@ export const OwnerCollectionForm = () => {
                             />
                         </FormControl>
 
-                        <Button mt="4" colorScheme="purple" onClick={handleSubmit}> Devenir propriétaire </Button>
+                        <Button mt="4" colorScheme="purple" onClick={handleSubmit}> Devenir Loueur </Button>
                     </VStack>             
             </Box>
         </>

@@ -153,7 +153,10 @@ interface IAnyRental {
      */
     event RentalExtended(address renter, address user, address renterCollectionAddress, uint tokenId, uint duration ,uint timestamp);
     
-
+    /**
+     * @dev Emitted when a renter accept thereturn of the tool
+     */
+     event RentalReAvailable(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
 
     function setNbRentalMax(uint _nb) external;
 
@@ -311,4 +314,10 @@ interface IAnyRental {
      */
      function redeemPaymentForRental(address _renter, uint _rentalID) external;  
 
+    /**
+     * @notice owner re rent its Rentak
+     * - all fields a re reinit
+     * @dev owner re rentRental
+     */
+    function rentAgainRental(uint _rentalID) external;
 }
