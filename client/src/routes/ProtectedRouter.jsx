@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { ProtectedLayout } from '../pages/protected/ProtectedLayout';
 import { Renter } from '../pages/protected/Renter';
 import { Dao } from '../pages/protected/Dao';
@@ -12,8 +12,7 @@ import { CollectionItemForm } from '../components/OwnerDashboard/CollectionItemF
 import { Rentals } from '../components/RentalsList';
 
 export const ProtectedRouter = () => {
-    const location = useLocation();
-    const rental = location.state ? location.state.rental : null;
+   //const rental = location.state ? location.state.rental : null;
 
     return (
         <EthProvider>

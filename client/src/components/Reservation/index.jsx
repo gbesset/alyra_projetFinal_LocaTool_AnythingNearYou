@@ -1,8 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { useParams } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
 import { useEth } from '../../contexts/EthContext';
-import { Heading, Box, Tabs, TabList, Tab, TabPanels, TabPanel,Flex, Link, Icon, Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
+import { Box, Tabs, TabList, Tab, TabPanels, TabPanel,Icon, Text } from '@chakra-ui/react';
 import { FaUserShield } from 'react-icons/fa';
 import { Reservation } from './Reservation';
 import { ReservationConfirmation } from './ReservationConfirmation';
@@ -10,13 +9,13 @@ import { NFTConfirmation } from './NFTConfirmation';
 import { Location } from './Location';
 import { RetourValidation } from './RetourValidation';
 import { ConfirmRetourValidation } from './ConfirmRetourValidation';
-
-import { RentalStatus, toastError } from '../../utils/Enum';
 import { ReRent } from './ReRent';
+import { RentalStatus } from '../../utils/Enum';
 
 export const ReservationDashboard = () => {
     const { state: { contract, accounts} } = useEth();
     const { rentalID } = useParams();
+
     const [rental, setRental] = useState('')
     const [rentalStatus, setRentalStatus]=useState(0)
     const [isRentalAvailable, setIsRentalAvailable] =useState(false);
@@ -27,8 +26,6 @@ export const ReservationDashboard = () => {
     const handleTabsChange = (index) => {
         setTabIndex(index)
       }
-    
-      let selectedTab={ color: 'white', bg: 'purple.500' };
 
     const isTabActive = (status) => {
         return rentalStatus==status;
@@ -40,7 +37,6 @@ export const ReservationDashboard = () => {
 
     async function handleStatusChange(){
         console.log("declenchement")
-        //setRefreshStatus(refreshStatus+1)
         setRentalStatus(rental.rentalStatus+1) 
     }
 
@@ -55,7 +51,6 @@ export const ReservationDashboard = () => {
 
     const retrieveRental = async () => {
         try{
-            console.log("et oui.........")
             let rent = await contract.methods.getRentalByRentalID(rentalID).call({ from: accounts[0] });
             let nfts = await contract.methods.getToolsCollection(rent.collection.owner).call({ from: accounts[0] });
             
@@ -76,7 +71,6 @@ export const ReservationDashboard = () => {
     }
     
       useEffect( () =>{    
-        console.log("je met a jour")
         retrieveRental();
         setTabIndexFromRental(parseInt(rentalStatus))
 
@@ -84,7 +78,7 @@ export const ReservationDashboard = () => {
 
     return (
         <Box> 
-            Status : {rentalStatus}  index {tabIndex} 
+
           { (isRentalAvailable || (isRenter || isRentalOwner) ) && (<> 
                     {rental && (
                             <>
@@ -132,6 +126,5 @@ export const ReservationDashboard = () => {
                 <Text>L'objet est en cours de location......</Text>
             )}
          </Box>
-  
     );
 };

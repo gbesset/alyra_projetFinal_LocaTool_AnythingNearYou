@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { Heading, Box,  Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
+import { Heading, Box,  Image, Text,  Stack} from '@chakra-ui/react';
 import { Card,  CardBody, CardFooter } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
 
 
 export const  RentalDetails= ({rental}) => {
   let navigate = useNavigate();
-  const { rentalID, title, description, tokenImgURI, dayPrice, caution , rentalStatus, renter, start, end, rentalData} = rental;
+  const { title, description, tokenImgURI, dayPrice, caution , rentalStatus, renter, start, end, rentalData} = rental;
   
 
   const handleManage = () => {

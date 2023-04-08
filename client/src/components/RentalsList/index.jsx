@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useEth } from '../../contexts/EthContext';
-import { Heading, Box,  Flex, Text, Button } from '@chakra-ui/react';
-import { toastInfo, toastError } from '../../utils/utils';
+import { Heading, Box,   Text, } from '@chakra-ui/react';
 import { Authent } from '../../components/Authent/Authent';
-import { Link } from "react-router-dom";
 import { RentalList } from './RentalsList';
 
 export const Rentals = () => {

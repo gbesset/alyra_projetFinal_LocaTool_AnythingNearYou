@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import { useLocation } from 'react-router-dom';
 import { useEth } from '../../contexts/EthContext';
-import { Heading, Box, Tabs, TabList, Tab, TabPanels, TabPanel,Flex, Link, Icon, Image, Text, Button, Stack, Divider, ButtonGroup } from '@chakra-ui/react';
+import { Heading, Box } from '@chakra-ui/react';
 import { Authent } from '../../components/Authent/Authent';
 import { ReservationDashboard } from '../../components/Reservation';
 

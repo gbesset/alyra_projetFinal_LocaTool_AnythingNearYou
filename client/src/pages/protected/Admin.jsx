@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Heading, Text, Switch, Button, FormControl, FormLabel,} from "@chakra-ui/react";
+import React  from 'react';
+import { Box, Heading, Text, Switch, FormControl, FormLabel,} from "@chakra-ui/react";
 import { useEth } from '../../contexts/EthContext';
 
 export const Admin = () => {

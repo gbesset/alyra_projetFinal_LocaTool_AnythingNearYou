@@ -7,7 +7,7 @@ import { useEth } from '../../contexts/EthContext';
 import { FaUserShield } from 'react-icons/fa';
 
 export const Reservation = ({rental, rentalOwner, updateStatus}) => {
-    const { state: { contract, accounts, web3, isOwner} } = useEth();
+    const { state: { contract, accounts, web3} } = useEth();
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [price, setPrice] = useState("");
