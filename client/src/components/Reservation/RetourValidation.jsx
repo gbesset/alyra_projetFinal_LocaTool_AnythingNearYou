@@ -15,7 +15,7 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
         try{
 
                 contract.events.RentalCompletedByRenter({ filter: { renter: accounts[0] } })
-                .on('data', () => {
+                .once('data', () => {
                     toastInfo("Votre Validation a été prise en compte (Acceptation)");
                     setTimeout(()=>{
                         updateStatus()
@@ -40,7 +40,7 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
     const handleRefuseRetour = async () =>{
         try{
                 contract.events.RentalDisputeCreated({ filter: { renter: accounts[0] } })
-                .on('data', () => {
+                .once('data', () => {
                     toastInfo("Votre Validation a bien été prise en compte (REFUS)");
                     updateStatus()
                 });
@@ -92,7 +92,7 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
-                            <Button  mt="4" colorScheme="red" onClick={handleRefuseRetour} > Refuser le retour</Button>
+                            <Button  mt="4" colorScheme="red" onClick={handleRefuseRetour} > Créer litige</Button>
                         </HStack>
                     </Box>
                     )}

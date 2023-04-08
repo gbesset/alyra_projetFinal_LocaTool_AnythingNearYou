@@ -12,10 +12,10 @@ export const Location = ({rental, rentalOwner, updateStatus}) => {
     const { state: { contract, accounts, web3,  artifactCollection} } = useEth();
     const [NFTExpires, setNFTExpires] = useState(false);
 
-        const formatDate = (ts) =>{
-            const dt = moment.unix(ts);
-            return dt.format('DD/MM/YYYY, hh:mm:ss');
-        }
+    const formatDate = (ts) =>{
+        const dt = moment.unix(ts);
+        return dt.format('DD/MM/YYYY, hh:mm:ss');
+    }
 
     const handleCheckNFT = async () =>{
 
@@ -34,7 +34,7 @@ export const Location = ({rental, rentalOwner, updateStatus}) => {
         const handleRestituteNFT = async () =>{
             try{
                 contract.events.RentalCompletedByUser({ filter: { renter: accounts[0] } })
-                .on('data', () => {
+                .once('data', () => {
                         toastInfo("Votre Validation a été effectuée");
                         setTimeout(()=>{
                             updateStatus()

@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { useParams } from "react-router-dom";
 import { useEth } from '../../contexts/EthContext';
 import { Box, Tabs, TabList, Tab, TabPanels, TabPanel,Icon, Text } from '@chakra-ui/react';
-import { FaUserShield } from 'react-icons/fa';
+import { FaUserShield, FaAward } from 'react-icons/fa';
 import { Reservation } from './Reservation';
 import { ReservationConfirmation } from './ReservationConfirmation';
 import { NFTConfirmation } from './NFTConfirmation';
@@ -88,7 +88,7 @@ export const ReservationDashboard = () => {
 
     return (
         <Box> 
-{rental.rentalStatus}
+
           { (isRentalAvailable || (isRenter || isRentalOwner) ) && (<> 
                     {rental && (
                             <>
@@ -99,9 +99,9 @@ export const ReservationDashboard = () => {
                             <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_REQUESTED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider</Tab>
                             <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ACCEPTED_NFT_SENT)}>Confirmer NFT</Tab>
                             <Tab isDisabled={!isTabActive(RentalStatus.VALIDATE_RECEIPT_PAYMENT)}>Location</Tab>
-                            <Tab isDisabled={!isTabActive(RentalStatus.COMPLETED_USER)}>Restituer</Tab>
-                            <Tab isDisabled={!isTabActive(RentalStatus.RETURN_ACCEPTED_BY_OWNER)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider retour</Tab>
-                            <Tab isDisabled={!isTabActive(RentalStatus.DISPUTE) }> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" />Litige</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.COMPLETED_USER)}><Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider retour</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.RETURN_ACCEPTED_BY_OWNER)}>Fin location</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.DISPUTE) }> <Icon as={FaAward} w={5} h={5} color="white.500" mr="1rem" />Litige</Tab>
                             <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ENDED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" />Relouer</Tab>
                             
                         </TabList>

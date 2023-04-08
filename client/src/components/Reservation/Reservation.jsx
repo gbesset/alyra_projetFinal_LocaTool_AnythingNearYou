@@ -48,7 +48,7 @@ export const Reservation = ({rental, rentalOwner, updateStatus}) => {
                 const endTs = moment(endDate, "YYYY-MM-DD").unix();
 
                 contract.events.RentalRequested({ filter: { renter: accounts[0] } })
-                .on('data', () => {
+                .once('data', () => {
                       toastInfo("Votre demande a été effectuée");
                       setTimeout(()=>{
                         updateStatus()
@@ -118,9 +118,9 @@ export const Reservation = ({rental, rentalOwner, updateStatus}) => {
                                 </CardHeader>
                                 <CardBody>
                                 <HStack>
-                                    <Box mr="3rem">Durée :  {duration} jours.</Box>
-                                    <Box mr="3rem">Couts: {price} euros.</Box>
-                                    <Box>Caution: {rental.caution} euros.</Box>
+                                    <Box mr="1rem">Durée :  {duration} jours.</Box>
+                                    <Box mr="1rem">Couts: {price} euros.</Box>
+                                    <Box >Caution: {rental.caution} euros.</Box>
 
                                 </HStack>
                                 </CardBody>
@@ -146,7 +146,7 @@ export const Reservation = ({rental, rentalOwner, updateStatus}) => {
             {rentalOwner &&  <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> }
              Réservations</Heading>
             
-            <Box mt="2rem">Ps de location en cours.....</Box>
+            <Box mt="2rem">Pas de location en cours.....</Box>
             </>
             )}
         </>

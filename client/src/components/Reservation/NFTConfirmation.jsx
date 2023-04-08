@@ -3,13 +3,20 @@ import { RentalDetails } from './RentalDetails';
 import { Heading, Box, Text, Center, Icon, Button,  Card, CardHeader, CardBody, VStack, HStack } from '@chakra-ui/react';
 import { useEth } from '../../contexts/EthContext';
 import { toastError, toastInfo} from '../../utils/utils'
-import { FaCheckCircle, FaUserShield } from 'react-icons/fa';
+import {FaClock, FaCheckCircle, FaUserShield } from 'react-icons/fa';
+import moment from 'moment';
 
 export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
     const { state: { contract, accounts, web3, isOwner, artifactCollection} } = useEth();
 
     const [renterAddress, setRenterAddress] = useState(false);
-    
+    const [NFTExpires, setNFTExpires] = useState(false);
+
+    const formatDate = (ts) =>{
+        const dt = moment.unix(ts);
+        return dt.format('DD/MM/YYYY, hh:mm:ss');
+    }
+
     const handleCheckNFT = async () => {
        try{
             const contractCollection = new web3.eth.Contract(artifactCollection.abi, rental.collection.collection);            
@@ -20,6 +27,8 @@ export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
                 const rAdress = await contractCollection.methods.userOf(parseInt(rental.tokenID)).call({from:accounts[0]});
                 setRenterAddress(rAdress);
 
+                const expires = await contractCollection.methods.userExpires(parseInt(rental.tokenID)).call({from:accounts[0]});
+                setNFTExpires(formatDate(expires));
             }
         }catch(error){
             console.log(error)
@@ -32,7 +41,7 @@ export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
     
         try{       
             contract.events.RentalNFTToolDelegated({ filter: { renter: accounts[0] } })
-            .on('data', () => {
+            .once('data', () => {
                     toastInfo("Votre Validation a été effectuée");
                     setTimeout(()=>{
                         updateStatus()
@@ -106,7 +115,10 @@ export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
                                     <Text>Les adresses ne correspondent pas!</Text>
                                 )}
                                 </Box>
-
+                                <HStack>
+                                    <Icon as={FaClock} w={8} h={8} color="purple.500"  />
+                                    <Text>Fin de la délégation : {NFTExpires}</Text>
+                              </HStack>
                             </VStack>
                         </CardBody>
                     </Card>
