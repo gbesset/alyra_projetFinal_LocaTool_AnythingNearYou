@@ -12,6 +12,7 @@ import { RetourValidation } from './RetourValidation';
 import { ConfirmRetourValidation } from './ConfirmRetourValidation';
 
 import { RentalStatus, toastError } from '../../utils/Enum';
+import { ReRent } from './ReRent';
 
 export const ReservationDashboard = () => {
     const { state: { contract, accounts} } = useEth();
@@ -40,7 +41,27 @@ export const ReservationDashboard = () => {
     async function handleStatusChange(){
         console.log("declenchement")
         //setRefreshStatus(refreshStatus+1)
-        setRentalStatus(rental.rentalStatus+1) 
+        //setRentalStatus(rental.rentalStatus+1) 
+    }
+
+    const setTabIndexFromRental= (status) => {
+        if(status==RentalStatus.AVAILABLE)
+            setTabIndex(0);
+        else if(status==RentalStatus.RENTAL_REQUESTED)
+            setTabIndex(1);
+        else if(status==RentalStatus.RENTAL_ACCEPTED_NFT_SENT)
+            setTabIndex(2);
+        else if(status==RentalStatus.VALIDATE_RECEIPT_PAYMENT)
+            setTabIndex(3);
+        else if(status==RentalStatus.COMPLETED_USER)
+            setTabIndex(4);
+        else if(status==RentalStatus.RETURN_ACCEPTED_BY_OWNER)
+            setTabIndex(5);
+        else if(status==RentalStatus.DISPUTE || status==RentalStatus.DISPUTE_SOLVED )
+            setTabIndex(6);
+        else if(status==RentalStatus.RENTAL_ENDED)
+            setTabIndex(6);
+
     }
 
     const retrieveRental = async () => {
@@ -68,7 +89,7 @@ export const ReservationDashboard = () => {
       useEffect( () =>{    
         console.log("je met a jour")
         retrieveRental();
-        setTabIndex(parseInt(rentalStatus));
+        setTabIndexFromRental(parseInt(rentalStatus))
 
     }, [accounts, contract, rentalStatus]);
 
@@ -84,9 +105,10 @@ export const ReservationDashboard = () => {
                             <Tab isDisabled={!isTabActive(RentalStatus.AVAILABLE)} className="text-white">Réserver</Tab>
                             <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_REQUESTED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider</Tab>
                             <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ACCEPTED_NFT_SENT)}>Confirmer NFT</Tab>
-                            <Tab isDisabled={!isTabActive(RentalStatus.COMPLETED_USER)}>Location</Tab>
-                            <Tab isDisabled={!isTabActive(RentalStatus.VALIDATE_RECEIPT_PAYMENT)}>Restituer</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.VALIDATE_RECEIPT_PAYMENT)}>Location</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.COMPLETED_USER)}>Restituer</Tab>
                             <Tab isDisabled={!isTabActive(RentalStatus.RETURN_ACCEPTED_BY_OWNER)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Valider retour</Tab>
+                            <Tab isDisabled={!isTabActive(RentalStatus.RENTAL_ENDED)}> <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> Relouer</Tab>
                         </TabList>
                         <TabPanels>
                             <TabPanel>
@@ -106,6 +128,9 @@ export const ReservationDashboard = () => {
                             </TabPanel>
                             <TabPanel>
                                 <ConfirmRetourValidation rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
+                            </TabPanel>
+                            <TabPanel>
+                                <ReRent rental={rental} rentalOwner={isRentalOwner} updateStatus={handleStatusChange} />
                             </TabPanel>
                         </TabPanels>
                         </Tabs>

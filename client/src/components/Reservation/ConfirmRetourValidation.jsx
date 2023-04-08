@@ -17,7 +17,9 @@ export const ConfirmRetourValidation = ({rental, rentalOwner, updateStatus}) => 
                 contract.events.RentalEnded({ filter: { renter: accounts[0] } })
                 .on('data', () => {
                     toastInfo("Votre demande a été prise en compte");
-                    updateStatus()
+                    setTimeout(()=>{
+                        updateStatus()
+                    },2000)
                 });
 
 
