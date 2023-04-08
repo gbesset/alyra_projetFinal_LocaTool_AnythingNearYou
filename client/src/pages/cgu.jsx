@@ -1,6 +1,5 @@
 import React from 'react';
 import { Text, Box, Heading} from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
 
 export const CGU = () => {
     return (

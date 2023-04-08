@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useEth } from '../../contexts/EthContext';
-import { Heading, Box,  Flex, Text, Button } from '@chakra-ui/react';
+import { Heading, Box } from '@chakra-ui/react';
 import { Authent } from '../../components/Authent/Authent';
 import { OwnerDashboard } from '../../components/OwnerDashboard';
 import { OwnerCollectionForm } from '../../components/OwnerCollectionForm/OwnerCollectionForm';
@@ -12,7 +12,7 @@ export const Owner = () => {
     const refreshStatus = async () => {
         try{
    
-            let test = await contract.methods.isAddressOwner(accounts[0]).call({ from: accounts[0] });
+           await contract.methods.isAddressOwner(accounts[0]).call({ from: accounts[0] });
         }
         catch(error){
             console.log(error)

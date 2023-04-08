@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useEth } from '../../contexts/EthContext';
 import { Heading, Box, Flex, Image, Text } from '@chakra-ui/react';
 
