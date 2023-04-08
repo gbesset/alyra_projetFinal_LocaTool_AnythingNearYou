@@ -13,7 +13,7 @@ export const ReservationConfirmation = ({rental, rentalOwner, updateStatus}) => 
         try{
             if(isDelegate){
                 contract.events.RentalAccepted({ filter: { renter: accounts[0] } })
-                .on('data', () => {
+                .once('data', () => {
                     toastInfo("Votre Validation a été effectuée");
                     setTimeout(()=>{
                         updateStatus()
@@ -42,7 +42,7 @@ export const ReservationConfirmation = ({rental, rentalOwner, updateStatus}) => 
                 console.log("delegate")
 
                 contractCollection.events.UpdateDelegation({ filter: { renter: accounts[0] } })
-                .on('data', () => {
+                .once('data', () => {
                     toastInfo("Le transfert du NFT a été effecuté");
                     setIsDelegate(true);
                 });
