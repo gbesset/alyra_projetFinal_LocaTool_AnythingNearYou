@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box, Heading, Text, Button } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { SimpleGrid} from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
 import { RentalItem } from './RentalItem';
 
 export const RentalList= ({rentals}) => {

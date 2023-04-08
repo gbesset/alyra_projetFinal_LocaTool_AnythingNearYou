@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { RentalDetails } from './RentalDetails';
-import { Heading, Box, Text, Icon, Center, Input,Button, HStack, FormControl, Card, CardHeader, CardBody, VStack } from '@chakra-ui/react';
+import { Heading, Box, Text, Icon, Center, Button,  VStack } from '@chakra-ui/react';
 import { useEth } from '../../contexts/EthContext';
 import { toastError, toastInfo} from '../../utils/utils'
-import { FaCheckCircle, FaUserShield } from 'react-icons/fa';
+import {  FaUserShield } from 'react-icons/fa';
 
 export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
-    const { state: { contract, accounts, web3, isOwner, artifactCollection} } = useEth();
+    const { state: { contract, accounts} } = useEth();
 
     
     const handleConfirmRetour = async () =>{

@@ -1,10 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect} from 'react';
 import { RentalDetails } from './RentalDetails';
-import { Heading, Box, Text, Icon, Center, Input,Button, HStack, FormControl, Card, CardHeader, CardBody, VStack } from '@chakra-ui/react';
+import { Heading, Box, Text, Icon, Center, Button, VStack } from '@chakra-ui/react';
 import { useEth } from '../../contexts/EthContext';
 import { toastError, toastInfo} from '../../utils/utils'
-import { FaCheckCircle, FaUserShield } from 'react-icons/fa';
-import { RentalStatus } from '../../utils/Enum';
+import {  FaUserShield } from 'react-icons/fa';
 
 
 export const ReRent = ({rental, rentalOwner, updateStatus}) => {
