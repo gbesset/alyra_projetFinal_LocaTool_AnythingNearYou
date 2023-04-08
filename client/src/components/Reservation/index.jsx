@@ -41,23 +41,12 @@ export const ReservationDashboard = () => {
     async function handleStatusChange(){
         console.log("declenchement")
         //setRefreshStatus(refreshStatus+1)
-        //setRentalStatus(rental.rentalStatus+1) 
+        setRentalStatus(rental.rentalStatus+1) 
     }
 
     const setTabIndexFromRental= (status) => {
-        if(status==RentalStatus.AVAILABLE)
-            setTabIndex(0);
-        else if(status==RentalStatus.RENTAL_REQUESTED)
-            setTabIndex(1);
-        else if(status==RentalStatus.RENTAL_ACCEPTED_NFT_SENT)
-            setTabIndex(2);
-        else if(status==RentalStatus.VALIDATE_RECEIPT_PAYMENT)
-            setTabIndex(3);
-        else if(status==RentalStatus.COMPLETED_USER)
-            setTabIndex(4);
-        else if(status==RentalStatus.RETURN_ACCEPTED_BY_OWNER)
-            setTabIndex(5);
-        else if(status==RentalStatus.DISPUTE || status==RentalStatus.DISPUTE_SOLVED )
+        setTabIndex(status);
+        if(status==RentalStatus.DISPUTE || status==RentalStatus.DISPUTE_SOLVED )
             setTabIndex(6);
         else if(status==RentalStatus.RENTAL_ENDED)
             setTabIndex(6);
