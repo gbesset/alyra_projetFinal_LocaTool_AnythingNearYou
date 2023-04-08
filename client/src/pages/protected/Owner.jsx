@@ -45,7 +45,7 @@ export const Owner = () => {
         <Box>
             {accounts ? (
                 <>
-                    <Heading as="h1">Bienvenue sur votre page de propriétaire</Heading>
+                    <Heading as="h1">Bienvenue sur votre page de Loueur</Heading>
                     <Box p="4">
                         {isOwner ? <OwnerDashboard /> : <OwnerCollectionForm /> }
                        

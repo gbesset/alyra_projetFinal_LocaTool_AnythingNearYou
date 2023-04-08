@@ -34,7 +34,9 @@ export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
             contract.events.RentalNFTToolDelegated({ filter: { renter: accounts[0] } })
             .on('data', () => {
                     toastInfo("Votre Validation a été effectuée");
-                    updateStatus()
+                    setTimeout(()=>{
+                        updateStatus()
+                    },2000)
                 });
 
 
@@ -60,7 +62,7 @@ export const NFTConfirmation = ({rental, rentalOwner, updateStatus}) => {
                     <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> 
                     En attente de confirmation
                 </Heading>
-                <Text mt="2rem">Votre demande a été envoyée, il faut attendre la validation du locataire</Text>
+                <Text mt="2rem">Votre demande a été envoyée, il faut attendre que le locataire valide la reception du NFT avant de lui donner l'objet</Text>
                 
             </Box>
 

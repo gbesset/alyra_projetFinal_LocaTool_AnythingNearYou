@@ -15,7 +15,9 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
                 contract.events.RentalCompletedByRenter({ filter: { renter: accounts[0] } })
                 .on('data', () => {
                     toastInfo("Votre Validation a été prise en compte (Acceptation)");
-                    updateStatus()
+                    setTimeout(()=>{
+                        updateStatus()
+                    },2000)
                 });
 
 
@@ -58,7 +60,7 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
         { !rentalOwner && (<>
             <Box mt="2rem">
                 <Heading as="h3" size="lg">En attente de confirmation</Heading>
-                <Text mt="2rem">Votre demande a été envoyée, il faut attendre la validation du propriétaire</Text>
+                <Text mt="2rem">La restitution a été effectuée et votre demande a été envoyée, il faut attendre la validation du loueur</Text>
                 
             </Box>
 
@@ -70,11 +72,11 @@ export const RetourValidation = ({rental, rentalOwner, updateStatus}) => {
             <VStack mt="1rem">
                     <Heading as="h3" size="lg">
                         {rentalOwner &&  <Icon as={FaUserShield} w={5} h={5} color="white.500" mr="1rem" /> }
-                        Valider la demande de location
+                        Confirmer le retour de location
                     </Heading>
                     <Box>
-                    <Text>La demande de location a a été effectuée. Les fonds (paiement et caution) sont sécurisés dans le contrat</Text>
-                    <Text>Vous pouvez accepter la demande de location. Pour cela, il faut déléguer votre NFT</Text>
+                    <Text>Le retour de l'objet a été effectuée. Les fonds (paiement et caution) seront libérés ou toujours bloqués dans le contrat en fonction du retour</Text>
+                    <Text>Si l'objet a été détérioré ete que vous n'êtes pas d'accords, il faudra déclencher un litige et faire examiner le problème par les membres de la DAO</Text>
 
                     </Box>
                     <Center>

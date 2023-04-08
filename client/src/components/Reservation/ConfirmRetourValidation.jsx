@@ -38,7 +38,9 @@ export const ConfirmRetourValidation = ({rental, rentalOwner, updateStatus}) => 
                 contract.events.RentalDisputelConfirmedByUser({ filter: { renter: accounts[0] } })
                 .on('data', () => {
                     toastInfo("Votre Validation a bien été prise en compte ");
-                    updateStatus()
+                    setTimeout(()=>{
+                        updateStatus()
+                    },2000)
                 });
 
 
@@ -81,8 +83,8 @@ export const ConfirmRetourValidation = ({rental, rentalOwner, updateStatus}) => 
                         Fin de la location
                     </Heading>
                     <Box>
-                    <Text>La demande de location a a été effectuée. Les fonds (paiement et caution) sont sécurisés dans le contrat</Text>
-                    <Text>Vous pouvez accepter la demande de location. Pour cela, il faut déléguer votre NFT</Text>
+                    <Text>La restitution a été acceptée. Les fonds (caution) sont libérés du contrat</Text>
+                    <Text>Vous pouvez procéder a sa récupération</Text>
 
                     </Box>
                     <Center>
