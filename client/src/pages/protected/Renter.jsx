@@ -25,7 +25,7 @@ export const Renter = () => {
             }
         }
       
-   
+        console.log(process.env.PINATA_URL)
         getWorkflowStatus();
     }, [accounts, contract, artifact]);
 
@@ -35,7 +35,7 @@ export const Renter = () => {
                 <> <Heading as="h1">Mes locations</Heading>
                   
                   <Text className="text-white" pl="3rem" pt="1rem">
-                   En constuction.... ${process.env.PINATA_URL}
+                   En construction....
                     </Text>
 
                   </>
