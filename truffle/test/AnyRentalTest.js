@@ -183,6 +183,34 @@ contract('AnyRental', accounts => {
             expect(addressColBefore).to.be.equal(collectionAddress);
         });
 
+        it("... check  getRentalsOwner", async () => {
+            let addresses = await anyRentalInstance.getRentalsOwner({ from: _owner1 });
+            expect(addresses.length).to.be.equal(0);
+
+            let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _owner1 });
+            expectEvent(tx, 'NFTCollectionCreated', { renter: _owner1, renterCollectionName:"Collection de test"  });
+            let collectionAddress = tx.logs[2].args.renterCollectionAddress;
+       
+            addresses = await anyRentalInstance.getRentalsOwner({ from: _owner1 });
+            expect(addresses[0]).to.be.equal(_owner1);
+            expect(addresses.length).to.be.equal(1);
+
+        });
+
+        it("... check  getRentalByRentalID", async () => {
+            let tx = await anyRentalInstance.createCollection("Collection de test", "CT",{ from: _owner1 });
+            expectEvent(tx, 'NFTCollectionCreated', { renter: _owner1, renterCollectionName:"Collection de test"  });
+            let collectionAddress = tx.logs[2].args.renterCollectionAddress;
+            
+            tx = await anyRentalInstance.addToolToCollection("https://www.example.com/tokenURI", 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
+            expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(1) });
+    
+
+            rental = await anyRentalInstance.getRentalByRentalID(0, { from: _owner1 });
+            expect(rental).not.to.be.empty;
+            expect(new BN(rental[0].tokenID)).to.be.equal(new BN(0));
+        });
+
 
 
 });
@@ -779,6 +807,34 @@ contract('AnyRental', accounts => {
                     "The rental is not available"
                 );
             });
+            it("... renter could not book a rental that does not exist", async () => {
+                await expectRevert(
+                    anyRentalInstance.sendPaiementForRental(_owner1, 4, end, start  ,{ from: _renter1 }),
+                    "Tool does not exist"
+                );
+            });
+            it("... renter could not book a rental with a bad start date", async () => {
+                await expectRevert(
+                    anyRentalInstance.sendPaiementForRental(_owner1, rental1, 0, end  ,{ from: _renter1 }),
+                    "begin must be a valid date"
+                );
+            });
+            it("... renter could not book a rental with a bad end date", async () => {
+                await expectRevert(
+                    anyRentalInstance.sendPaiementForRental(_owner1, rental1, start,0  ,{ from: _renter1 }),
+                    "end must be a valid date"
+                );
+            });
+            it("... renter could not book a rental with a bad status", async () => {
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+  
+
+                await expectRevert(
+                    anyRentalInstance.sendPaiementForRental(_owner1, rental1, start,end  ,{ from: _renter1 }),
+                    "The rental status is incorrect."
+                );
+            });
 
         });
         describe('-- owner shoud validate a NFT delegation to a renter (in order to validate the rental asking)', () => {
@@ -851,7 +907,32 @@ contract('AnyRental', accounts => {
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenImgURI).to.be.equal(tokenImgURI);
-            });            
+            });   
+            
+        });
+        it("... owner should validate the sending ot NFT - with wrong rental ID", async () => {
+            await expectRevert(
+                anyRentalInstance.validateNFTDelegationForRental(4, token1, { from: _owner1 }),
+                "Tool does not exist"
+            );
+        });
+        it("... owner should validate the sending ot NFT - a rental that does not exist", async () => {
+            await expectRevert(
+                anyRentalInstance.validateNFTDelegationForRental(rental1, 0, { from: _owner1 }),
+                "token ID must be valid"
+            );
+
+            it("... owner should validate the sending ot NFT in wrong status", async () => {
+                tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+
+
+                await expectRevert(
+                    anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 }),
+                    "The rental status is incorrect."
+                );
+            });
+    
             
         });
         describe('-- renter shoud validate a NFT reception (in order to validate the receipt of the tool in real life)', () => {
@@ -925,7 +1006,26 @@ contract('AnyRental', accounts => {
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenImgURI).to.be.equal(tokenImgURI);
-            });            
+            });      
+            
+            
+            it("...renter should not book a rental, sending paiement and caution - with wrong rental ID", async () => {
+                await expectRevert(
+                    anyRentalInstance.validateNFTandToolReception(_owner1, 4, { from: _renter1 }),
+                    "Tool does not exist"
+                );
+            });
+    
+            it("... renter should not book a rental, sending paiement and caution -  in wrong status", async () => {
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+
+
+                await expectRevert(
+                    anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 }),
+                    "The rental status is incorrect."
+                );
+            });
 
         });
         describe('-- [After time...] renter shoud give back the tool to end the rental', () => {
@@ -1005,6 +1105,24 @@ contract('AnyRental', accounts => {
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenImgURI).to.be.equal(tokenImgURI);
             });            
+
+            it("... renter shoud not give back the tool - with wrong rental ID", async () => {
+                await expectRevert(
+                    anyRentalInstance.giveBackToolAfterRental(_owner1, 4, { from: _renter1 }),
+                    "Tool does not exist"
+                );
+            });
+    
+            it("...  renter shoud  not give back the tool -  in wrong status", async () => {
+                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+
+
+                await expectRevert(
+                    anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 }),
+                    "The rental status is incorrect."
+                );
+            });
 
 
         });
@@ -1089,7 +1207,27 @@ contract('AnyRental', accounts => {
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenImgURI).to.be.equal(tokenImgURI);
-            });            
+            });          
+            
+            it("... owner shoud not validate the return of the tool and end the rental -  with wrong rental ID", async () => {
+                await expectRevert(
+                    anyRentalInstance.validateReturnToolAfterRental( 4, { from: _owner1 }),
+                    "Tool does not exist"
+                );
+            });
+    
+            it("...  owner shoud not validate the return of the tool and end the rental -   in wrong status", async () => {
+                tx = await anyRentalInstance.validateReturnToolAfterRental( rental1, { from: _owner1 });
+                expectEvent(tx, "RentalCompletedByRenter", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+
+
+
+                await expectRevert(
+                    anyRentalInstance.validateReturnToolAfterRental( rental1, { from: _owner1 }),
+                    "The rental status is incorrect."
+                );
+            });
+
 
         });
         describe('-- owner shoud refuse the return of the tool and create a dispute', () => {
@@ -1174,7 +1312,26 @@ contract('AnyRental', accounts => {
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenImgURI).to.be.equal(tokenImgURI);
-            });            
+            });     
+            
+            it("... renter shoud rnot efuse the return of the tool and create a dispute -  with wrong rental ID", async () => {
+                await expectRevert(
+                    anyRentalInstance.refuseReturnToolAfterRental( 4, msg, { from: _owner1 }),
+                    "Tool does not exist"
+                );
+            });
+    
+            it("...  renter shoud not refuse the return of the tool and create a dispute -   in wrong status", async () => {
+                tx = await anyRentalInstance.refuseReturnToolAfterRental( rental1, msg, { from: _owner1 });
+                expectEvent(tx, "RentalDisputeCreated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, dispute: msg, tokenId: new BN(token1) });
+
+                await expectRevert(
+                    anyRentalInstance.refuseReturnToolAfterRental( rental1, msg, { from: _owner1 }),
+                    "The rental status is incorrect."
+                );
+            });
+
+
         });
         describe('-- renter should confirm the dispute', () => {
             const disputeOwner = "Mon objet a été abimé";
@@ -1263,8 +1420,16 @@ contract('AnyRental', accounts => {
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenImgURI).to.be.equal(tokenImgURI);
-            });            
-        });
+            });     
+            
+            it("... renter shoud not refuse the return of the tool and create a dispute -  with wrong rental ID", async () => {
+                await expectRevert(
+                    anyRentalInstance.confirmDisputeAfterRental(_owner1, 4, disputeRenter, { from: _renter1 }),
+                    "Tool does not exist"
+                );
+            });
+    
+     });
         describe('-- renter shoud redeem its payment (caution or rental decline)', () => {
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
@@ -1350,7 +1515,139 @@ contract('AnyRental', accounts => {
                 expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
                 expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
                 expect(rentalRetuned.tokenImgURI).to.be.equal(tokenImgURI );
-            });        
+            });      
+            
+            it("... renter should not redeem its caution after the renter validation -  with wrong rental ID", async () => {
+                await expectRevert(
+                    anyRentalInstance.redeemPaymentForRental(_owner1, 4, { from: _renter1 }),
+                    "Tool does not exist"
+                );
+            });
+    
+            it("... renter should not redeem its caution after the renter validation -   in wrong status", async () => {
+                tx = await anyRentalInstance.redeemPaymentForRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalEnded", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+  
+                tx = await anyRentalInstance.rentAgainRental( rental1, { from: _owner1 });
+                expectEvent(tx, "RentalReAvailable", { renter: _owner1, user: "0x0000000000000000000000000000000000000000", tokenId: new BN(token1) });
+
+                await expectRevert(
+                     anyRentalInstance.redeemPaymentForRental(_owner1, rental1, { from: _renter1 }),
+                    "The rental status is incorrect."
+                );
+            });
+
+
+
+        });    
+        
+        describe('-- owner shoud re rent its tool', () => {
+            beforeEach(async function () {
+                anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
+                anyRentalInstance = await AnyRental.new(anyNFTFactoryInstance.address,{ from: _contractOwner });
+                await anyNFTFactoryInstance.transferOwnership(anyRentalInstance.address,{ from: _contractOwner });
+
+                let tx = await anyRentalInstance.createCollection("Collection de test", "CT", { from: _owner1 });
+                expectEvent(tx, 'NFTCollectionCreated', { renter: _owner1, renterCollectionName:"Collection de test"  });
+
+                collectionAddress = tx.logs[2].args.renterCollectionAddress;
+
+                // add first tool
+                tx = await anyRentalInstance.addToolToCollection(tokenURI, 12345, "Mon outil", "Une description de mon outil", { from: _owner1 });
+                expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token1) });
+                tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 11, 200, token1, { from: _owner1 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental1) });
+
+                 // add second tool
+                 tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner1 });
+                 expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner1,  tokenId: new BN(token2) });
+                 tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 20, 300, token2, { from: _owner1 });
+                 expectEvent(tx, "ToolAddedToRentals", { renter: _owner1,  rentalID: new BN(rental2) });
+
+
+                 let tx2 = await anyRentalInstance.createCollection("Collection de test for renter2", "CT2", { from: _owner2 });
+                 expectEvent(tx2, 'NFTCollectionCreated', { renter: _owner2, renterCollectionName:"Collection de test for renter2"  });
+                 
+                // add third tool to another one to increment toolID
+                tx = await anyRentalInstance.addToolToCollection(tokenURI, 345, "Velo", "roule bien", { from: _owner2 });
+                expectEvent(tx, "NFTToolAddedToCollection", { renter: _owner2,  tokenId: new BN(token1) });    //token 1 de la seconde collection
+                tx = await anyRentalInstance.addToolToRentals(tokenImgURI, 5, 40, token1, { from: _owner2 });
+                expectEvent(tx, "ToolAddedToRentals", { renter: _owner2,  rentalID: new BN(rental3) });
+
+                //  user 1 rent renter 1 object
+                tx = await anyRentalInstance.sendPaiementForRental(_owner1, rental1, start, end  ,{ from: _renter1 });
+                expectEvent(tx, "RentalRequested", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+     
+                //owner validate NFT delegation 
+                tx = await anyRentalInstance.validateNFTDelegationForRental(rental1, token1, { from: _owner1 });
+                expectEvent(tx, "RentalAccepted", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+    
+                // user validate the NFT reception and tool in real life
+                tx = await anyRentalInstance.validateNFTandToolReception(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalNFTToolDelegated", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+  
+                // user give back the tool
+                tx = await anyRentalInstance.giveBackToolAfterRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalCompletedByUser", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+  
+                //renter valiate the return
+                tx = await anyRentalInstance.validateReturnToolAfterRental( rental1, { from: _owner1 });
+                expectEvent(tx, "RentalCompletedByRenter", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+
+
+                tx = await anyRentalInstance.redeemPaymentForRental(_owner1, rental1, { from: _renter1 });
+                expectEvent(tx, "RentalEnded", { renter: _owner1, user: _renter1, renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+
+            });
+
+
+            it("... owner shoud re rent its tool  - emit RentalEnded", async () => {
+                tx = await anyRentalInstance.rentAgainRental( rental1, { from: _owner1 });
+                expectEvent(tx, "RentalReAvailable", { renter: _owner1, user: "0x0000000000000000000000000000000000000000", tokenId: new BN(token1) });
+            });
+
+            it("... owner shoud re rent its tool - check Rental stored params", async () => {
+
+                tx = await anyRentalInstance.rentAgainRental( rental1, { from: _owner1 });
+               
+                const rentalRetuned = await anyRentalInstance.getRentalByOwnerAddressAndRentalID(_owner1, rental1);
+                expect(new BN(rentalRetuned.rentalID)).to.be.bignumber.equal(new BN(rental1));
+                expect(new BN( rentalRetuned.dayPrice)).to.be.bignumber.equal(new BN(11));
+                expect(new BN(rentalRetuned.caution)).to.be.bignumber.equal(new BN(200));
+                expect(new BN(rentalRetuned.start)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalRetuned.end)).to.be.bignumber.equal(new BN(0));
+                expect(new BN(rentalRetuned.rentalStatus)).to.be.bignumber.equal(new BN(RentalStatus.AVAILABLE));
+                expect(rentalRetuned.rentalData.isCautionDeposed).to.be.false;
+                expect(rentalRetuned.rentalData.isNFTDelegated).to.be.false;
+                expect(rentalRetuned.rentalData.isToolReturned).to.be.false;
+                expect(rentalRetuned.rentalData.isReturnValidated).to.be.false;
+                expect(rentalRetuned.rentalData.isDisputeConfirmed).to.be.false;
+                expect(rentalRetuned.rentalData.isRedeemed).to.be.false;
+                expect(rentalRetuned.renter).to.be.equal("0x0000000000000000000000000000000000000000");
+                expect(rentalRetuned.collection.collection).to.be.equal(collectionAddress);
+                expect((rentalRetuned.collection.owner)).to.be.equal(_owner1);
+                expect(new BN(rentalRetuned.tokenID)).to.be.bignumber.equal(new BN(token1));
+                expect(rentalRetuned.tokenImgURI).to.be.equal(tokenImgURI );
+            });      
+            
+            it("... owner shoud not re rent its tool -  with wrong rental ID", async () => {
+                await expectRevert(
+                    anyRentalInstance.rentAgainRental( 4, { from: _owner1 }),
+                    "Tool does not exist"
+                );
+            });
+    
+            it("... owner shoud not re rent its tool -   in wrong status", async () => {
+                tx = await anyRentalInstance.rentAgainRental( rental1, { from: _owner1 });
+                expectEvent(tx, "RentalReAvailable", { renter: _owner1, user: "0x0000000000000000000000000000000000000000", renterCollectionAddress: collectionAddress, tokenId: new BN(token1) });
+
+                await expectRevert(
+                    anyRentalInstance.rentAgainRental( rental1, { from: _owner1 }),
+                    "The rental status is incorrect."
+                );
+            });
+
+
 
         });           
     });
