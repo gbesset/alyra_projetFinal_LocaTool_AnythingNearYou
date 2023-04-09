@@ -29,7 +29,13 @@
 ![Résumé](./Documentation/Ressources/TUs/tu_3.png)
 
 ## PR et CI
-Utilisation de github actions pour déclencher les TUs a chaque PR
+Utilisation de github actions pour déclencher les TUs a chaque PR.
+
+Puis deploiiuement auto sur Vercel
+
+![Branches & PR](./Documentation/Ressources/CI-CD/mergePR.png)
+![github action](./Documentation/Ressources/CI-CD/githubActions.png)
+
 
 ## Developpeur - (Plus tard)
 Problème de deploiement sur Vercel (les clées de .env ne sont pas prises en compte)
