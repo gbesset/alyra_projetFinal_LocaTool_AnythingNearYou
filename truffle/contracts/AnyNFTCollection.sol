@@ -7,6 +7,13 @@ import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "./Utils.sol";
 
+
+/**
+ * @title NFT Collection
+ * @author https://github.com/gbesset
+ * @notice contract to generate NFTs collection, mint, burn and delegate
+ * @dev Implements NFT Collection  generation / burn / delegation
+ */
 contract AnyNFTCollection is ERC4907, IAnyNFTCollection, Ownable{
 
     using Counters for Counters.Counter;
@@ -120,7 +127,6 @@ function setFactoryAddress(address _factoryAuthorized) external onlyOwner{
 
         tools.push(_tool);
 
-
         _mint(owner(), newToolId);
         _setTokenURI(newToolId, _tokenURI);
 
@@ -156,7 +162,7 @@ function setFactoryAddress(address _factoryAuthorized) external onlyOwner{
 
         setUser(_tokenId, _to, _expires);
         emit UpdateDelegation(_tokenId, _to, _expires);
-}
+    }
     
 }
 

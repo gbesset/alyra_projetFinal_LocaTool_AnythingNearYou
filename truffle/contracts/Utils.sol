@@ -1,15 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.19;
 
+
+/**
+ * @title Some Utils functions / Enum
+ * @author https://github.com/gbesset
+ * @dev some utils functions
+ */
 library Utils {
 
     struct Tool {
         uint tokenID;
         uint serialID;
+        bool isAvailable;
         string title;
         string description;
         string tokenURI;
-        bool isAvailable; //???
     }
 
     /**
