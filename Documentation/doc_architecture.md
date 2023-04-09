@@ -6,6 +6,11 @@
 ## Contrats
 ![contrats](./Ressources/Architecture/contrats.png)
 
+
+## Dapp
+![contrats](./Ressources/Architecture/Architecture_dapp.png)
+
+
 ## Deploiement
 ### Deploiement
 ![deploiement](./Ressources/Permissions/permissions_1.png)
