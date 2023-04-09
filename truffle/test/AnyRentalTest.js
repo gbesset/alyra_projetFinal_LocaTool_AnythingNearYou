@@ -208,7 +208,7 @@ contract('AnyRental', accounts => {
 
             rental = await anyRentalInstance.getRentalByRentalID(0, { from: _owner1 });
             expect(rental).not.to.be.empty;
-            expect(new BN(rental[0].tokenID)).to.be.equal(new BN(0));
+            expect(new BN(rental[0].tokenID)).to.be.bignumber.equal(new BN(0));
         });
 
 
