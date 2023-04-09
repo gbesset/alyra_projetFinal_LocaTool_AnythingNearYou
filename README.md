@@ -5,8 +5,7 @@
 - Vidéos sur loom
    - [Vidéo on loom](https://www.loom.com/share/9e3c7bf988dd4f5581c19c91ea03853f) ou [video youtube](https://youtu.be/nDM1WIbrohE)
    - [Vidéo on loom](https://www.loom.com/share/a905b4aa12a444c0a5e639c25ccc756d) ou [video youtube](https://youtu.be/pN-cQsTc1fo)
-
-
+- [Slides de presentation](https://any-presentation.vercel.app/)
 
 
 ## Documentation
