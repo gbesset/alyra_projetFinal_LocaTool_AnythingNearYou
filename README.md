@@ -23,6 +23,22 @@
 - Gradients effectués avec [mesher](https://csshero.org/mesher/)
 - Présentation effectuée avec [reveal.js](https://revealjs.com/)
 
+## Tests et couverture de code
+![Partie 1](./Documentation/Ressources/TUs/tu_1.png)
+![Partie 2](./Documentation/Ressources/TUs/tu_2.png)
+![Résumé](./Documentation/Ressources/TUs/tu_3.png)
+
+## Gas reporter
+![Gas reporter](./Documentation/Ressources/TUs/gas-reporter.png)
+
+## PR et CI
+Utilisation de github actions pour déclencher les TUs a chaque PR.
+
+Puis deploiement auto sur Vercel
+
+![Branches & PR](./Documentation/Ressources/CI-CD/mergePR.png)
+![github action](./Documentation/Ressources/CI-CD/githubActions.png)
+
 
 ## Developpeur - (Plus tard)
 Problème de deploiement sur Vercel (les clées de .env ne sont pas prises en compte)
