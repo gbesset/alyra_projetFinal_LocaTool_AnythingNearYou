@@ -5,6 +5,7 @@ import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721UR
 import "./IERC4907.sol";
 
 /// @author https://github.com/gbesset based on EIP-4907 https://eips.ethereum.org/EIPS/eip-4907
+/// ER4907 implementation.
 contract ERC4907 is ERC721URIStorage, IERC4907 {
 
   struct UserInfo 

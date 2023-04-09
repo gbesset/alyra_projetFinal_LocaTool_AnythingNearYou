@@ -41,17 +41,17 @@ interface IAnyRental {
 
     struct Rental {
         uint256 rentalID;
-        string title;
-        string description;
         uint64 dayPrice;
         uint64 caution;
         uint64 start;
         uint64 end;
+        uint tokenID;
+        address renter;
         RentalStatus rentalStatus;
         RentalData rentalData;
-        address renter;
         CollectionNFT collection;
-        uint tokenID;
+        string title;
+        string description;
         string tokenImgURI; 
     }
 
@@ -62,43 +62,41 @@ interface IAnyRental {
      **************************************************** */
 
     /**
-     * @dev Emitted when a renter create its NFT Collection.
-     * give RenterAddress, CollectionName, CollectionAddress, timestamp
+     * @dev Emitted when a owner create its NFT Collection.
+     * give OwnerAddress, CollectionName, CollectionAddress, timestamp
      */
     event NFTCollectionCreated(address renter, string renterCollectionName, address renterCollectionAddress,  uint timestamp);
     /**
-     * @dev Emitted when a renter delete its NFT Collection.
-     * give RenterAddress, CollectionName, CollectionAddress, timestamp
+     * @dev Emitted when a owner delete its NFT Collection.
+     * give OwnerAddress, CollectionName, CollectionAddress, timestamp
      */
     event NFTCollectionDeleted(address renter,  address renterCollectionAddress,  uint timestamp);
     
     /**
-     * @dev Emitted when a renter add a tool to its NFT Collection.
+     * @dev Emitted when a owner add a tool to its NFT Collection.
      */
     event NFTToolAddedToCollection(address renter, address renterCollectionAddress, uint tokenId, uint timestamp);
        /**
-     * @dev Emitted when a renter add a tool to its NFT Collection.
+     * @dev Emitted when a owner add a tool to its NFT Collection.
      */
     event ToolAddedToRentals(address renter, uint rentalID, uint tokenID, string title, string description, string tokenImgURI, uint dayPrice, uint caution, uint timestamp);
     
     /**
-     * @dev Emitted when a renter delete a tool into its NFT Collection.
+     * @dev Emitted when a owner delete a tool into its NFT Collection.
      */
     event ToolDeletedFromRentals(address renter, uint toolID, uint timestamp);
     /**
-     * @dev Emitted when a renter aduptate a tool to its NFT Collection.
+     * @dev Emitted when a owner aduptate a tool to its NFT Collection.
      */
     event ToolUpdatedFromRentals(address renter, uint toolID, uint timestamp);
 
 
-
-
     /**
-     * @dev Emitted when a renter update a tool into its NFT Collection.
+     * @dev Emitted when a owner update a tool into its NFT Collection.
      */
 //    event NFTToolUpdatedIntoCollection(address renter, address renterCollectionAddress, uint tokenId, uint timestamp);
     /**
-     * @dev Emitted when a renter delete a tool into its NFT Collection.
+     * @dev Emitted when a owner delete a tool into its NFT Collection.
      */
 //    event NFTToolDeletedFromCollection(address renter, address renterCollectionAddress, uint tokenId, uint timestamp);
     
@@ -106,46 +104,46 @@ interface IAnyRental {
 
 
     /**
-     * @dev Emitted when a user ask to rent a tool from a collection
+     * @dev Emitted when a renter ask to rent a tool from a collection
      */
     event RentalRequested(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
     
     /**
-     * @dev Emitted when a renter accept to rent its tool
+     * @dev Emitted when a owner accept to rent its tool
      */
      event RentalAccepted(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
      /**
-     * @dev Emitted when a renter doesn't accept to rent its tool
+     * @dev Emitted when a owner doesn't accept to rent its tool
      */
      event RentalRejected(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
    
-       /* @dev Emitted when a user pay for the tental
+       /* @dev Emitted when a renter pay for the rental
      */
      event RentalNFTToolDelegated(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
      /**
-     * @dev Emitted when a user give back the tool
+     * @dev Emitted when a renter give back the tool
      */
      event RentalCompletedByUser(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
     /**
-     * @dev Emitted when a renter accept thereturn of the tool
+     * @dev Emitted when a owner accept thereturn of the tool
      */
      event RentalCompletedByRenter(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
     /**
-     * @dev Emitted when a renter doensn't accept the return of the tool
+     * @dev Emitted when a owner doensn't accept the return of the tool
      */
      event RentalDisputeCreated(address renter, address user, address renterCollectionAddress, uint tokenId, string dispute, uint timestamp);
  /**
-     * @dev Emitted when a renter doensn't accept the return of the tool
+     * @dev Emitted when a owner doensn't accept the return of the tool
      */
      event RentalDisputelConfirmedByUser(address renter, address user, address renterCollectionAddress, uint tokenId, string dispute, uint timestamp);
 
     /**
-     * @dev Emitted when a renter doensn't accept the return of the tool
+     * @dev Emitted when a owner doensn't accept the return of the tool
      */
      event RentalDisputeSolved(address renter, address user, address renterCollectionAddress, uint tokenId, string disputeSolution, uint timestamp);
 
     /**
-     * @dev Emitted when a renter redeem its causion and end the rental of the tool
+     * @dev Emitted when a owner redeem its causion and end the rental of the tool
      */
      event RentalEnded(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
     /**
@@ -154,7 +152,7 @@ interface IAnyRental {
     event RentalExtended(address renter, address user, address renterCollectionAddress, uint tokenId, uint duration ,uint timestamp);
     
     /**
-     * @dev Emitted when a renter accept thereturn of the tool
+     * @dev Emitted when a owner accept thereturn of the tool
      */
      event RentalReAvailable(address renter, address user, address renterCollectionAddress, uint tokenId, uint timestamp);
 
@@ -167,13 +165,10 @@ interface IAnyRental {
     function isAddressOwner(address _renter) external view returns(bool);
     function isAddressRenter(address _renter) external view returns(bool);
 
-     //  getUserRentals
-    // getUserRentalById  ?
-
     
      /** 
      * @notice return the NFT Tools from a owner address
-     * @dev get collection from renter Address
+     * @dev get collection from owner Address
      * @return Tool[]  (NFT attributes)
      */
      function getToolsCollection(address _owner) external returns(Utils.Tool[] memory);
@@ -200,14 +195,11 @@ interface IAnyRental {
      */
      function getRentalByOwnerAddressAndRentalID(address _owner, uint _rentalId) external view returns(Rental memory);
   
-    // getUserToolById     ?
-    // getToolRental        // pour un tool, renter, user, duree caution, etc
 
     /** ****************************************************
      *  functions   NFT Management
      **************************************************** */
    
-
      /**
      * @dev Create a new NFT collection
      */
@@ -215,12 +207,13 @@ interface IAnyRental {
     function deleteCollection() external; 
     
     /**
-     * @dev delegate the NFT to a user . onlyRenter
+     * @dev delegate the NFT to a user . onlyowner
+     * @dev use collection access
      */
-    function delegateNFT(uint _tokenId, address _to, uint64 _expires) external;  
+   //function delegateNFT(uint _tokenId, address _to, uint64 _expires) external;  
 
   /**
-     * @dev add a tool to collection . onlyRenter
+     * @dev add a tool to collection . onlyOwner
      */
      //function addToolToCollection(Utils.Tool memory, string memory _tokenURI) external returns(uint tokenId);    
      function addToolToCollection(string calldata _tokenURI, uint _serialId, string memory _title, string memory _description )external returns(uint tokenId);    
@@ -230,17 +223,17 @@ interface IAnyRental {
      **************************************************** */
 
     /**
-     * @dev add a tool to collection . onlyRenter
+     * @dev add a tool to collection . onlyOwner
      */
      function addToolToRentals(string calldata _tokenImgURI, uint64 _dayPrice, uint64 _caution, uint _tokenID) external;
   
      /**
-     * @dev update a tool into collection . onlyRenter
+     * @dev update a tool into collection . onlyOwner
      */
      function updateToolIntoRentals(uint _rentalID, uint64 _dayPrice,  uint64 _caution) external;
   
       /**
-     * @dev delete a tool into collection . onlyRenter
+     * @dev delete a tool into collection . onlyOwner
      */
      function deleteToolIntoRentals(uint _rentalID) external;    
 
@@ -258,16 +251,16 @@ interface IAnyRental {
      function sendPaiementForRental(address _renter, uint _rentalID, uint64 _begin, uint64 _end)  external;   
 
   /**
-     * @notice renter refuse the rental
+     * @notice owner refuse the rental
      * - the caution and location is still secured
-     * @dev renter refuse to rent its tool
+     * @dev owner refuse to rent its tool
      */
      //function refuseRental(uint _rentalID, uint _tokenID, string message) external;   
 
    /**
-     * @notice renter delegate the NFT in order to validate the rental asking
+     * @notice owner delegate the NFT in order to validate the rental asking
      * - the caution and location is still secured
-     * @dev renter validate the delagation of the NFT
+     * @dev owner validate the delagation of the NFT
      */
      function validateNFTDelegationForRental(uint _rentalID, uint _tokenID) external;   
 
@@ -287,16 +280,16 @@ interface IAnyRental {
      function giveBackToolAfterRental(address _renter, uint _rentalID) external;  
      
     /**
-     * @notice renter validate the return of the tool
+     * @notice owner validate the return of the tool
      * - the caution is given back
-     * @dev renter validae the return of the tool
+     * @dev owner validae the return of the tool
      */
      function validateReturnToolAfterRental(uint _rentalID) external;  
 
     /**
-     * @notice renter doens't validate the return of the tool. Problem. dispute creation
+     * @notice owner doens't validate the return of the tool. Problem. dispute creation
      * - the caution still secured
-     * @dev renter doesn't validate the return of the tool, because of a problem
+     * @dev owner doesn't validate the return of the tool, because of a problem
      */
      function refuseReturnToolAfterRental(uint _rentalID, string memory message) external;  
 
@@ -315,7 +308,7 @@ interface IAnyRental {
      function redeemPaymentForRental(address _renter, uint _rentalID) external;  
 
     /**
-     * @notice owner re rent its Rentak
+     * @notice owner re rent its Rental
      * - all fields a re reinit
      * @dev owner re rentRental
      */

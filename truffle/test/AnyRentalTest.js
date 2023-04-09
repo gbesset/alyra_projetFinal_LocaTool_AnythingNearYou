@@ -1,8 +1,6 @@
 const AnyRental = artifacts.require('./AnyRental.sol');
-//const {IAnyRental} = artifacts.require('./IAnyRental.sol');
 const AnyNFTCollectionFactory = artifacts.require('./AnyNFTCollectionFactory.sol')
 const AnyNFTCollection = artifacts.require('./AnyNFTCollection.sol');
-//const AnyNFTCollectionJSon = require('../../client/src/contracts/AnyNFTCollection.json');
 const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 
@@ -57,6 +55,7 @@ contract('AnyRental', accounts => {
         
     }
 
+    
     /**
      * Smart contract Deploiement
      */
@@ -364,7 +363,7 @@ contract('AnyRental', accounts => {
             });     
         });
 
-        describe('-- delegate NFT to a user', () => {
+        describe.skip('-- delegate NFT to a user', () => {
             let collectionAddress;
             beforeEach(async function () {
                 anyNFTFactoryInstance = await AnyNFTCollectionFactory.new({from: _contractOwner});
