@@ -28,6 +28,12 @@ module.exports = {
       network_id: 80001,
       production: true,
     },
+    sepolia: {
+      provider: () =>
+        new HDWalletProvider(MNEMONIC,`https://ethereum-sepolia.blockpi.network/v1/rpc/public/${ALCHEMY_ID}`),
+      network_id: 11155111,
+      production: true,
+    },
     
   },
 
