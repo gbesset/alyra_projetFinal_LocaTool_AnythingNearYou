@@ -11,9 +11,9 @@
 
 ## Documentation
 ### Schémas
-- [Workflow utilisateur](/documentation/doc_workflow_utilisateur.md)
-- [Architecture / deploiement & droits](/documentation/doc_architecture.md)
-- [Workflow complet](/documentation/doc_workflow_complet.md)
+- [Workflow utilisateur](./documentation/doc_workflow_utilisateur.md)
+- [Architecture / deploiement & droits](./documentation/doc_architecture.md)
+- [Workflow complet](./documentation/doc_workflow_complet.md)
 
 
 
