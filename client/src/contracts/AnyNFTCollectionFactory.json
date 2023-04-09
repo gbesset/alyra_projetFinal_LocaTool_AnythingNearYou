@@ -5625,12 +5625,75 @@
         }
       },
       "links": {},
-      "address": "0xe9BD4ECB26a1894AA40106f2B6b1D6f3f5D4a550",
-      "transactionHash": "0xd87fa4eb7537ade80ee9b0fbcb76842eb568e3726bc0455df56d4b949024ff99"
+      "address": "0xf60888521662E1Cb09f52af79C336D4bA4322e14",
+      "transactionHash": "0xb2b652d0a27931433c6b93cec590e8cb0eefd7a31bd91aaee231ef41682cbb7d"
+    },
+    "1681048791343": {
+      "events": {
+        "0xbd6a0cb2cc43300f5337ae96695cf21f13aeb0f35b48539e72ae96722cd9d293": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "renter",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "renterCollectionName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "renterCollectionSymbol",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "renterCollectionAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            }
+          ],
+          "name": "NFTCollectionCreated",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x5D4095cD1E47eb126C04188d83Dfb76799C071C1",
+      "transactionHash": "0x1abd12d69be703b069e0659842f3336d4017f15ba3531dcc22f6bde66bed6a09"
     }
   },
   "schemaVersion": "3.4.11",
-  "updatedAt": "2023-04-09T10:36:24.654Z",
+  "updatedAt": "2023-04-09T14:02:30.659Z",
   "networkType": "ethereum",
   "devdoc": {
     "author": "https://github.com/gbesset",

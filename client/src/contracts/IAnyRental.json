@@ -7389,7 +7389,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.11",
-  "updatedAt": "2023-04-09T09:46:29.320Z",
+  "updatedAt": "2023-04-09T13:52:03.770Z",
   "devdoc": {
     "events": {
       "NFTCollectionCreated(address,string,address,uint256)": {
