@@ -28,10 +28,13 @@
 ![Partie 2](./Documentation/Ressources/TUs/tu_2.png)
 ![Résumé](./Documentation/Ressources/TUs/tu_3.png)
 
+## Gas reporter
+![Gas reporter](./Documentation/Ressources/TUs/gas-reporter.png)
+
 ## PR et CI
 Utilisation de github actions pour déclencher les TUs a chaque PR.
 
-Puis deploiiuement auto sur Vercel
+Puis deploiement auto sur Vercel
 
 ![Branches & PR](./Documentation/Ressources/CI-CD/mergePR.png)
 ![github action](./Documentation/Ressources/CI-CD/githubActions.png)
