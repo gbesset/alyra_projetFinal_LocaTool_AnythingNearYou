@@ -1,7 +1,8 @@
-# Documentation
+# Architecture - Droits
 
 ## Présentation de l'application
 [Slides de presentation](https://any-presentation.vercel.app/)
+
 ## Contrats
 ![contrats](./Ressources/Architecture/contrats.png)
 

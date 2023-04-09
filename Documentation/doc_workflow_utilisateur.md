@@ -1,8 +1,7 @@
-# Documentation
+# Workflow utilisateur
 
 ## Présentation de l'application
 [Slides de presentation](https://any-presentation.vercel.app/)
-## Schémas de l'application
 
 ## Workflow Utilisateur
 ### Création / déposer une annonce
