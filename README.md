@@ -23,6 +23,13 @@
 - Gradients effectués avec [mesher](https://csshero.org/mesher/)
 - Présentation effectuée avec [reveal.js](https://revealjs.com/)
 
+## Tests et couverture de code
+![Partie 1](./Documentation/Ressources/TUs/tu_1.png)
+![Partie 2](./Documentation/Ressources/TUs/tu_2.png)
+![Résumé](./Documentation/Ressources/TUs/tu_3.png)
+
+## PR et CI
+Utilisation de github actions pour déclencher les TUs a chaque PR
 
 ## Developpeur - (Plus tard)
 Problème de deploiement sur Vercel (les clées de .env ne sont pas prises en compte)
