@@ -7,7 +7,6 @@ import "./AnyNFTCollection.sol";
 import "./AnyNFTCollectionFactory.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "./Utils.sol";
-//import "../node_modules/@ganache/console.log/console.sol";
 
 /**
  * @title Rental Any  contract 
@@ -24,18 +23,16 @@ contract AnyRental is Ownable, IAnyRental{
     Counters.Counter private rentalIds;
 
 
-    // mapping of  a user address to the rented tools
+    // mapping of  a renter address to the rented tools
     mapping (address => RentalReference) private userRentals;
 
-
-
-    // list of all the renters address
+    // list of all the owner address
     address[] rentersList;
 
-    // mapping of a renter address to its collection
+    // mapping of a owner address to its collection
     mapping (address => CollectionNFT) private rentersCollection;
     
-    // mapping of a renter address to its rentals
+    // mapping of a owner address to its rentals
     mapping (address => Rental[]) public rentersRentals;
     uint256 public nbRentalMax = 20;
 
@@ -46,6 +43,18 @@ contract AnyRental is Ownable, IAnyRental{
         factory = AnyNFTCollectionFactory(_anyNFTFactory);
     }
 
+
+        /**
+        *   /!\ Sur le naming des variables,  un        loueur fait une location a un locataire
+        *    je suis initialement parti sur             renter           rental       user
+        *    avant de me rendre compte que Loueur se disait owner et locataire renter
+        *    j'ai donc changé les variables en          owner ->         rental ->    renter              
+        * 
+        *   J'ai donc essayé de clarifier cela.
+        *       => Dans tous les commentaires ca doit etre OK.   (ils font fois pour la compréhension)
+        *       => Dans le code je nai pas pris le risque de changer avec le front qui interragi dessus au risque de tout casser
+        *   il me faudrait une passe de plus pour renommer. :/
+        */
 
     /* ***********************************************
     *   Modifiers 
@@ -66,12 +75,9 @@ contract AnyRental is Ownable, IAnyRental{
      */
     modifier ownerMustExist(address _owner) {
         require(rentersCollection[_owner].collection != address(0), "Owner does not exist");
-        //require(rentersRentals[_owner].length>0, "Owner does not exist");
         _;
     }
              
-
-
 
     /* ***********************************************
     *   Setters 
@@ -81,18 +87,15 @@ contract AnyRental is Ownable, IAnyRental{
         nbRentalMax = _nb;
     }
 
-   
-
     /* ***********************************************
     *   Getters 
     *********************************************** */
      /** 
      * @notice return the NFT Tools from a owner address
-     * @dev get collection from renter Address
+     * @dev get collection from owner Address
      * @return Tool[]  (NFT attributes)
      */
     function getToolsCollection(address _owner) ownerMustExist(_owner) external view returns(Utils.Tool[] memory){
-        //return factory._rentersCollection().tools();
         IAnyNFTCollection collec = IAnyNFTCollection(rentersCollection[_owner].collection);
         return collec.getTools();
     }
@@ -105,14 +108,6 @@ contract AnyRental is Ownable, IAnyRental{
         return rentersCollection[_owner].collection;
     }
     
-    /*function getCollections()external view returns(Utils.Tool[] memory){
-        // pour toutes les addresses
-        // concatener les collections
-        // renvoyer l'ensemble
-        //ou en js appeler les differentes collections pour les addresses..?
-    }*/
-
-
     /** 
      * @notice return the Rentals Owners
      * @dev get owners 
@@ -188,25 +183,6 @@ contract AnyRental is Ownable, IAnyRental{
         }
         return found;
     }
-
-    /** 
-     * @notice return a Rental by the  rentalId
-     * @dev Internal ! very bad complexity.... don't use often !
-     * @return Rental 
-     */
-    /* function getRentalByRentalId(uint _rentalId) internal view returns(Rental memory){
-        Rental memory rentalFound;
-         for(uint i; i< rentersList.length; i++){
-            Rental[] memory rentalsTmp = rentersRentals[rentersList[i]];
-            for(uint j; j<rentalsTmp.length; j++){
-                if(rentalsTmp[j].rentalID == _rentalId){
-                     rentalFound=rentalsTmp[j];
-                    break;
-                }
-            }   
-        }
-        return rentalFound;
-     }*/
     
     /**
     * @notice return if the address is defined as an owner
@@ -230,7 +206,7 @@ contract AnyRental is Ownable, IAnyRental{
     *   Functions  - NFT Managment
     *********************************************** */
     /**
-     * @notice Create the NFT Collection of a renter
+     * @notice Create the NFT Collection of a owner
      * @return collectionCreated : colletion address deployed
      */
     function createCollection(string memory _collectionName, string memory _collectionSymbol) external returns(address){
@@ -239,7 +215,6 @@ contract AnyRental is Ownable, IAnyRental{
         require(!Utils.isEqualString(_collectionName,""), "collection name can't be empty");
 
          address collectionAddress = factory.createAnyNFTCollection(msg.sender, _collectionName, _collectionSymbol);
-         //AnyNFTCollection collectionCreated = AnyNFTCollection(collectionAddress);
 
         // update Renters Collection
         rentersCollection[msg.sender].collection = collectionAddress;
@@ -256,7 +231,7 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
     /**
-     * @notice renter delete its NFT Collection of a
+     * @notice owner delete its NFT Collection of a
      */
     function deleteCollection() external onlyRentalOwner{
         require(msg.sender != address(0), "address zero is not valid");
@@ -315,9 +290,10 @@ contract AnyRental is Ownable, IAnyRental{
     }
 
       /**
-     * @dev delegate the NFT to a user . onlyRentalOwner
+     * @dev delegate the NFT to a renter . onlyRentalOwner
+     * @dev use the direct collection acces instead
      */
-    function delegateNFT(uint _tokenId, address _to, uint64 _expires) external onlyRentalOwner {
+    /*function delegateNFT(uint _tokenId, address _to, uint64 _expires) external onlyRentalOwner {
         require(rentersCollection[msg.sender].collection!=address(0), "You don't have any collection");
         require(rentersCollection[msg.sender].owner==msg.sender, "You are not the owner of the collection");
 
@@ -329,7 +305,7 @@ contract AnyRental is Ownable, IAnyRental{
          collec.rentTool(_tokenId, _to, _expires, msg.sender);
 
         emit RentalNFTToolDelegated(msg.sender, _to, rentersCollection[msg.sender].collection, _tokenId, block.timestamp);
-    }
+    }*/
 
 
     /* ***********************************************
@@ -398,9 +374,9 @@ contract AnyRental is Ownable, IAnyRental{
 
 
  /**
-     * @notice user send the location and caution which in order to ask for the rental of a Rental
+     * @notice renter send the location and caution which in order to ask for the rental of a Rental
      * - the caution and location is secured until
-     * @dev user send caution and location price for rent a Rental
+     * @dev rener send caution and location price for rent a Rental
      */
      function sendPaiementForRental(address _owner, uint _rentalID, uint64 _begin, uint64 _end) ownerMustExist(_owner) external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -425,9 +401,9 @@ contract AnyRental is Ownable, IAnyRental{
      }
 
    /**
-     * @notice renter delegate the NFT in order to validate the rental asking
+     * @notice owner delegate the NFT in order to validate the rental asking
      * - the caution and location is still secured
-     * @dev renter validate the delagation of the NFT
+     * @dev owner validate the delagation of the NFT
      */
      function validateNFTDelegationForRental(uint _rentalID, uint _tokenID) ownerMustExist(msg.sender)  external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -448,9 +424,9 @@ contract AnyRental is Ownable, IAnyRental{
 
 
     /**
-     * @notice user get the tool in real life, has the NFT and valiate the transaction
+     * @notice renter get the tool in real life, has the NFT and valiate the transaction
      * - the caution is still secured, the location is payed
-     * @dev user validate having the NFT, annd receipt the tool
+     * @dev renter validate having the NFT, annd receipt the tool
      */
      function validateNFTandToolReception(address _owner, uint _rentalID) ownerMustExist(_owner)  external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -470,9 +446,9 @@ contract AnyRental is Ownable, IAnyRental{
      }
 
     /**
-     * @notice user give back the tool at the end of renting
+     * @notice renter give back the tool at the end of renting
      * - the caution is still secured, the location is already payed
-     * @dev user give bak the tool
+     * @dev renter give bak the tool
      */
      function giveBackToolAfterRental(address _owner, uint _rentalID) ownerMustExist(_owner) external{
         require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -493,9 +469,9 @@ contract AnyRental is Ownable, IAnyRental{
      }  
      
     /**
-     * @notice renter validate the return of the tool
+     * @notice owner validate the return of the tool
      * - the caution is given back
-     * @dev renter validae the return of the tool
+     * @dev owner validate the return of the tool
      */
      function validateReturnToolAfterRental(uint _rentalID) ownerMustExist(msg.sender)  external{
         require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -513,9 +489,9 @@ contract AnyRental is Ownable, IAnyRental{
      } 
 
     /**
-     * @notice renter doens't validate the return of the tool. Problem. dispute creation
+     * @notice owner doens't validate the return of the tool. Problem. dispute creation
      * - the caution still secured
-     * @dev renter doesn't validate the return of the tool, because of a problem
+     * @dev owner doesn't validate the return of the tool, because of a problem
      */
      function refuseReturnToolAfterRental(uint _rentalID, string memory message)ownerMustExist(msg.sender)  external{
         require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -534,9 +510,9 @@ contract AnyRental is Ownable, IAnyRental{
      }
 
     /**
-     * @notice user confirm dispute and expose its point of view
+     * @notice renter confirm dispute and expose its point of view
      * - the caution still secured
-     * @dev user confirm dispute and expose its point of view
+     * @dev renter confirm dispute and expose its point of view
      */
      function confirmDisputeAfterRental(address _renter, uint _rentalID, string memory message)ownerMustExist(_renter)  external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -554,9 +530,9 @@ contract AnyRental is Ownable, IAnyRental{
      }
 
     /**
-     * @notice user redeem its caution or caution and location
+     * @notice renter redeem its caution or caution and location
      * - the caution is given back at the end of rental or because the renter refuse the rental
-     * @dev user redeem its caution
+     * @dev renter redeem its caution
      */
      function redeemPaymentForRental(address _renter, uint _rentalID) external{
          require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -578,9 +554,9 @@ contract AnyRental is Ownable, IAnyRental{
      }  
 
   /**
-     * @notice user redeem its caution or caution and location
-     * - the caution is given back at the end of rental or because the renter refuse the rental
-     * @dev user redeem its caution
+     * @notice renter redeem its caution or caution and location
+     * - the caution is given back at the end of rental or because the owner refuse the rental
+     * @dev renter redeem its caution
      */
      function rentAgainRental(uint _rentalID) ownerMustExist(msg.sender)  external{
       require(rentalIds.current() >= _rentalID, "Tool does not exist");
@@ -600,7 +576,7 @@ contract AnyRental is Ownable, IAnyRental{
         
         
         emit RentalReAvailable(rental.collection.owner, rental.renter,  rental.collection.collection, rental.tokenID, block.timestamp);
-         }  
+    }  
   
   
 }

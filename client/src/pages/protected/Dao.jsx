@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useEth } from '../../contexts/EthContext';
-import { Heading, Box, Flex, Image, Text } from '@chakra-ui/react';
-
+import { Heading, Box, Flex, Image, Text, Icon } from '@chakra-ui/react';
+import {FaTools } from 'react-icons/fa';
 
 export const Dao = () => {
     const { state: { contract, accounts, artifact} } = useEth();
@@ -36,9 +36,9 @@ export const Dao = () => {
             </Flex>
         </Box>
         </Flex>
-        <Box flex="1" h="100%">
+        <Box mt="3rem" flex="1" h="100%">
             <Text className="text-white" pl="3rem" pt="1rem">
-                DAO en construction.............
+            <Icon as={FaTools} w={5} h={5} color="white.500" mr="1rem" />  DAO en construction.............
             </Text>
         </Box>
         </>

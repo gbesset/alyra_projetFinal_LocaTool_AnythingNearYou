@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { useEth } from '../../contexts/EthContext';
-import { Heading, Box, Text} from '@chakra-ui/react';
+import { Heading, Box, Text, Icon} from '@chakra-ui/react';
 import { Authent } from '../../components/Authent/Authent';
+import {FaTools } from 'react-icons/fa';
 
 export const Renter = () => {
     const { state: { contract, accounts, artifact} } = useEth();
@@ -35,7 +36,7 @@ export const Renter = () => {
                 <> <Heading as="h1">Mes locations</Heading>
                   
                   <Text className="text-white" pl="3rem" pt="1rem">
-                   En construction....
+                  <Icon as={FaTools} w={5} h={5} color="white.500" mr="1rem" /> Page en construction....
                     </Text>
 
                   </>

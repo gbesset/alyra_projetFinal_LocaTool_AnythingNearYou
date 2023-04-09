@@ -1,8 +1,16 @@
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
 import "./AnyNFTCollection.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
+
+/**
+ * @title NFT Collection Factory
+ * @author https://github.com/gbesset
+ * @notice contract to instantiate and deploy a NFTs collection
+ * @dev Instantiate and deploy NFT Collection 
+ */
 contract AnyNFTCollectionFactory is Ownable{
 
 
