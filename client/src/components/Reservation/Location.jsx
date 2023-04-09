@@ -75,8 +75,8 @@ export const Location = ({rental, rentalOwner, updateStatus}) => {
             <VStack mt="2rem">
                     <Heading as="h3" size="lg">Location en cours</Heading>
                     <Box>
-                    <Text>La demande de location a a été effectuée. Les fonds (paiement et caution) sont sécurisés dans le contrat</Text>
-                    <Text>Vous pouvez accepter la demande de location. Pour cela, il faut déléguer votre NFT</Text>
+                    <Text>La location est en cours. Le paiement a été effectué et les fonds (caution) sont sécurisés dans le contrat</Text>
+                    <Text>Vous pouvez restituer l'objet à la fin de la location</Text>
 
                     </Box>
                     <Center>
