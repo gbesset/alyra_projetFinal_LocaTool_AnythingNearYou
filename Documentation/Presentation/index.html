@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./reveal/dist/reveal.css">
+    <link rel="stylesheet" href="./reveal/dist/theme/dracula.css">
+    <link rel="styllesheet" href="./main.css />
+    "
+    <title>Guillaume Besset Présentation</title>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <img src="./../Ressources/logo.png" width="60%"/>
+                <p>Guillaume Besset</p>
+                <p><small>Promo Satoshi</small></p>
+            </section>
+          
+            <section>
+                <section>
+                    <h2>Projet</strong></h2>
+                </section>
+                <section>
+                    <p >Application de location entre particuliers</p>
+                    <p >concept: </p>
+                    <ul>
+                        <li class="fragment">Objets qui ne servent pas souvent</li>
+                        <li class="fragment">Objets qui ont de la valeur</li>
+                        <li class="fragment">Philosophie de ne pas acheter -> louer</li>
+                        <li class="fragment">Bricoleurs, vacanciers</li>
+                        <li class="fragment">Economie locale</li>
+                        <li class="fragment">Point d'entée dans la crypto</li>
+                    </ul> 
+
+                 </section>
+             </section>
+            
+            <section>            
+                    <section>
+                        <h2>Besoin utilisateurs</h2>
+                    </section>
+                    <section>
+                        <h2>Besoins</h2>
+                        <ul>
+                            <li class="fragment">Connection</li>
+                            <li class="fragment">Création d'un compte</li>
+                            <li class="fragment">Déposer (Supprimer / modifier) une annonce</li>
+                            <li class="fragment">Suivre une annonce</li>
+                            <li class="fragment">Gestion de litige</li>
+                            <li class="fragment">Décentrlisation / sécurité / traçabilité </li>
+                        </ul> 
+                    </section>
+                    <section>
+                        <h2>Mise en place</h2>
+                        
+                        <ul>
+                            <li class="fragment">(connection) => Wallet Metamask</li>
+                            <li class="fragment">(compte) => Création d'une collection NFT & smart contract</li>
+                            <li class="fragment">(annonce) => Mint d'un NFT et création d'une location dans un smartcontrat</li>
+                            <li class="fragment">(suivi) => Smart contrat offre la possibilité de suivre ses annonces</li>
+                            <li class="fragment">(litige) => DAO pour la geston de litige et gouvernance du projet</li>
+                            <li class="fragment">(décentralisation, ...) => Blockchain</li>
+                        </ul> 
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Workflow utilisateur</h2>
+                        
+                        <ul>
+                            <li >Création d'une collection et location</li>
+                            <li >Workflow complet location</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <img src="./../Ressources/user_workflow/user_workflow_creation.png" />
+                    </section>
+                    <section>
+                        <img src="./../Ressources/user_workflow/user_workflow_location.png" width="auto" height="700"/>
+                    </section>
+
+            </section>
+          
+            <section>
+                    <section>
+                        <h2>Architecture</h2>
+                    </section>
+                   <section>
+                        <ul>
+                            <li> un contrat basé sur ERC-4907 (et ERC-721)</li>
+                            <li> un contrat Factory et un contrat Collection</li>
+                            <li> Contrat de location</li>
+                        </ul>
+                </section>
+                <section>
+                    <img src="./../Ressources/Architecture/contrats.png" width="auto" height="500" />
+                </section>
+            </section>
+
+            <section>
+                <section>
+                    <h2>Deploiement / Droits</h2>
+                 </section>
+                   <section>
+                       <img src="./../Ressources/Permissions/permissions_1.png" width="auto" height="500" />
+                    </section>
+                    <section>
+                        <img src="./../Ressources/Permissions/permissions_2.png" width="auto" height="500" />
+                     </section>
+                     <section>
+                        <img src="./../Ressources/Permissions/permissions_3.png" width="auto" height="500" />
+                     </section>
+                     <section>
+                        <img src="./../Ressources/Permissions/permissions_4.png" width="auto" height="500" />
+                     </section>
+            </section>
+            <section>
+                <section>
+                    <h2>Workflow complet</h2>
+                 </section>
+                   <section>
+                       <img src="./../Ressources/Workflow/workflow_creation.png" width="auto" height="500" />
+                    </section>
+                    <section>
+                        <img src="./../Ressources/Workflow/workflow_location.png" width="auto" height="700" />
+                     </section>
+            </section>
+    
+        
+            <section>
+                <h2>Démo : prochaine vidéo</h2>
+            </section>
+        </div>
+    </div>
+
+    <script type="module">
+        import Reveal from './reveal/dist/reveal.esm.js';
+        import RevealNotes from  './reveal/plugin/notes/notes.esm.js';
+        import RevealMarkdown from  './reveal/plugin/markdown/markdown.esm.js';
+        import RevealHighlight from  './reveal/plugin/highlight/highlight.esm.js';
+        Reveal.initialize({
+            hash: true,
+            plugins: [RevealNotes, RevealMarkdown, RevealHighlight]
+        });
+    </script>
+</body>
+
+</html>
